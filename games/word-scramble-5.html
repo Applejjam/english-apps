@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Scramble 5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#E9FBF3; --card:#FFFFFF; --ink:#1F2D2A; --muted:#6F8580; --line:#CDEBDD;
+    --brand:#14B87A; --brand-d:#0E8F5E; --tile:#FFD84D; --tile-d:#E0B21E; --bad:#EF4A5E; --blue:#3D8BFD; --purple:#8B5CF6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+       font-family:'Jua','Noto Sans KR',sans-serif; -webkit-tap-highlight-color:transparent; user-select:none}
+  .en{font-family:'Nunito',sans-serif; font-weight:900}
+  button{font-family:inherit; cursor:pointer; border:none}
+  .wrap{max-width:760px; margin:0 auto; padding:16px}
+  .hide{display:none !important}
+
+  .top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px}
+  .pill{background:var(--card); border:2px solid var(--line); border-radius:999px; padding:8px 14px; font-size:16px; color:var(--ink); text-decoration:none}
+  .stats{display:flex; gap:8px}
+
+  .screen{display:none} .screen.on{display:block}
+
+  /* 시작 */
+  .hero{text-align:center; padding:16px 8px 4px}
+  .badge{display:inline-block; background:var(--brand); color:#fff; border-radius:999px; padding:4px 14px; font-size:16px}
+  .hero h1{font-size:46px; margin:10px 0 4px; color:var(--brand-d)}
+  .hero p{font-size:19px; color:var(--muted); margin:0}
+  .demo{display:flex; justify-content:center; gap:6px; margin:16px 0 4px}
+  .demo span{width:44px; height:50px; line-height:50px; text-align:center; background:var(--tile); border-radius:10px; font-size:26px; box-shadow:0 4px 0 var(--tile-d)}
+  .demo span:nth-child(odd){transform:rotate(-6deg)} .demo span:nth-child(even){transform:rotate(5deg)}
+  .label{font-size:19px; margin:22px 0 10px}
+  .label small{color:var(--muted); font-size:15px}
+  .topics{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{background:var(--card); border:2px solid var(--line); border-radius:999px; padding:9px 16px; font-size:16px; color:var(--muted)}
+  .chip.on{background:var(--brand); border-color:var(--brand); color:#fff}
+  .modes{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .mode{background:var(--card); border:3px solid var(--line); border-radius:22px; padding:20px 10px; font-size:22px; color:var(--ink); transition:transform .15s, border-color .15s}
+  .mode:hover{transform:translateY(-3px); border-color:var(--brand)}
+  .mode .ico{font-size:44px; display:block; margin-bottom:4px}
+  .mode small{display:block; font-size:14px; color:var(--muted); margin-top:4px}
+  .how{background:var(--card); border:2px dashed var(--line); border-radius:18px; padding:12px 16px; margin-top:16px; font-size:15px; color:var(--muted); line-height:1.8}
+  .note{text-align:center; color:var(--bad); font-size:15px; margin-top:10px; min-height:20px}
+
+  /* 게임 */
+  .bar{height:12px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:6px}
+  .bar i{display:block; height:100%; width:0; background:var(--brand); border-radius:99px; transition:width .3s linear}
+  .bar.timer i{background:var(--tile-d)}
+  .bar.danger i{background:var(--bad)}
+  .meta{display:flex; justify-content:space-between; color:var(--muted); font-size:15px; margin-bottom:10px}
+  .qcard{background:var(--card); border:3px solid var(--line); border-radius:28px; padding:22px 16px 20px; text-align:center}
+  .clue{display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap}
+  .clue .emoji{font-size:58px; line-height:1}
+  .clue .meaning{font-size:38px; word-break:keep-all}
+  .listen{background:#EAF2FF; color:var(--blue); border-radius:999px; padding:8px 14px; font-size:16px; margin-top:10px}
+
+  .slots, .tiles{display:flex; justify-content:center; flex-wrap:wrap; gap:8px}
+  .slots{margin:22px 0 6px; min-height:66px}
+  .slot{width:52px; height:62px; border-radius:12px; border:3px dashed var(--line); background:#F7FDFA; font-size:32px; line-height:56px; text-align:center; color:var(--ink); padding:0}
+  .slot.filled{border-style:solid; border-color:var(--brand); background:#fff}
+  .slot.locked{background:var(--brand); border-color:var(--brand); color:#fff}
+  .slot.wrong{border-color:var(--bad); color:var(--bad); background:#FFF0F2}
+  .slots.done .slot{background:var(--brand); border-color:var(--brand); color:#fff; animation:bounce .45s ease both}
+  .slots.done .slot:nth-child(2){animation-delay:.04s} .slots.done .slot:nth-child(3){animation-delay:.08s}
+  .slots.done .slot:nth-child(4){animation-delay:.12s} .slots.done .slot:nth-child(5){animation-delay:.16s}
+  .slots.done .slot:nth-child(6){animation-delay:.2s}  .slots.done .slot:nth-child(7){animation-delay:.24s}
+  .slots.done .slot:nth-child(n+8){animation-delay:.28s}
+  @keyframes bounce{0%{transform:translateY(0)}40%{transform:translateY(-14px)}100%{transform:translateY(0)}}
+  .tiles{margin-top:14px; min-height:66px}
+  .tile{width:52px; height:58px; border-radius:12px; background:var(--tile); box-shadow:0 5px 0 var(--tile-d); font-size:30px; color:var(--ink); padding:0; transition:transform .1s}
+  .tile:hover:not(:disabled){transform:translateY(-3px)}
+  .tile:active:not(:disabled){transform:translateY(3px); box-shadow:0 2px 0 var(--tile-d)}
+  .tile.used{visibility:hidden}
+  .shake{animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+  .tools{display:flex; justify-content:center; gap:8px; margin-top:16px; flex-wrap:wrap}
+  .btn{border-radius:16px; padding:11px 16px; font-size:17px; color:#fff; background:var(--brand)}
+  .btn.soft{background:var(--card); color:var(--ink); border:3px solid var(--line)}
+  .btn.go{background:var(--brand); box-shadow:0 5px 0 var(--brand-d)}
+  .btn.voice{background:var(--purple); box-shadow:0 5px 0 #6D3FD6}
+  .btn.voice.on{background:var(--bad); box-shadow:0 5px 0 #B83244; animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+  .feedback{text-align:center; font-size:23px; min-height:34px; margin:14px 0 2px}
+  .feedback.good{color:var(--brand-d)} .feedback.bad{color:var(--bad)}
+  .heard{text-align:center; font-size:15px; color:var(--muted); min-height:20px}
+  .after{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:8px}
+
+  /* 결과 */
+  .result{text-align:center; padding:18px 6px}
+  .result .big{font-size:64px}
+  .result h2{font-size:38px; margin:6px 0 2px}
+  .result p{font-size:20px; color:var(--muted); margin:0 0 16px}
+  .review{background:var(--card); border:3px solid var(--line); border-radius:22px; padding:16px; text-align:left; margin:0 auto 18px; max-width:520px}
+  .review h3{margin:0 0 8px; font-size:18px}
+  .review ul{list-style:none; margin:0; padding:0}
+  .review li{display:flex; align-items:center; gap:10px; padding:8px 4px; border-top:1px solid var(--line); font-size:18px}
+  .review li:first-child{border-top:none}
+  .review li .w{flex:1}
+  .review li button{background:#EAF2FF; color:var(--blue); border-radius:999px; padding:5px 11px; font-size:15px}
+  .result .after .btn{padding:13px 20px; font-size:19px}
+
+  @media (max-width:560px){
+    .slot,.tile{width:40px; height:50px; font-size:24px; line-height:44px}
+    .tile{line-height:normal}
+    .clue .meaning{font-size:30px} .clue .emoji{font-size:46px}
+    .hero h1{font-size:36px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a class="pill" href="../index.html">← 목록</a>
+    <div class="stats">
+      <div class="pill hide" id="timerPill">⏱ <span id="timeLeft">60</span></div>
+      <div class="pill">⭐ <span id="score">0</span></div>
+    </div>
+  </div>
+
+  <!-- 1. 시작 -->
+  <section id="start" class="screen on">
+    <div class="hero">
+      <span class="badge">5학년</span>
+      <div class="demo en"><span>R</span><span>W</span><span>D</span><span>O</span></div>
+      <h1 class="en">Word Scramble</h1>
+      <p>뒤죽박죽 알파벳을 바르게 세워 단어를 완성해요!</p>
+    </div>
+
+    <div class="label">① 범위 고르기 <small>(여러 개 선택 가능)</small></div>
+    <div class="topics" id="topics"></div>
+
+    <div class="label">② 방법 고르기</div>
+    <div class="modes">
+      <button class="mode" data-mode="practice"><span class="ico">🧩</span>연습해요<small>10문제 · 힌트와 말하기 보너스</small></button>
+      <button class="mode" data-mode="challenge"><span class="ico">⏱️</span>60초 도전<small>제한 시간 안에 최대한 많이!</small></button>
+    </div>
+    <div class="how">
+      🖱️ 노란 글자를 누르면 칸에 들어가요. 칸의 글자를 누르면 다시 빠져요.<br>
+      ⌨️ 키보드로 글자를 치고, <b>Backspace</b>로 지워요.<br>
+      🎤 맞힌 뒤 단어를 소리 내어 말하면 보너스 ⭐ (연습해요, 크롬)
+    </div>
+    <div class="note" id="note"></div>
+  </section>
+
+  <!-- 2. 게임 -->
+  <section id="play" class="screen">
+    <div class="bar" id="barBox"><i id="bar"></i></div>
+    <div class="meta"><span id="topicName"></span><span id="count"></span></div>
+
+    <div class="qcard" id="qcard">
+      <div class="clue"><span class="emoji" id="emoji"></span><span class="meaning" id="meaning"></span></div>
+      <button class="listen" id="listen">🔊 들어보기</button>
+      <div class="slots en" id="slots"></div>
+      <div class="tiles en" id="tiles"></div>
+    </div>
+
+    <div class="tools" id="tools">
+      <button class="btn soft" id="hintBtn">💡 한 글자 힌트</button>
+      <button class="btn soft" id="resetBtn">↺ 다시 섞기</button>
+      <button class="btn soft" id="skipBtn">넘어가기</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+    <div class="after hide" id="after">
+      <button class="btn voice hide" id="voiceBtn">🎤 말하고 보너스 ⭐</button>
+      <button class="btn go" id="nextBtn">다음 ▶</button>
+    </div>
+    <div class="heard" id="heard"></div>
+  </section>
+
+  <!-- 3. 결과 -->
+  <section id="end" class="screen">
+    <div class="result">
+      <div class="big" id="big"></div>
+      <h2 class="en" id="endTitle"></h2>
+      <p id="endText"></p>
+      <div class="review" id="review">
+        <h3>📒 다시 볼 단어</h3>
+        <ul id="reviewList"></ul>
+      </div>
+      <div class="after">
+        <button class="btn go" id="again">다시 하기</button>
+        <button class="btn soft" id="toStart">처음으로</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* =========================================================
+   ✏️ 선생님 수정 구역
+   - topic: 범위 이름 (교과서 단원 이름으로 바꿔도 좋아요)
+   - word: 영어 단어 (띄어쓰기 없는 한 단어로 넣어 주세요)
+   - meaning: 우리말 뜻 / emoji: 그림 힌트 (없으면 "" 로 비워 두기)
+   - PRACTICE_ROUNDS: 연습 문제 수 / CHALLENGE_SECONDS: 도전 시간(초)
+   ========================================================= */
+const WORDS = [
+  // 학교생활
+  { topic:"학교생활", word:"science",  meaning:"과학",   emoji:"🔬" },
+  { topic:"학교생활", word:"music",    meaning:"음악",   emoji:"🎵" },
+  { topic:"학교생활", word:"math",     meaning:"수학",   emoji:"➗" },
+  { topic:"학교생활", word:"history",  meaning:"역사",   emoji:"🏛️" },
+  { topic:"학교생활", word:"subject",  meaning:"과목",   emoji:"📚" },
+  { topic:"학교생활", word:"teacher",  meaning:"선생님", emoji:"🧑‍🏫" },
+  { topic:"학교생활", word:"classroom",meaning:"교실",   emoji:"🏫" },
+  { topic:"학교생활", word:"eraser",   meaning:"지우개", emoji:"🧽" },
+  // 하루 일과
+  { topic:"하루 일과", word:"wake",     meaning:"(잠에서) 깨다", emoji:"⏰" },
+  { topic:"하루 일과", word:"breakfast",meaning:"아침 식사",     emoji:"🍳" },
+  { topic:"하루 일과", word:"lunch",    meaning:"점심 식사",     emoji:"🍱" },
+  { topic:"하루 일과", word:"dinner",   meaning:"저녁 식사",     emoji:"🍽️" },
+  { topic:"하루 일과", word:"homework", meaning:"숙제",          emoji:"📝" },
+  { topic:"하루 일과", word:"usually",  meaning:"보통, 대개",    emoji:"🔁" },
+  { topic:"하루 일과", word:"always",   meaning:"항상",          emoji:"♾️" },
+  { topic:"하루 일과", word:"sleep",    meaning:"자다",          emoji:"😴" },
+  // 날씨와 계절
+  { topic:"날씨와 계절", word:"sunny",  meaning:"화창한",   emoji:"☀️" },
+  { topic:"날씨와 계절", word:"cloudy", meaning:"흐린",     emoji:"☁️" },
+  { topic:"날씨와 계절", word:"rainy",  meaning:"비 오는",  emoji:"🌧️" },
+  { topic:"날씨와 계절", word:"windy",  meaning:"바람 부는",emoji:"🌬️" },
+  { topic:"날씨와 계절", word:"snowy",  meaning:"눈 오는",  emoji:"🌨️" },
+  { topic:"날씨와 계절", word:"spring", meaning:"봄",       emoji:"🌸" },
+  { topic:"날씨와 계절", word:"summer", meaning:"여름",     emoji:"🏖️" },
+  { topic:"날씨와 계절", word:"winter", meaning:"겨울",     emoji:"⛄" },
+  // 음식
+  { topic:"음식", word:"bread",    meaning:"빵",     emoji:"🍞" },
+  { topic:"음식", word:"cheese",   meaning:"치즈",   emoji:"🧀" },
+  { topic:"음식", word:"noodles",  meaning:"국수",   emoji:"🍜" },
+  { topic:"음식", word:"salad",    meaning:"샐러드", emoji:"🥗" },
+  { topic:"음식", word:"carrot",   meaning:"당근",   emoji:"🥕" },
+  { topic:"음식", word:"potato",   meaning:"감자",   emoji:"🥔" },
+  { topic:"음식", word:"orange",   meaning:"오렌지", emoji:"🍊" },
+  { topic:"음식", word:"hungry",   meaning:"배고픈", emoji:"🤤" },
+  // 취미와 운동
+  { topic:"취미와 운동", word:"soccer",   meaning:"축구",       emoji:"⚽" },
+  { topic:"취미와 운동", word:"baseball", meaning:"야구",       emoji:"⚾" },
+  { topic:"취미와 운동", word:"swimming", meaning:"수영",       emoji:"🏊" },
+  { topic:"취미와 운동", word:"guitar",   meaning:"기타",       emoji:"🎸" },
+  { topic:"취미와 운동", word:"camping",  meaning:"캠핑",       emoji:"🏕️" },
+  { topic:"취미와 운동", word:"drawing",  meaning:"그림 그리기",emoji:"🎨" },
+  { topic:"취미와 운동", word:"cooking",  meaning:"요리하기",   emoji:"👩‍🍳" },
+  { topic:"취미와 운동", word:"hobby",    meaning:"취미",       emoji:"🧩" },
+  // 감정
+  { topic:"감정", word:"happy",    meaning:"행복한",   emoji:"😊" },
+  { topic:"감정", word:"angry",    meaning:"화난",     emoji:"😠" },
+  { topic:"감정", word:"tired",    meaning:"피곤한",   emoji:"🥱" },
+  { topic:"감정", word:"worried",  meaning:"걱정하는", emoji:"😟" },
+  { topic:"감정", word:"excited",  meaning:"신이 난",  emoji:"🤩" },
+  { topic:"감정", word:"bored",    meaning:"지루한",   emoji:"😑" },
+  { topic:"감정", word:"scared",   meaning:"무서워하는",emoji:"😨" },
+  { topic:"감정", word:"proud",    meaning:"자랑스러운",emoji:"😌" }
+];
+const PRACTICE_ROUNDS = 10;
+const CHALLENGE_SECONDS = 60;
+/* ========================================================= */
+
+const $ = s => document.querySelector(s);
+const TOPICS = [...new Set(WORDS.map(w=>w.topic))];
+let picked = new Set(TOPICS);
+let mode, deck, idx, score, solvedCount, solved, hintsUsed, missed, letters, slots, locked, timer, endAt, bonusDone;
+
+/* ---------- 도구 ---------- */
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const show = id => { document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on")); $("#"+id).classList.add("on"); window.scrollTo(0,0); };
+const replay = (el,c) => { el.classList.remove(c); void el.offsetWidth; el.classList.add(c); };
+const setScore = () => $("#score").textContent = score;
+
+let actx;
+function tone(freqs, type="sine"){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const t=actx.currentTime;
+    freqs.forEach((f,i)=>{
+      const o=actx.createOscillator(), g=actx.createGain(), s=t+i*0.1;
+      o.type=type; o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.2,s+0.015); g.gain.exponentialRampToValueAtTime(0.0001,s+0.16);
+      o.connect(g).connect(actx.destination); o.start(s); o.stop(s+0.18);
+    });
+  }catch(e){}
+}
+const clickSound = () => tone([880],"triangle");
+
+let enVoice=null;
+function pickVoice(){
+  const vs=speechSynthesis.getVoices();
+  enVoice = vs.find(v=>v.lang==="en-US" && /Google|Samantha|Microsoft/i.test(v.name)) || vs.find(v=>v.lang && v.lang.startsWith("en")) || null;
+}
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged=pickVoice; }
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text); u.lang="en-US"; if(enVoice) u.voice=enVoice; u.rate=0.85;
+  speechSynthesis.speak(u);
+}
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+/* ---------- 시작 화면 ---------- */
+function drawTopics(){
+  const box=$("#topics"); box.innerHTML="";
+  const all=document.createElement("button");
+  all.className="chip"+(picked.size===TOPICS.length?" on":""); all.textContent="전체";
+  all.onclick=()=>{ picked = picked.size===TOPICS.length? new Set(): new Set(TOPICS); drawTopics(); };
+  box.appendChild(all);
+  TOPICS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="chip"+(picked.has(t)?" on":""); b.textContent=`${t} (${WORDS.filter(w=>w.topic===t).length})`;
+    b.onclick=()=>{ picked.has(t)?picked.delete(t):picked.add(t); drawTopics(); };
+    box.appendChild(b);
+  });
+}
+drawTopics();
+
+document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{
+  if(picked.size===0){ $("#note").textContent="범위를 하나 이상 골라 주세요!"; return; }
+  $("#note").textContent="";
+  startGame(b.dataset.mode);
+}));
+
+function startGame(m){
+  mode=m; idx=0; score=0; solvedCount=0; missed=[]; setScore();
+  const pool=WORDS.filter(w=>picked.has(w.topic));
+  deck = mode==="practice" ? shuffle([...pool]).slice(0,Math.min(PRACTICE_ROUNDS,pool.length)) : shuffle([...pool]);
+  $("#timerPill").classList.toggle("hide", mode!=="challenge");
+  $("#barBox").classList.toggle("timer", mode==="challenge");
+  $("#barBox").classList.remove("danger");
+  $("#hintBtn").classList.toggle("hide", mode==="challenge");
+  show("play");
+  if(mode==="challenge") startTimer();
+  newRound();
+}
+
+/* ---------- 타이머 (60초 도전) ---------- */
+function startTimer(){
+  clearInterval(timer);
+  endAt = Date.now() + CHALLENGE_SECONDS*1000;
+  const tick=()=>{
+    const left=Math.max(0,(endAt-Date.now())/1000);
+    $("#timeLeft").textContent=Math.ceil(left);
+    $("#bar").style.width=(left/CHALLENGE_SECONDS*100)+"%";
+    $("#barBox").classList.toggle("danger", left<=10);
+    if(left<=0){ clearInterval(timer); endGame(); }
+  };
+  tick(); timer=setInterval(tick,200);
+}
+
+/* ---------- 문제 ---------- */
+function scramble(word){
+  const arr=[...word];
+  if(new Set(arr).size<2) return arr;
+  let s; do{ s=shuffle([...arr]); }while(s.join("")===word);
+  return s;
+}
+
+function newRound(){
+  if(idx>=deck.length){
+    if(mode==="challenge"){ deck=deck.concat(shuffle([...deck])); }
+    else return endGame();
+  }
+  const item=deck[idx];
+  solved=false; hintsUsed=0; bonusDone=false;
+  letters = scramble(item.word.toLowerCase()).map((ch,i)=>({ch, id:i, used:false}));
+  slots = new Array(item.word.length).fill(null);
+  locked = new Array(item.word.length).fill(false);
+
+  if(mode==="practice"){
+    $("#bar").style.width=(idx/deck.length*100)+"%";
+    $("#count").textContent=`${idx+1} / ${deck.length}`;
+  }else{
+    $("#count").textContent=`${solvedCount}개 성공`;
+  }
+  $("#topicName").textContent=item.topic;
+  $("#emoji").textContent=item.emoji||"";
+  $("#meaning").textContent=item.meaning;
+  $("#feedback").textContent=""; $("#feedback").className="feedback";
+  $("#heard").textContent="";
+  $("#after").classList.add("hide"); $("#tools").classList.remove("hide");
+  $("#slots").classList.remove("done");
+  draw();
+}
+
+function draw(){
+  const item=deck[idx];
+  const sBox=$("#slots"); sBox.innerHTML="";
+  slots.forEach((tid,i)=>{
+    const b=document.createElement("button");
+    b.className="slot"+(tid!==null?" filled":"")+(locked[i]?" locked":"");
+    b.textContent = tid!==null ? letters[tid].ch : "";
+    b.onclick=()=>removeAt(i);
+    sBox.appendChild(b);
+  });
+  const tBox=$("#tiles"); tBox.innerHTML="";
+  letters.forEach(l=>{
+    const b=document.createElement("button");
+    b.className="tile"+(l.used?" used":""); b.textContent=l.ch;
+    b.onclick=()=>place(l.id);
+    tBox.appendChild(b);
+  });
+}
+
+function place(tid){
+  if(solved || letters[tid].used) return;
+  const pos=slots.indexOf(null); if(pos<0) return;
+  slots[pos]=tid; letters[tid].used=true; clickSound();
+  draw(); checkFull();
+}
+function removeAt(i){
+  if(solved || locked[i] || slots[i]===null) return;
+  letters[slots[i]].used=false; slots[i]=null; draw();
+}
+function removeLast(){
+  for(let i=slots.length-1;i>=0;i--){ if(slots[i]!==null && !locked[i]){ removeAt(i); return; } }
+}
+function clearAll(){
+  slots.forEach((tid,i)=>{ if(tid!==null && !locked[i]){ letters[tid].used=false; slots[i]=null; } });
+}
+
+function checkFull(){
+  if(slots.includes(null)) return;
+  const item=deck[idx];
+  const guess=slots.map(t=>letters[t].ch).join("");
+  if(guess===item.word.toLowerCase()) return success();
+  // 오답: 틀린 칸 표시 후 비우기
+  tone([260,200]);
+  const target=item.word.toLowerCase();
+  [...$("#slots").children].forEach((el,i)=>{ if(!locked[i] && letters[slots[i]].ch!==target[i]) el.classList.add("wrong"); });
+  replay($("#qcard"),"shake");
+  $("#feedback").textContent="빨간 글자를 다시 생각해 볼까요?"; $("#feedback").className="feedback bad";
+  setTimeout(()=>{
+    if(solved) return;
+    slots.forEach((tid,i)=>{ if(tid!==null && !locked[i] && letters[tid].ch!==target[i]){ letters[tid].used=false; slots[i]=null; } });
+    draw();
+  },700);
+}
+
+function success(){
+  solved=true; solvedCount++;
+  const item=deck[idx];
+  const earned = hintsUsed===0 ? 2 : 1;
+  score+=earned; setScore();
+  if(hintsUsed>0 && !missed.includes(item)) missed.push(item);
+  $("#slots").classList.add("done");
+  tone([523,659,784]);
+  setTimeout(()=>speak(item.word),200);
+  $("#feedback").className="feedback good";
+  $("#tools").classList.add("hide");
+
+  if(mode==="challenge"){
+    $("#feedback").textContent="Good! +"+earned;
+    $("#count").textContent=`${solvedCount}개 성공`;
+    setTimeout(()=>{ if(Date.now()<endAt){ idx++; newRound(); } }, 750);
+    return;
+  }
+  $("#feedback").textContent = hintsUsed===0 ? `Perfect! ⭐ +2` : `Good! ⭐ +1 (힌트 사용)`;
+  $("#after").classList.remove("hide");
+  $("#voiceBtn").classList.toggle("hide", !SR);
+  $("#voiceBtn").disabled=false;
+  $("#nextBtn").focus();
+}
+
+/* 버튼 */
+$("#listen").onclick=()=>speak(deck[idx].word);
+$("#resetBtn").onclick=()=>{ if(solved) return; clearAll(); const free=letters.filter(l=>!l.used); const chs=shuffle(free.map(l=>l.ch)); free.forEach((l,i)=>l.ch=chs[i]); draw(); };
+$("#hintBtn").onclick=()=>{
+  if(solved) return;
+  const target=deck[idx].word.toLowerCase();
+  const pos=locked.indexOf(false); if(pos<0) return;
+  clearAll();
+  const tid=letters.find(l=>!l.used && l.ch===target[pos]).id;
+  slots[pos]=tid; letters[tid].used=true; locked[pos]=true; hintsUsed++;
+  draw(); checkFull();
+};
+$("#skipBtn").onclick=()=>{
+  if(solved) return;
+  const item=deck[idx];
+  if(!missed.includes(item)) missed.push(item);
+  if(mode==="challenge"){ idx++; newRound(); return; }
+  solved=true;
+  const target=item.word.toLowerCase();
+  letters.forEach(l=>l.used=true);
+  slots=[...target].map((ch)=>{ const l=letters.find(x=>x.ch===ch && !x._s); l._s=true; return l.id; });
+  letters.forEach(l=>delete l._s);
+  draw(); $("#slots").classList.add("done");
+  setTimeout(()=>speak(item.word),200);
+  $("#feedback").textContent="괜찮아요! 같이 익혀 봐요 😊"; $("#feedback").className="feedback";
+  $("#tools").classList.add("hide"); $("#after").classList.remove("hide"); $("#voiceBtn").classList.add("hide");
+};
+$("#nextBtn").onclick=()=>{ idx++; newRound(); };
+
+/* 🎤 말하기 보너스 */
+let rec=null, listening=false;
+$("#voiceBtn").onclick=()=>{
+  if(bonusDone) return;
+  if(listening && rec){ rec.stop(); return; }
+  const item=deck[idx];
+  speechSynthesis.cancel();
+  rec=new SR(); rec.lang="en-US"; rec.interimResults=false; rec.maxAlternatives=5;
+  rec.onstart=()=>{ listening=true; $("#voiceBtn").classList.add("on"); $("#heard").textContent="듣고 있어요... 말해 보세요!"; };
+  rec.onresult=e=>{
+    const alts=[...e.results[0]].map(r=>r.transcript.toLowerCase().replace(/[^a-z\s]/g,"").trim());
+    const t=item.word.toLowerCase();
+    $("#heard").textContent=`들린 말: "${alts[0]}"`;
+    if(alts.some(a=>(" "+a+" ").includes(" "+t+" ") || a.replace(/\s/g,"")===t)){
+      bonusDone=true; score++; setScore(); tone([659,784,1047]);
+      $("#feedback").textContent="발음 보너스! ⭐ +1"; $("#voiceBtn").disabled=true;
+    }else{
+      $("#heard").textContent+=" · 다시 한번 말해 볼까요? 🔊 들어보기도 눌러 보세요";
+    }
+  };
+  rec.onerror=e=>{
+    $("#heard").textContent = e.error==="no-speech" ? "소리가 들리지 않았어요. 다시 눌러 주세요."
+      : e.error==="not-allowed" ? "마이크 사용을 허용해 주세요." : "다시 한번 눌러 주세요.";
+  };
+  rec.onend=()=>{ listening=false; $("#voiceBtn").classList.remove("on"); };
+  rec.start();
+};
+
+/* ⌨️ 키보드 */
+document.addEventListener("keydown",e=>{
+  if(!$("#play").classList.contains("on")) return;
+  if(e.key==="Enter"){ if(solved && mode==="practice"){ e.preventDefault(); $("#nextBtn").click(); } return; }
+  if(solved) return;
+  if(e.key==="Backspace"){ e.preventDefault(); removeLast(); return; }
+  if(/^[a-zA-Z]$/.test(e.key)){
+    const l=letters.find(x=>!x.used && x.ch===e.key.toLowerCase());
+    if(l) place(l.id); else { replay($("#tiles"),"shake"); }
+  }
+});
+
+/* ---------- 결과 ---------- */
+function endGame(){
+  clearInterval(timer);
+  if(listening && rec) rec.stop();
+  if(mode==="practice"){
+    $("#bar").style.width="100%";
+    const r=solvedCount ? (deck.length-missed.length)/deck.length : 0;
+    $("#big").textContent = r>=0.9?"🏆":r>=0.6?"⭐⭐⭐":r>=0.3?"⭐⭐":"💪";
+    $("#endTitle").textContent = r>=0.9?"Amazing!":r>=0.6?"Great job!":"Nice try!";
+    $("#endText").textContent=`${deck.length}문제 중 ${deck.length-missed.length}문제를 힌트 없이 맞혔어요 · ⭐ ${score}개`;
+  }else{
+    $("#big").textContent = solvedCount>=10?"🏆":solvedCount>=5?"🔥":"💪";
+    $("#endTitle").textContent = solvedCount>=10?"Amazing!":solvedCount>=5?"Great job!":"Nice try!";
+    $("#endText").textContent=`${CHALLENGE_SECONDS}초 동안 ${solvedCount}개 성공! · ⭐ ${score}개`;
+  }
+  const ul=$("#reviewList"); ul.innerHTML="";
+  $("#review").classList.toggle("hide", missed.length===0);
+  missed.forEach(w=>{
+    const li=document.createElement("li");
+    li.innerHTML=`<span class="w">${w.emoji||""} <b class="en">${w.word}</b> · ${w.meaning}</span>`;
+    const b=document.createElement("button"); b.textContent="🔊"; b.onclick=()=>speak(w.word);
+    li.appendChild(b); ul.appendChild(li);
+  });
+  show("end"); tone([523,659,784,1047]);
+}
+$("#again").onclick=()=>startGame(mode);
+$("#toStart").onclick=()=>show("start");
+</script>
+</body>
+</html>
