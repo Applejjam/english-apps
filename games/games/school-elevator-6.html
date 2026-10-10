@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>School Elevator · 6학년 Lesson 1 | NAVI PLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sky:#dff1ff; --sky2:#f7fbff;
+  --brick:#e9734f; --brick-d:#c85a3a;
+  --ink:#24324a; --muted:#6a7891;
+  --paper:#ffffff; --line:#d8e2ef;
+  --c-conn:#2f9e8f;   /* 연결 */
+  --c-func:#3d6fd8;   /* 기능 */
+  --c-pers:#9a4fd0;   /* 관점 */
+  --good:#22a565; --bad:#e04b4b; --gold:#f5b800;
+  --r:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:"Nunito","Jua",system-ui,sans-serif;
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sky) 0%,var(--sky2) 70%,#eaf6e4 100%);
+  min-height:100vh;
+}
+.ko{font-family:"Jua",system-ui,sans-serif;font-weight:400}
+button{font-family:inherit;cursor:pointer}
+.wrap{max-width:980px;margin:0 auto;padding:16px}
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+.brand{font-family:"Jua",sans-serif;font-size:15px;color:var(--muted);letter-spacing:.5px}
+.brand b{color:var(--brick)}
+h1{font-family:"Jua",sans-serif;font-weight:400;font-size:clamp(26px,5vw,40px);margin:4px 0 2px;line-height:1.15}
+.sub{color:var(--muted);font-family:"Jua",sans-serif;font-size:17px;margin:0 0 14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-family:"Jua",sans-serif;font-size:14px;padding:4px 12px;border-radius:999px;color:#fff}
+.chip.conn{background:var(--c-conn)}.chip.func{background:var(--c-func)}.chip.pers{background:var(--c-pers)}
+
+/* ---------- building (home) ---------- */
+.home{margin-top:28px;display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+@media (max-width:760px){.home{grid-template-columns:1fr}}
+.building{position:relative;background:var(--brick);border-radius:12px 12px 0 0;padding:14px 14px 0;box-shadow:0 10px 0 #b9b0a2}
+.roof{position:absolute;left:-10px;right:-10px;top:-18px;height:22px;background:#5b6b85;border-radius:8px}
+.floor-btn{
+  width:100%;display:grid;grid-template-columns:62px 1fr auto;align-items:center;gap:12px;
+  background:#fff8ef;border:none;border-radius:12px;margin-bottom:10px;padding:12px 14px;text-align:left;
+  box-shadow:inset 0 -4px 0 #ecd9c4;transition:transform .12s;
+}
+.floor-btn:hover{transform:translateX(4px)}
+.floor-btn:focus-visible{outline:4px solid var(--gold)}
+.fnum{font-family:"Nunito",sans-serif;font-weight:900;font-size:24px;background:var(--ink);color:#fff;border-radius:10px;text-align:center;padding:8px 0}
+.floor-btn.rooftop{background:#eaf8df;box-shadow:inset 0 -4px 0 #cfe8bb}
+.floor-btn.rooftop .fnum{background:#4c9a3c}
+.ftitle{font-family:"Jua",sans-serif;font-size:19px}
+.fdesc{font-size:14px;color:var(--muted);font-family:"Jua"}
+.ftag{display:inline-block;font-family:"Jua",sans-serif;font-size:12px;color:#fff;border-radius:999px;padding:1px 8px;margin-right:6px;vertical-align:2px}
+.stars{font-size:18px;letter-spacing:1px;white-space:nowrap}
+.stars .off{opacity:.22;filter:grayscale(1)}
+.ground{height:14px;background:#7cb86a;border-radius:0 0 10px 10px}
+.side{background:#fff;border-radius:var(--r);padding:18px;box-shadow:0 4px 0 var(--line)}
+.side h3{font-family:"Jua",sans-serif;font-weight:400;margin:0 0 8px;font-size:20px}
+.side p{margin:6px 0;font-size:15px;line-height:1.55}
+.concept{border-left:5px solid;padding:6px 10px;margin:10px 0;border-radius:4px;background:#f7f9fc}
+.concept b{font-family:"Jua",sans-serif;font-weight:400;font-size:17px}
+.total{font-family:"Jua",sans-serif;font-size:18px;margin-top:12px}
+.reset{background:none;border:none;color:var(--muted);text-decoration:underline;font-size:13px;padding:0;margin-top:6px}
+
+/* ---------- mission screen ---------- */
+.mbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.back{background:#fff;border:2px solid var(--line);border-radius:12px;padding:8px 14px;font-family:"Jua",sans-serif;font-size:16px}
+.mtitle{font-family:"Jua",sans-serif;font-size:22px;flex:1;min-width:180px}
+.dots{display:flex;gap:6px}
+.dot{width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--line)}
+.dot.ok{background:var(--good);border-color:var(--good)}
+.dot.miss{background:var(--gold);border-color:var(--gold)}
+.dot.now{border-color:var(--ink);transform:scale(1.2)}
+.card{background:#fff;border-radius:var(--r);padding:22px;box-shadow:0 6px 0 var(--line);min-height:340px}
+.concept-line{font-family:"Jua",sans-serif;font-size:15px;color:#fff;display:inline-block;padding:4px 12px;border-radius:999px;margin-bottom:12px}
+.prompt{font-family:"Jua",sans-serif;font-size:22px;margin:0 0 6px}
+.prompt-en{font-size:26px;font-weight:900;margin:6px 0}
+.help{color:var(--muted);font-family:"Jua",sans-serif;font-size:15px;margin:0 0 14px}
+
+.big-visual{display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;margin:10px 0 16px}
+.badge{font-family:"Nunito",sans-serif;font-weight:900;font-size:40px;background:#fff4d6;border:3px solid var(--gold);border-radius:18px;padding:10px 22px}
+.emoji{font-size:58px;line-height:1}
+
+/* matching */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mcol{display:flex;flex-direction:column;gap:10px}
+.mitem{border:3px solid var(--line);background:#fff;border-radius:14px;padding:12px;font-size:20px;font-weight:800;min-height:56px}
+.mitem.sel{border-color:var(--c-conn);background:#e8f7f4}
+.mitem.done{border-color:var(--good);background:#e9f8ef;color:#2b7a4b;cursor:default}
+.mitem.wrong{animation:shake .35s;border-color:var(--bad)}
+.mitem .k{font-family:"Jua",sans-serif;font-weight:400;font-size:16px;color:var(--muted);display:block}
+
+/* spelling */
+.slots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:12px 0}
+.slot{width:42px;height:52px;border-bottom:4px solid var(--ink);font-size:30px;font-weight:900;display:flex;align-items:flex-end;justify-content:center;padding-bottom:2px}
+.slot.cur{border-color:var(--c-func);background:#eef3ff;border-radius:6px 6px 0 0}
+.gap{width:22px}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:10px 0}
+.tile{min-width:48px;padding:10px 12px;font-size:22px;font-weight:900;border:none;border-radius:12px;background:#ffe9a8;box-shadow:0 4px 0 #e2c35d;color:var(--ink)}
+.tile:active{transform:translateY(3px);box-shadow:0 1px 0 #e2c35d}
+.tile.used{visibility:hidden}
+.tile.wrong{animation:shake .35s}
+.tile.word{background:#dfe9ff;box-shadow:0 4px 0 #a9bdf0}
+.tile.punct{background:#f1e2ff;box-shadow:0 4px 0 #cba6ef;min-width:44px}
+.answer-line{min-height:64px;border:3px dashed var(--line);border-radius:14px;padding:8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:center;margin:8px 0}
+.answer-line .tile{background:#fff;box-shadow:0 4px 0 var(--line);border:2px solid var(--line)}
+
+/* choice */
+.choices{display:grid;gap:10px;margin-top:8px}
+.choice{text-align:left;border:3px solid var(--line);border-radius:14px;background:#fff;padding:14px 16px;font-size:21px;font-weight:800}
+.choice:hover{border-color:var(--c-func)}
+.choice.right{border-color:var(--good);background:#e9f8ef}
+.choice.wrongc{border-color:var(--bad);background:#fdeeee}
+
+/* typing */
+.sentence-frame{font-size:26px;font-weight:800;text-align:center;margin:10px 0;line-height:1.8}
+.inline-input{font:inherit;font-size:24px;font-weight:900;width:150px;text-align:center;border:none;border-bottom:4px solid var(--c-func);background:#eef3ff;border-radius:6px 6px 0 0;padding:2px 6px;color:var(--ink)}
+.line-input{width:100%;font:inherit;font-size:24px;font-weight:800;border:3px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink)}
+.line-input:focus,.inline-input:focus{outline:none;border-color:var(--c-func)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:14px}
+.btn{border:none;border-radius:14px;padding:12px 22px;font-family:"Jua",sans-serif;font-size:19px;color:#fff;background:var(--ink);box-shadow:0 4px 0 #0f1a2c}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0f1a2c}
+.btn.go{background:var(--good);box-shadow:0 4px 0 #157a47}
+.btn.soft{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.say{background:#ff8a3d;box-shadow:0 4px 0 #cf6420}
+.feedback{min-height:34px;text-align:center;font-family:"Jua",sans-serif;font-size:20px;margin-top:12px}
+.feedback.ok{color:var(--good)}.feedback.no{color:var(--bad)}.feedback.tip{color:#b87900}
+.reveal{font-size:20px;font-weight:800;text-align:center;color:var(--muted);margin-top:6px}
+
+/* mini building for floor questions */
+.mini{display:inline-flex;flex-direction:column;border:4px solid var(--brick-d);background:var(--brick);border-radius:8px;padding:5px;gap:4px;min-width:170px}
+.mini div{background:#fff8ef;border-radius:5px;height:34px;display:flex;align-items:center;gap:8px;padding:0 8px;font-weight:900;font-size:15px}
+.mini div.hl{background:#fff1b8;outline:3px solid var(--gold)}
+.mini span.e{font-size:22px}
+
+/* wrong-word sentence */
+.wordpick{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:12px 0}
+.wp{border:none;background:#f2f5fa;border-radius:10px;padding:8px 12px;font-size:24px;font-weight:800;color:var(--ink)}
+.wp:hover{background:#e3eaf5}
+.wp.hit{text-decoration:underline wavy var(--bad) 3px;background:#fdeeee}
+.wp.missw{animation:shake .35s}
+
+/* profile card */
+.profile{display:flex;gap:16px;align-items:center;background:#f6efff;border:3px solid #dcc5f3;border-radius:18px;padding:14px 18px;margin:8px auto 14px;max-width:520px}
+.avatar{font-size:56px}
+.pinfo{font-family:"Jua",sans-serif;font-size:17px;line-height:1.6}
+.wordbank{display:none;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:10px}
+.wordbank.show{display:flex}
+.wordbank span{background:#eef3ff;border-radius:8px;padding:4px 10px;font-weight:800}
+
+/* email */
+.email-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.email-grid{grid-template-columns:1fr}}
+.field{margin-bottom:10px}
+.field label{display:block;font-family:"Jua",sans-serif;font-size:16px;margin-bottom:4px}
+.field input{width:100%;font:inherit;font-size:20px;font-weight:800;border:3px solid var(--line);border-radius:12px;padding:8px 12px}
+.field input.badf{border-color:var(--bad);background:#fff4f4}
+.field input.goodf{border-color:var(--good)}
+.field small{font-family:"Jua",sans-serif;color:var(--bad);font-size:14px}
+.letter{background:#fffdf5;border:2px solid #eadfb8;border-radius:12px;padding:18px 20px;font-size:20px;line-height:1.75;font-weight:700;box-shadow:0 4px 0 #eadfb8}
+.letter .blank{color:#b9b9b9}
+.reflect{margin-top:18px;display:grid;gap:10px}
+.reflect .concept textarea{width:100%;font:inherit;font-family:"Jua",sans-serif;font-size:16px;border:2px solid var(--line);border-radius:10px;padding:8px;margin-top:6px;min-height:56px}
+
+/* result */
+.result{text-align:center;padding:20px 0}
+.result .big{font-size:64px;letter-spacing:6px}
+.result h2{font-family:"Jua",sans-serif;font-weight:400;font-size:30px;margin:10px 0}
+
+footer{text-align:center;color:var(--muted);font-size:13px;padding:24px 0 10px;font-family:"Nunito",sans-serif;font-weight:800}
+.hidden{display:none!important}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .3s ease-out}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><a href="../index.html" style="color:inherit;text-decoration:none">🏠 <b>NAVI PLAY</b></a> · 6학년 영어 Lesson 1</div>
+    <div class="chips"><span class="chip conn">연결</span><span class="chip func">기능</span><span class="chip pers">관점</span></div>
+  </header>
+
+  <!-- HOME -->
+  <section id="home">
+    <h1>🛗 School Elevator</h1>
+    <p class="sub ko">학교 안의 우리 · What Grade Are You In? — 엘리베이터를 타고 층마다 미션을 해결해요!</p>
+    <div class="home">
+      <div>
+        <div class="building" id="building"><div class="roof"></div></div>
+        <div class="ground"></div>
+      </div>
+      <aside class="side">
+        <h3 class="ko">🧭 이 단원의 개념</h3>
+        <div class="concept" style="border-color:var(--c-conn)"><b style="color:var(--c-conn)">연결</b><br><span class="ko">숫자 1, 2, 3 ↔ first, second, third. 학년과 층수는 순서로 연결돼요.</span></div>
+        <div class="concept" style="border-color:var(--c-func)"><b style="color:var(--c-func)">기능</b><br><span class="ko">학년을 물을 땐 What grade…? 장소를 물을 땐 Where is…? 말에는 쓰임이 있어요.</span></div>
+        <div class="concept" style="border-color:var(--c-pers)"><b style="color:var(--c-pers)">관점</b><br><span class="ko">Andy, Mei, James, 그리고 나. 누가 말하느냐에 따라 문장이 달라져요.</span></div>
+        <div class="total ko" id="totalStars"></div>
+        <button class="reset ko" id="resetBtn">기록 지우기</button>
+      </aside>
+    </div>
+  </section>
+
+  <!-- MISSION -->
+  <section id="mission" class="hidden">
+    <div class="mbar">
+      <button class="back" id="backBtn">🛗 엘리베이터</button>
+      <div class="mtitle" id="mTitle"></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="card" id="stage"></div>
+  </section>
+
+  <footer>NAVI PLAY · Made by Boeun.S</footer>
+</div>
+
+<script>
+/* =========================================================
+   DATA — 6학년 영어 Lesson 1 "What Grade Are You In?"
+   ========================================================= */
+const ORD = [
+  {n:1, w:"first",  ab:"1st", card:"one"},
+  {n:2, w:"second", ab:"2nd", card:"two"},
+  {n:3, w:"third",  ab:"3rd", card:"three"},
+  {n:4, w:"fourth", ab:"4th", card:"four"},
+  {n:5, w:"fifth",  ab:"5th", card:"five"},
+  {n:6, w:"sixth",  ab:"6th", card:"six"}
+];
+const ROOMS = [
+  {w:"classroom",     ko:"교실",     e:"🏫"},
+  {w:"library",       ko:"도서관",   e:"📚"},
+  {w:"music room",    ko:"음악실",   e:"🎵"},
+  {w:"art room",      ko:"미술실",   e:"🎨"},
+  {w:"computer room", ko:"컴퓨터실", e:"💻"},
+  {w:"English room",  ko:"영어실",   e:"🔤"},
+  {w:"science room",  ko:"과학실",   e:"🔬"}
+];
+const EXTRA = [
+  {w:"grade", ko:"학년", e:"🎒"},
+  {w:"floor", ko:"층",   e:"🏢"},
+  {w:"place", ko:"장소", e:"📍"},
+  {w:"court", ko:"코트(경기장)", e:"🏀"},
+  {w:"arm",   ko:"팔",   e:"💪"},
+  {w:"grow",  ko:"자라다", e:"🌱"}
+];
+const PEOPLE = {
+  andy:  {name:"Andy",  av:"🧢", from:"New York, U.S.",  grade:6, room:1, place:"basketball court", placeFloor:2},
+  mei:   {name:"Mei",   av:"🎹", from:"Taipei, Taiwan",  grade:4, room:2, place:"music room",       placeFloor:3},
+  james: {name:"James", av:"🔬", from:"Toronto, Canada", grade:5, room:1, subject:"science"}
+};
+
+const FLOORS = [
+  {id:"f1", n:"1F", title:"서수 짝꿍 연결", desc:"숫자·장소와 영어 단어를 연결해요", tag:"conn", rounds:4},
+  {id:"f2", n:"2F", title:"철자 엘리베이터", desc:"주요 단어의 철자를 한 글자씩 완성해요", tag:"func", rounds:8},
+  {id:"f3", n:"3F", title:"어구 완성", desc:"in the ___ grade / on the ___ floor", tag:"func", rounds:8},
+  {id:"f4", n:"4F", title:"문장 블록 쌓기", desc:"단어 블록을 순서대로 놓아 문장을 만들어요", tag:"conn", rounds:6},
+  {id:"f5", n:"5F", title:"틀린 곳 고치기", desc:"그림과 다른 곳을 찾아 바르게 고쳐 써요", tag:"func", rounds:6},
+  {id:"f6", n:"6F", title:"관점 바꿔 쓰기", desc:"Andy, Mei, James가 되어 문장을 써요", tag:"pers", rounds:6},
+  {id:"roof", n:"🌱", title:"옥상 정원: 나의 이메일", desc:"James에게 나를 소개하는 이메일을 써요", tag:"pers", rounds:0}
+];
+const TAGNAME = {conn:"연결", func:"기능", pers:"관점"};
+const TAGCOLOR = {conn:"var(--c-conn)", func:"var(--c-func)", pers:"var(--c-pers)"};
+
+/* =========================================================
+   UTILITIES
+   ========================================================= */
+const $ = s => document.querySelector(s);
+const rnd = n => Math.floor(Math.random()*n);
+const pick = a => a[rnd(a.length)];
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+function sample(a,k){return shuffle(a).slice(0,k);}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+
+function norm(s){return String(s).replace(/[’‘`´]/g,"'").replace(/\s+/g," ").trim();}
+function canon(s){
+  return norm(s)
+    .replace(/\bI am\b/g,"I'm").replace(/\bIt is\b/g,"It's").replace(/\bit is\b/g,"it's")
+    .replace(/\s+([.?!,])/g,"$1");
+}
+function loose(s){return canon(s).toLowerCase().replace(/[.?!,]/g,"").replace(/\s+/g," ").trim();}
+/* returns "ok" | "almost" | "no" */
+function check(input, answers){
+  answers = [].concat(answers);
+  const c = canon(input);
+  if(answers.some(a=>canon(a)===c)) return "ok";
+  if(answers.some(a=>loose(a)===loose(input))) return "almost";
+  return "no";
+}
+
+/* TTS */
+let voice=null;
+function loadVoice(){
+  if(!("speechSynthesis" in window)) return;
+  const vs = speechSynthesis.getVoices();
+  voice = vs.find(v=>/en-US/i.test(v.lang)&&/female|samantha|google/i.test(v.name)) || vs.find(v=>/^en/i.test(v.lang)) || null;
+}
+if("speechSynthesis" in window){loadVoice();speechSynthesis.onvoiceschanged=loadVoice;}
+function say(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/_+/g,"blank"));
+  u.lang="en-US"; u.rate=0.85; if(voice) u.voice=voice;
+  speechSynthesis.speak(u);
+}
+
+/* sounds */
+let actx=null;
+function beep(ok){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.connect(g); g.connect(actx.destination);
+    const t=actx.currentTime;
+    if(ok){o.frequency.setValueAtTime(660,t);o.frequency.setValueAtTime(990,t+.09);}
+    else {o.type="square";o.frequency.setValueAtTime(220,t);}
+    g.gain.setValueAtTime(.08,t); g.gain.exponentialRampToValueAtTime(.001,t+.25);
+    o.start(t); o.stop(t+.26);
+  }catch(e){}
+}
+
+/* storage (per-browser convenience only) */
+const KEY="naviplay-g6l1-elevator";
+function loadStars(){try{return JSON.parse(localStorage.getItem(KEY))||{};}catch(e){return {};}}
+function saveStars(o){try{localStorage.setItem(KEY,JSON.stringify(o));}catch(e){}}
+let STARS = loadStars();
+
+/* =========================================================
+   HOME
+   ========================================================= */
+function starStr(n,max=3){let s="";for(let i=0;i<max;i++)s+= i<n?"⭐":'<span class="off">⭐</span>';return s;}
+function renderHome(){
+  const b=$("#building");
+  b.querySelectorAll(".floor-btn").forEach(x=>x.remove());
+  FLOORS.slice().reverse().forEach(f=>{
+    const btn=document.createElement("button");
+    btn.className="floor-btn"+(f.id==="roof"?" rooftop":"");
+    btn.innerHTML=`<div class="fnum">${f.n}</div>
+      <div><div class="ftitle">${f.title}</div>
+      <div class="fdesc"><span class="ftag" style="background:${TAGCOLOR[f.tag]}">${TAGNAME[f.tag]}</span>${esc(f.desc)}</div></div>
+      <div class="stars">${starStr(STARS[f.id]||0)}</div>`;
+    btn.onclick=()=>startFloor(f.id);
+    b.appendChild(btn);
+  });
+  const tot=Object.values(STARS).reduce((a,b)=>a+b,0);
+  $("#totalStars").innerHTML=`모은 별: ${tot} / ${FLOORS.length*3} ⭐`;
+}
+$("#resetBtn").onclick=()=>{ if(confirm("모은 별 기록을 지울까요?")){STARS={};saveStars(STARS);renderHome();} };
+$("#backBtn").onclick=()=>{ speechSynthesis && speechSynthesis.cancel(); showHome(); };
+function showHome(){ $("#mission").classList.add("hidden"); $("#home").classList.remove("hidden"); renderHome(); window.scrollTo(0,0);}
+
+/* =========================================================
+   MISSION ENGINE
+   ========================================================= */
+let G=null; // {floor, rounds:[], i, results:[]}
+function startFloor(id){
+  const f=FLOORS.find(x=>x.id===id);
+  $("#home").classList.add("hidden"); $("#mission").classList.remove("hidden");
+  $("#mTitle").innerHTML=`<span class="ko">${f.n} ${f.title}</span>`;
+  window.scrollTo(0,0);
+  if(id==="roof"){ $("#dots").innerHTML=""; renderEmail(); return; }
+  G={floor:f, rounds:GEN[id](), i:0, results:[]};
+  nextRound();
+}
+function renderDots(){
+  $("#dots").innerHTML=G.rounds.map((_,k)=>{
+    let c="dot"; if(k<G.results.length) c+= G.results[k]?" ok":" miss"; if(k===G.i) c+=" now";
+    return `<div class="${c}"></div>`;}).join("");
+}
+function nextRound(){
+  if(G.i>=G.rounds.length){ return finishFloor(); }
+  renderDots();
+  const st=$("#stage"); st.innerHTML=""; st.classList.remove("pop"); void st.offsetWidth; st.classList.add("pop");
+  const r=G.rounds[G.i];
+  RENDER[r.type](r, st, firstTry=>{
+    G.results.push(firstTry); G.i++;
+    renderDots();
+  });
+}
+function conceptLine(tag,text){return `<div class="concept-line ko" style="background:${TAGCOLOR[tag]}">${TAGNAME[tag]} · ${text}</div>`;}
+function nextButton(st){
+  const row=document.createElement("div"); row.className="row";
+  const b=document.createElement("button"); b.className="btn go"; b.textContent= G.i>=G.rounds.length ? "결과 보기 ▶" : "다음 ▶";
+  b.onclick=nextRound; row.appendChild(b); st.appendChild(row); setTimeout(()=>b.focus(),50);
+}
+function finishFloor(){
+  const ok=G.results.filter(Boolean).length, n=G.results.length;
+  const ratio=ok/n, s= ratio>=.9?3: ratio>=.6?2:1;
+  const id=G.floor.id;
+  if(!STARS[id]||STARS[id]<s){STARS[id]=s;saveStars(STARS);}
+  const msgs={3:"완벽해요! 다음 층으로 올라가요!",2:"잘했어요! 한 번 더 하면 별 3개도 가능해요.",1:"좋은 출발이에요! 다시 도전해 볼까요?"};
+  const idx=FLOORS.findIndex(f=>f.id===id), nxt=FLOORS[idx+1];
+  $("#stage").innerHTML=`<div class="result">
+    <div class="big">${starStr(s)}</div>
+    <h2>${msgs[s]}</h2>
+    <p class="ko" style="font-size:18px">한 번에 맞힌 문제: ${ok} / ${n}</p>
+    <div class="row">
+      <button class="btn soft" id="again">🔁 다시 하기</button>
+      ${nxt?`<button class="btn go" id="up">🛗 ${nxt.n} ${nxt.title}</button>`:""}
+      <button class="btn" id="home2">엘리베이터로</button>
+    </div></div>`;
+  $("#again").onclick=()=>startFloor(id);
+  if(nxt) $("#up").onclick=()=>startFloor(nxt.id);
+  $("#home2").onclick=showHome;
+  beep(true);
+}
+
+/* shared answer-check UI for typed answers */
+function typedCheck({st, input, answers, fullAnswer, onDone, speakText}){
+  let tries=0, done=false;
+  const fb=document.createElement("div"); fb.className="feedback ko";
+  const row=document.createElement("div"); row.className="row";
+  const btnHint=document.createElement("button"); btnHint.className="btn soft"; btnHint.textContent="💡 힌트";
+  const btnOk=document.createElement("button"); btnOk.className="btn go"; btnOk.textContent="확인 ✔";
+  row.append(btnHint,btnOk); st.append(row,fb);
+  const shown = fullAnswer || [].concat(answers)[0];
+  btnHint.onclick=()=>{
+    const a=[].concat(answers)[0];
+    const words=a.split(" ");
+    fb.className="feedback tip ko";
+    fb.textContent="힌트: "+words.map(w=>w[0]+"_".repeat(Math.max(0,w.replace(/[.?!]/,"").length-1))+(/[.?!]$/.test(w)?w.slice(-1):"")).join(" ");
+    tries=Math.max(tries,1);
+  };
+  const submit=()=>{
+    if(done) return;
+    const v=Array.isArray(input)? input.map(x=>x.value).join("|") : input.value;
+    if(!v.trim()){fb.className="feedback tip ko";fb.textContent="답을 써 보세요!";return;}
+    const res=check(v,answers);
+    if(res==="ok"){
+      done=true; beep(true);
+      fb.className="feedback ok ko"; fb.innerHTML= tries===0? "정답! 🎉":"정답! 잘 고쳤어요 👍";
+      (Array.isArray(input)?input:[input]).forEach(x=>x.disabled=true);
+      row.innerHTML="";
+      const sb=document.createElement("button"); sb.className="btn say"; sb.textContent="🔊 들어 보기";
+      sb.onclick=()=>say(speakText||shown); row.appendChild(sb);
+      say(speakText||shown);
+      onDone(tries===0); nextButton(st);
+    } else if(res==="almost"){
+      tries++; beep(false);
+      fb.className="feedback tip ko"; fb.textContent="거의 다 왔어요! 대문자, 마침표·물음표, 띄어쓰기를 확인해요.";
+    } else {
+      tries++; beep(false);
+      fb.className="feedback no ko";
+      if(tries>=3){
+        fb.innerHTML=`정답은 <b style="font-family:Nunito,sans-serif">${esc(shown)}</b> — 보고 똑같이 써 보세요.`;
+      } else fb.textContent= tries===1? "다시 한 번! 철자를 확인해요." : "조금만 더! 💡 힌트를 눌러 봐요.";
+    }
+  };
+  btnOk.onclick=submit;
+  (Array.isArray(input)?input:[input]).forEach(x=>x.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();submit();}}));
+}
+
+/* =========================================================
+   ROUND GENERATORS
+   ========================================================= */
+const GEN = {
+  f1(){
+    return [
+      {type:"match", left:ORD.map(o=>({id:o.n,html:o.ab})), right:ORD.map(o=>({id:o.n,html:o.w})), say:true,
+       prompt:"숫자와 서수 단어를 연결해요", help:"왼쪽을 누르고, 짝이 되는 오른쪽을 눌러요."},
+      {type:"match", left:sample(ROOMS,6).map(r=>({id:r.w,html:`${r.e} <span class="k">${r.ko}</span>`})), right:null, say:true,
+       prompt:"학교 장소와 영어 이름을 연결해요", help:"우리 학교의 어느 곳일까요?"},
+      {type:"match", left:ORD.map(o=>({id:o.n,html:`🏢 ${o.n}층`})), right:ORD.map(o=>({id:o.n,html:`the ${o.w} floor`})), say:true,
+       prompt:"층수와 영어 어구를 연결해요", help:"1층 = the first floor"},
+      {type:"match", left:EXTRA.map(x=>({id:x.w,html:`${x.e} <span class="k">${x.ko}</span>`})), right:EXTRA.map(x=>({id:x.w,html:x.w})), say:true,
+       prompt:"새로 배운 낱말을 연결해요", help:"grade, floor, place, court, arm, grow"}
+    ].map(r=>{ if(!r.right) r.right=r.left.map(l=>({id:l.id,html:l.id})); return r; });
+  },
+  f2(){
+    const pool=[
+      ...ORD.map(o=>({ans:o.w, cue:o.ab, ko:`${o.n}번째`})),
+      ...ROOMS.map(r=>({ans:r.w, cue:r.e, ko:r.ko})),
+      {ans:"grade",cue:"🎒",ko:"학년"},{ans:"floor",cue:"🏢",ko:"층"}
+    ];
+    const ords=sample(pool.slice(0,6),4), rest=sample(pool.slice(6),4);
+    return shuffle([...ords,...rest]).map(x=>({type:"spell",...x}));
+  },
+  f3(){
+    const out=[];
+    // function questions (기능)
+    const q=[
+      {ko:"친구의 <b>학년</b>을 묻고 싶어요.", a:"What grade are you in?", d:["Where is your classroom?","What's your name?"]},
+      {ko:"친구의 <b>교실이 몇 층인지</b> 묻고 싶어요.", a:"Where is your classroom?", d:["What grade are you in?","How about you?"]},
+    ];
+    const room=pick(ROOMS.slice(2));
+    q.push({ko:`<b>${room.ko}</b>이 어디 있는지 묻고 싶어요.`, a:`Where is the ${room.w}?`, d:["What grade are you in?",`I'm in the ${room.w}.`]});
+    q.push({ko:"‘What grade are you in?’에 대답하려고 해요.", a:`I'm in the ${pick(ORD).w} grade.`, d:[`It's on the ${pick(ORD).w} floor.`,`I'm on the ${pick(ORD).w} grade.`]});
+    q.forEach(x=>out.push({type:"choose",...x}));
+    // phrase completion
+    const og=sample(ORD,2), of=sample(ORD,2);
+    og.forEach(o=>out.push({type:"fillGrade",o}));
+    of.forEach((o,k)=>out.push({type:"fillFloor",o,room:k===0?ROOMS[0]:pick(ROOMS.slice(1))}));
+    return shuffle(out);
+  },
+  f4(){
+    const o=()=>pick(ORD), r=()=>pick(ROOMS.slice(1));
+    const list=[];
+    const a=o(); list.push({en:`I'm in the ${a.w} grade.`, ko:`나는 ${a.n}학년이야.`});
+    list.push({en:"What grade are you in?", ko:"너는 몇 학년이니?"});
+    list.push({en:"Where is your classroom?", ko:"너의 교실은 어디 있니?"});
+    const b=o(); list.push({en:`It's on the ${b.w} floor.`, ko:`그것은 ${b.n}층에 있어.`, dis:pick(["in",b.card])});
+    const c=o(); list.push({en:`My classroom is on the ${c.w} floor.`, ko:`나의 교실은 ${c.n}층에 있어.`, dis:"in"});
+    const d=r(), e=o(); list.push({en:`The ${d.w} is on the ${e.w} floor.`, ko:`${d.ko}은 ${e.n}층에 있어.`, dis:e.card});
+    return list.map(x=>({type:"build",...x}));
+  },
+  f5(){
+    const kinds=shuffle(["A","B","C","A","B","C"]);
+    const errs=shuffle(["card","info","prep","card","info","prep"]);
+    return kinds.map((k,i)=>makeError(k,errs[i]));
+  },
+  f6(){
+    const A=PEOPLE.andy, M=PEOPLE.mei, J=PEOPLE.james;
+    const past=pick([ORD[0],ORD[1],ORD[2]]);
+    return [
+      {type:"persona", p:A, ko:`<b>Andy</b>가 되어 자기 학년을 소개해요.`, ans:`I'm in the ${ORD[A.grade-1].w} grade.`, bank:["I'm","in","the","sixth","grade"]},
+      {type:"persona", p:A, ko:`<b>Andy</b>가 되어 교실이 몇 층인지 써요.`, ans:`My classroom is on the ${ORD[A.room-1].w} floor.`, bank:["My","classroom","is","on","the","first","floor"]},
+      {type:"persona", p:M, ko:`<b>Mei</b>가 되어 자기 학년을 소개해요.`, ans:`I'm in the ${ORD[M.grade-1].w} grade.`, bank:["I'm","in","the","fourth","grade"]},
+      {type:"persona", p:M, ko:`<b>Mei</b>가 되어 가장 좋아하는 장소가 몇 층인지 써요.<br><span style="font-size:16px">(My favorite place is the music room. 다음 문장)</span>`, ans:`It's on the ${ORD[M.placeFloor-1].w} floor.`, bank:["It's","on","the","third","floor"]},
+      {type:"persona", p:J, ko:`<b>James</b>에게 학년을 묻는 질문을 써요.<br><span style="font-size:16px">(이번엔 묻는 사람의 관점!)</span>`, ans:"What grade are you in?", bank:["What","grade","are","you","in"]},
+      {type:"persona", p:{name:"나 (타임머신)",av:"⏳",from:"과거로 시간 여행",timeGrade:past.n}, ko:`타임머신을 타고 <b>${past.n}학년</b>의 내가 되었어요! 학년을 소개해요.`, ans:`I'm in the ${past.w} grade.`, bank:["I'm","in","the",past.w,"grade"]}
+    ];
+  }
+};
+
+function makeError(kind, err){
+  const o=pick(ORD);
+  let right, wrongWords, wrongIdx, visual;
+  const room=pick(ROOMS.slice(1));
+  if(kind==="A"){ right=`I'm in the ${o.w} grade.`; visual=`<div class="badge">${o.n}학년</div><div class="emoji">🎒</div>`; }
+  else if(kind==="B"){ right=`My classroom is on the ${o.w} floor.`; visual=miniBuilding(o.n,"🏫","교실"); }
+  else { right=`The ${room.w} is on the ${o.w} floor.`; visual=miniBuilding(o.n,room.e,room.ko); }
+  const words=right.replace(/\.$/,"").split(" ");
+  const ordIdx=words.indexOf(o.w);
+  if(err==="card"){ words[ordIdx]=o.card; wrongIdx=ordIdx; }
+  else if(err==="info"){ const other=pick(ORD.filter(x=>x.n!==o.n)); words[ordIdx]=other.w; wrongIdx=ordIdx; }
+  else { const pi=words.indexOf(kind==="A"?"in":"on"); words[pi]= kind==="A"?"on":"in"; wrongIdx=pi; }
+  return {type:"fix", right, words, wrongIdx, visual, err};
+}
+function miniBuilding(hl, e, label){
+  let h='<div class="mini">';
+  for(let f=6;f>=1;f--) h+=`<div class="${f===hl?"hl":""}">${f}F ${f===hl?`<span class="e">${e}</span><span class="ko" style="font-weight:400">${label}</span>`:""}</div>`;
+  return h+"</div>";
+}
+
+/* =========================================================
+   ROUND RENDERERS
+   ========================================================= */
+const RENDER = {
+  match(r, st, done){
+    st.innerHTML=conceptLine("conn","서로 짝이 되는 것끼리 이어요")+
+      `<p class="prompt">${r.prompt}</p><p class="help">${r.help}</p>
+       <div class="match"><div class="mcol" id="L"></div><div class="mcol" id="R"></div></div>
+       <div class="feedback ko" id="fb"></div>`;
+    const L=st.querySelector("#L"), R=st.querySelector("#R"), fb=st.querySelector("#fb");
+    let sel=null, miss=0, left=r.left.length;
+    const mk=(item,side)=>{
+      const b=document.createElement("button"); b.className="mitem"; b.innerHTML=item.html; b.dataset.id=item.id; b.dataset.side=side;
+      b.onclick=()=>{
+        if(b.classList.contains("done")) return;
+        if(side==="R" && r.say) say(b.textContent);
+        if(!sel || sel.dataset.side===side){ if(sel) sel.classList.remove("sel"); sel=b; b.classList.add("sel"); return; }
+        if(sel.dataset.id===b.dataset.id){
+          [sel,b].forEach(x=>{x.classList.remove("sel");x.classList.add("done");});
+          beep(true); sel=null; left--;
+          if(left===0){ fb.className="feedback ok ko"; fb.textContent= miss===0?"모두 연결했어요! 🎉":"모두 연결했어요! 👍"; done(miss<=1); nextButton(st); }
+        } else {
+          miss++; beep(false); [sel,b].forEach(x=>{x.classList.add("wrong");setTimeout(()=>x.classList.remove("wrong"),400);});
+          sel.classList.remove("sel"); sel=null;
+        }
+      };
+      return b;
+    };
+    shuffle(r.left).forEach(i=>L.appendChild(mk(i,"L")));
+    shuffle(r.right).forEach(i=>R.appendChild(mk(i,"R")));
+  },
+
+  spell(r, st, done){
+    st.innerHTML=conceptLine("func","철자를 정확하게 써야 뜻이 전달돼요")+
+      `<p class="prompt">이 단어의 철자를 완성해요</p>
+       <div class="big-visual"><div class="badge">${esc(r.cue)}</div><div class="ko" style="font-size:24px">${r.ko}</div>
+       <button class="btn say" id="sp">🔊</button></div>
+       <div class="slots" id="slots"></div><div class="tiles" id="tiles"></div>
+       <p class="help" style="text-align:center">글자 타일을 누르거나 키보드로 입력해요 · ⌫ 지우기</p>
+       <div class="row"><button class="btn soft" id="del">⌫ 지우기</button><button class="btn soft" id="hint">💡 힌트</button></div>
+       <div class="feedback ko" id="fb"></div>`;
+    st.querySelector("#sp").onclick=()=>say(r.ans);
+    const slotsEl=st.querySelector("#slots"), tilesEl=st.querySelector("#tiles"), fb=st.querySelector("#fb");
+    const letters=r.ans.split("");
+    const slotIdx=[]; // indices of non-space chars
+    letters.forEach((ch,i)=>{ if(ch===" "){const g=document.createElement("div");g.className="gap";slotsEl.appendChild(g);} else {const s=document.createElement("div");s.className="slot";slotsEl.appendChild(s);slotIdx.push(s);} });
+    const target=letters.filter(c=>c!==" ");
+    const filled=[]; // {ch, tileBtn}
+    let mistakes=0, finished=false, hinted=false;
+    const tileBtns=shuffle(target.map((c,i)=>({c,i}))).map(t=>{
+      const b=document.createElement("button"); b.className="tile"; b.textContent=t.c; b.onclick=()=>put(t.c,b); tilesEl.appendChild(b); return b;
+    });
+    function paint(){ slotIdx.forEach((s,i)=>{ s.textContent=filled[i]?filled[i].ch:""; s.classList.toggle("cur",i===filled.length && !finished); }); }
+    function put(ch,btn){
+      if(finished) return;
+      const need=target[filled.length];
+      if(ch.toLowerCase()!==need.toLowerCase()){
+        mistakes++; beep(false); fb.className="feedback no ko"; fb.textContent=`‘${ch}’는 여기 들어갈 글자가 아니에요.`;
+        if(btn){btn.classList.add("wrong");setTimeout(()=>btn.classList.remove("wrong"),400);} return;
+      }
+      if(!btn) btn=tileBtns.find(b=>!b.classList.contains("used")&&b.textContent.toLowerCase()===ch.toLowerCase());
+      if(btn) btn.classList.add("used");
+      filled.push({ch:need,btn}); fb.textContent=""; paint();
+      if(filled.length===target.length){
+        finished=true; paint(); beep(true); say(r.ans);
+        fb.className="feedback ok ko"; fb.textContent= mistakes===0&&!hinted? "완벽한 철자! 🎉" : "완성! 👍";
+        document.removeEventListener("keydown",kd);
+        done(mistakes<=1 && !hinted); nextButton(st);
+      }
+    }
+    function del(){ if(finished||!filled.length) return; const f=filled.pop(); if(f.btn) f.btn.classList.remove("used"); paint(); }
+    st.querySelector("#del").onclick=del;
+    st.querySelector("#hint").onclick=()=>{ hinted=true; if(!finished) put(target[filled.length], null); };
+    function kd(e){
+      if(!document.body.contains(slotsEl)){document.removeEventListener("keydown",kd);return;}
+      if(e.key==="Backspace"){e.preventDefault();del();}
+      else if(/^[a-zA-Z]$/.test(e.key)){ put(e.key,null); }
+    }
+    document.addEventListener("keydown",kd);
+    paint();
+  },
+
+  choose(r, st, done){
+    const opts=shuffle([r.a,...r.d]);
+    st.innerHTML=conceptLine("func","말의 쓰임(기능)에 맞는 문장을 골라요")+
+      `<p class="prompt">${r.ko}</p><p class="help">어떤 말을 해야 할까요?</p><div class="choices" id="ch"></div><div class="feedback ko" id="fb"></div>`;
+    const ch=st.querySelector("#ch"), fb=st.querySelector("#fb"); let miss=0, over=false;
+    opts.forEach(o=>{
+      const b=document.createElement("button"); b.className="choice"; b.textContent=o;
+      b.onclick=()=>{
+        if(over) return;
+        if(o===r.a){ over=true; b.classList.add("right"); beep(true); say(o); fb.className="feedback ok ko"; fb.textContent="맞아요! 상황에 딱 맞는 말이에요."; done(miss===0); nextButton(st); }
+        else { miss++; b.classList.add("wrongc"); beep(false); fb.className="feedback no ko"; fb.textContent="이 말은 쓰임이 달라요. 다시 골라 봐요."; }
+      };
+      ch.appendChild(b);
+    });
+  },
+
+  fillGrade(r, st, done){
+    st.innerHTML=conceptLine("func","학년을 말할 땐 in the ___ grade")+
+      `<p class="prompt">그림을 보고 빈칸에 알맞은 단어를 써요</p>
+       <div class="big-visual"><div class="badge">${r.o.n}학년</div><div class="emoji">🎒</div></div>
+       <div class="sentence-frame">A: What grade are you in?<br>B: I'm in the <input class="inline-input" id="in" autocomplete="off" autocapitalize="off" spellcheck="false"> grade.</div>`;
+    const inp=st.querySelector("#in"); inp.focus();
+    typedCheck({st,input:inp,answers:[r.o.w],fullAnswer:r.o.w,speakText:`I'm in the ${r.o.w} grade.`,onDone:done});
+  },
+  fillFloor(r, st, done){
+    const q = r.room.w==="classroom" ? "Where is your classroom?" : `Where is the ${r.room.w}?`;
+    st.innerHTML=conceptLine("func","층수를 말할 땐 on the ___ floor")+
+      `<p class="prompt">그림을 보고 빈칸에 알맞은 단어를 써요</p>
+       <div class="big-visual">${miniBuilding(r.o.n,r.room.e,r.room.ko)}</div>
+       <div class="sentence-frame">A: ${esc(q)}<br>B: It's on the <input class="inline-input" id="in" autocomplete="off" autocapitalize="off" spellcheck="false"> floor.</div>`;
+    const inp=st.querySelector("#in"); inp.focus();
+    typedCheck({st,input:inp,answers:[r.o.w],fullAnswer:r.o.w,speakText:`It's on the ${r.o.w} floor.`,onDone:done});
+  },
+
+  build(r, st, done){
+    const toks=r.en.replace(/([.?!])$/," $1").split(" ");
+    let pool=toks.map((t,i)=>({t,i}));
+    if(r.dis) pool.push({t:r.dis,i:-1});
+    pool=shuffle(pool);
+    st.innerHTML=conceptLine("conn","단어와 단어가 순서대로 연결되어 문장이 돼요")+
+      `<p class="prompt">우리말에 맞게 영어 문장을 만들어요</p>
+       <p class="prompt-en ko" style="font-weight:400;font-size:24px">“${r.ko}”</p>
+       ${r.dis?'<p class="help">⚠️ 필요 없는 블록이 하나 숨어 있어요!</p>':'<p class="help">블록을 순서대로 눌러요. 놓은 블록을 누르면 되돌아가요.</p>'}
+       <div class="answer-line" id="line"></div><div class="tiles" id="pool"></div>
+       <div class="row"><button class="btn soft" id="clr">↺ 처음부터</button><button class="btn go" id="ok">확인 ✔</button></div>
+       <div class="feedback ko" id="fb"></div>`;
+    const line=st.querySelector("#line"), P=st.querySelector("#pool"), fb=st.querySelector("#fb");
+    let placed=[], miss=0, over=false;
+    const btns=pool.map(p=>{
+      const b=document.createElement("button"); b.className="tile word"+(/^[.?!]$/.test(p.t)?" punct":""); b.textContent=p.t;
+      b.onclick=()=>{ if(over||b.classList.contains("used")) return; b.classList.add("used"); placed.push(p); paint(); };
+      P.appendChild(b); p.btn=b; return b;
+    });
+    function paint(){
+      line.innerHTML="";
+      placed.forEach((p,k)=>{ const b=document.createElement("button"); b.className="tile"+(/^[.?!]$/.test(p.t)?" punct":""); b.textContent=p.t;
+        b.onclick=()=>{ if(over) return; placed.splice(k,1); p.btn.classList.remove("used"); paint(); }; line.appendChild(b); });
+    }
+    st.querySelector("#clr").onclick=()=>{ if(over) return; placed=[]; btns.forEach(b=>b.classList.remove("used")); paint(); };
+    st.querySelector("#ok").onclick=()=>{
+      if(over) return;
+      const s=placed.map(p=>p.t).join(" ");
+      if(s===toks.join(" ")){
+        over=true; beep(true); say(r.en);
+        fb.className="feedback ok ko"; fb.innerHTML=`정답! <span style="font-family:Nunito,sans-serif;font-weight:900">${esc(r.en)}</span>`;
+        st.querySelector(".row").innerHTML=""; done(miss===0); nextButton(st);
+      } else {
+        miss++; beep(false); fb.className="feedback no ko";
+        const firstBad=placed.findIndex((p,k)=>p.t!==toks[k]);
+        if(placed.length<toks.length && firstBad===-1) fb.textContent="아직 블록이 남아 있어요. 마침표·물음표도 잊지 마세요!";
+        else fb.textContent= `${firstBad+1}번째 블록부터 다시 살펴봐요.`;
+      }
+    };
+  },
+
+  fix(r, st, done){
+    const errHelp={card:"숫자(one, two…)가 아니라 순서(first, second…)로 말해요.",
+                   info:"그림의 학년·층수와 문장이 달라요.",
+                   prep:"학년은 in the ___ grade, 층수는 on the ___ floor!"};
+    st.innerHTML=conceptLine("func","그림과 문장이 같은 뜻을 전달하나요?")+
+      `<p class="prompt">① 그림과 다른 곳(틀린 단어)을 눌러 찾아요</p>
+       <div class="big-visual">${r.visual}</div>
+       <div class="wordpick" id="wp"></div>
+       <div id="step2" class="hidden"><p class="prompt">② 문장을 바르게 고쳐 써요</p>
+       <input class="line-input" id="in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="여기에 문장 전체를 써요"></div>
+       <div class="feedback ko" id="fb"></div>`;
+    const wp=st.querySelector("#wp"), fb=st.querySelector("#fb"); let miss=0;
+    r.words.forEach((w,i)=>{
+      const b=document.createElement("button"); b.className="wp"; b.textContent= i===r.words.length-1? w+".":w;
+      b.onclick=()=>{
+        if(!st.querySelector("#step2").classList.contains("hidden")) return;
+        if(i===r.wrongIdx){
+          b.classList.add("hit"); beep(true); fb.className="feedback tip ko"; fb.textContent="찾았어요! "+errHelp[r.err];
+          st.querySelector("#step2").classList.remove("hidden");
+          const inp=st.querySelector("#in"); inp.focus();
+          typedCheck({st,input:inp,answers:[r.right],onDone:ok=>done(ok&&miss===0)});
+        } else { miss++; beep(false); b.classList.add("missw"); setTimeout(()=>b.classList.remove("missw"),400); fb.className="feedback no ko"; fb.textContent="이 단어는 맞아요. 그림을 다시 봐요."; }
+      };
+      wp.appendChild(b);
+    });
+  },
+
+  persona(r, st, done){
+    const p=r.p;
+    let info="";
+    if(p.timeGrade) info=`⏳ 지금 나는 <b>${p.timeGrade}학년</b>!`;
+    else {
+      info=`📍 ${p.from}<br>🎒 ${p.grade}학년 · 🏫 교실 ${p.room}층`;
+      if(p.place) info+=`<br>💛 좋아하는 장소: ${p.place} (${p.placeFloor}층)`;
+      if(p.subject) info+=`<br>💛 좋아하는 과목: ${p.subject}`;
+    }
+    st.innerHTML=conceptLine("pers","누구의 입장에서 쓰는지 생각해요")+
+      `<div class="profile"><div class="avatar">${p.av}</div><div class="pinfo"><b style="font-size:20px">${esc(p.name)}</b><br>${info}</div></div>
+       <p class="prompt" style="text-align:center">${r.ko}</p>
+       <input class="line-input" id="in" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="문장 전체를 영어로 써요">
+       <div class="row" style="margin-top:8px"><button class="btn soft" id="wb">📦 단어 상자</button></div>
+       <div class="wordbank" id="bank">${shuffle(r.bank).map(w=>`<span>${esc(w)}</span>`).join("")}</div>`;
+    let usedBank=false;
+    st.querySelector("#wb").onclick=()=>{usedBank=true; st.querySelector("#bank").classList.toggle("show");};
+    const inp=st.querySelector("#in"); inp.focus();
+    typedCheck({st,input:inp,answers:[r.ans],onDone:ok=>done(ok)});
+  }
+};
+
+/* =========================================================
+   ROOFTOP — 나의 이메일 (Write in Steps)
+   ========================================================= */
+function renderEmail(){
+  const st=$("#stage");
+  st.innerHTML=conceptLine("pers","이제 나의 관점에서! 외국인 친구 James에게 나를 소개해요")+
+   `<div class="email-grid">
+     <div>
+       <div class="field"><label>✏️ 이름 (영어로)</label><input id="e-name" placeholder="Jimin" autocomplete="off"></div>
+       <div class="field"><label>🏙️ 사는 도시 (영어로)</label><input id="e-city" placeholder="Seoul" autocomplete="off"></div>
+       <div class="field"><label>🌏 나라</label><input id="e-country" value="Korea" autocomplete="off"></div>
+       <div class="field"><label>🎒 학년 — 서수로 써요 (예: sixth)</label><input id="e-grade" placeholder="sixth" autocomplete="off" autocapitalize="off" spellcheck="false"><small id="m-grade"></small></div>
+       <div class="field"><label>🏫 우리 교실은 몇 층? — 서수로 써요</label><input id="e-floor" placeholder="third" autocomplete="off" autocapitalize="off" spellcheck="false"><small id="m-floor"></small></div>
+       <div class="field"><label>📘 좋아하는 과목 (영어로)</label><input id="e-sub" placeholder="math" autocomplete="off"></div>
+     </div>
+     <div>
+       <div class="letter" id="letter"></div>
+       <div class="row"><button class="btn say" id="e-say">🔊 내 이메일 들어 보기</button><button class="btn go" id="e-done">완성 ✔</button></div>
+       <div class="feedback ko" id="e-fb"></div>
+     </div>
+   </div>
+   <div class="reflect">
+     <p class="prompt" style="margin-top:8px">🧭 생각 나누기 (Notice &amp; Reflect)</p>
+     <div class="concept" style="border-color:var(--c-conn)"><b style="color:var(--c-conn)">연결</b> <span class="ko">— 오늘 배운 표현을 우리 학교의 어느 장소와 연결해 쓸 수 있을까요?</span><textarea placeholder="예: 우리 학교 도서관은 2층! The library is on the second floor."></textarea></div>
+     <div class="concept" style="border-color:var(--c-func)"><b style="color:var(--c-func)">기능</b> <span class="ko">— 학년과 층수를 묻는 말은 언제, 누구에게 쓸 수 있을까요?</span><textarea placeholder="예: 전학 온 친구에게 교실을 알려 줄 때"></textarea></div>
+     <div class="concept" style="border-color:var(--c-pers)"><b style="color:var(--c-pers)">관점</b> <span class="ko">— Andy, Mei와 나의 학교생활은 무엇이 같고 무엇이 다른가요?</span><textarea placeholder="예: Mei처럼 나도 음악실을 좋아해요."></textarea></div>
+   </div>`;
+  const ids=["name","city","country","grade","floor","sub"];
+  const v=id=>$("#e-"+id).value.trim();
+  const ordWords=ORD.map(o=>o.w);
+  function ordCheck(id){
+    const el=$("#e-"+id), m=$("#m-"+id), val=v(id).toLowerCase();
+    el.classList.remove("badf","goodf"); m.textContent="";
+    if(!val) return false;
+    if(ordWords.includes(val)){ el.classList.add("goodf"); return true; }
+    const c=ORD.find(o=>o.card===val||String(o.n)===val||o.ab===val);
+    el.classList.add("badf");
+    m.textContent = c? `서수로 바꿔 써요 → ${c.w}` : "first ~ sixth 중에서 철자를 확인해요";
+    return false;
+  }
+  function blank(x,ph){return x?esc(x):`<span class="blank">${ph}</span>`;}
+  function paint(){
+    const g=ordCheck("grade"), f=ordCheck("floor");
+    $("#letter").innerHTML=`Dear James,<br><br>
+      Hello, I'm ${blank(cap(v("name")),"_____")}.<br>
+      I live in ${blank(cap(v("city")),"_____")}, ${blank(cap(v("country")),"_____")}.<br>
+      I'm in the ${blank(g?v("grade").toLowerCase():v("grade"),"_____")} grade.<br>
+      My classroom is on the ${blank(f?v("floor").toLowerCase():v("floor"),"_____")} floor.<br>
+      My favorite subject is ${blank(v("sub"),"_____")}.<br>
+      Thanks for your email.<br><br>
+      Best wishes,<br>${blank(cap(v("name")),"_____")}`;
+  }
+  ids.forEach(id=>$("#e-"+id).addEventListener("input",paint));
+  paint();
+  $("#e-say").onclick=()=>say($("#letter").innerText.replace(/_+/g,"blank"));
+  $("#e-done").onclick=()=>{
+    const fb=$("#e-fb");
+    const missing=ids.filter(id=>!v(id));
+    if(missing.length){fb.className="feedback tip ko";fb.textContent="빈칸을 모두 채워 봐요!";return;}
+    if(!ordCheck("grade")||!ordCheck("floor")){fb.className="feedback no ko";fb.textContent="학년과 층수를 서수로 바르게 썼는지 확인해요. (I'm in the six grade ✕ → sixth ✔)";beep(false);return;}
+    fb.className="feedback ok ko"; fb.textContent="멋진 이메일 완성! 🌱 친구와 바꿔 읽어 봐요."; beep(true);
+    if(!STARS.roof||STARS.roof<3){STARS.roof=3;saveStars(STARS);}
+    say($("#letter").innerText);
+  };
+}
+
+renderHome();
+</script>
+</body>
+</html>
