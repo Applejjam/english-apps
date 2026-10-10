@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Quiz 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EEF4FF; --card:#FFFFFF; --ink:#24263A; --muted:#7C8098; --line:#D9E3F7;
+    --brand:#4C6FFF; --brand-d:#3352D6; --good:#1FAF7A; --bad:#EF4A5E; --accent:#FF8A3D;
+  }
+  *{box-sizing:border-box}
+  body{margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+       font-family:'Jua','Noto Sans KR',sans-serif; -webkit-tap-highlight-color:transparent}
+  .en{font-family:'Nunito',sans-serif; font-weight:900; letter-spacing:.3px}
+  button{font-family:inherit; cursor:pointer; border:none}
+  .wrap{max-width:780px; margin:0 auto; padding:16px}
+  .hide{display:none !important}
+
+  .top{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px}
+  .pill{background:var(--card); border:2px solid var(--line); border-radius:999px; padding:8px 14px; font-size:16px; color:var(--ink); text-decoration:none}
+  .score{font-size:18px}
+
+  .screen{display:none} .screen.on{display:block}
+
+  /* 시작 화면 */
+  .hero{text-align:center; padding:18px 8px 6px}
+  .hero .badge{display:inline-block; background:var(--brand); color:#fff; border-radius:999px; padding:4px 14px; font-size:16px}
+  .hero h1{font-size:46px; margin:10px 0 4px; color:var(--brand)}
+  .hero p{font-size:19px; color:var(--muted); margin:0}
+  .label{font-size:19px; margin:22px 0 10px}
+  .label small{color:var(--muted); font-size:15px}
+  .topics{display:flex; flex-wrap:wrap; gap:8px}
+  .chip{background:var(--card); border:2px solid var(--line); border-radius:999px; padding:9px 16px; font-size:16px; color:var(--muted)}
+  .chip.on{background:var(--brand); border-color:var(--brand); color:#fff}
+  .modes{display:grid; grid-template-columns:repeat(5,1fr); gap:10px}
+  .mode{background:var(--card); border:3px solid var(--line); border-radius:20px; padding:16px 6px; font-size:19px; color:var(--ink); transition:transform .15s, border-color .15s}
+  .mode:hover:not(:disabled){transform:translateY(-3px); border-color:var(--brand)}
+  .mode .ico{font-size:38px; display:block; margin-bottom:4px}
+  .mode small{display:block; font-size:13px; color:var(--muted); margin-top:3px}
+  .mode:disabled{opacity:.45; cursor:not-allowed}
+  .note{text-align:center; color:var(--muted); font-size:14px; margin-top:12px; min-height:18px}
+
+  /* 게임 화면 */
+  .bar{height:12px; background:var(--line); border-radius:99px; overflow:hidden; margin-bottom:6px}
+  .bar i{display:block; height:100%; width:0; background:var(--brand); border-radius:99px; transition:width .3s}
+  .meta{display:flex; justify-content:space-between; color:var(--muted); font-size:15px; margin-bottom:10px}
+  .qcard{background:var(--card); border:3px solid var(--line); border-radius:28px; padding:26px 20px 20px; text-align:center; position:relative}
+  .qtype{display:inline-block; background:#EEF2FF; color:var(--brand); border-radius:999px; padding:4px 12px; font-size:15px; margin-bottom:10px}
+  .prompt{font-size:52px; line-height:1.25; min-height:66px; word-break:keep-all}
+  .prompt.small{font-size:36px}
+  .sub{color:var(--muted); font-size:17px; margin-top:6px; min-height:22px}
+  .bigspeak{width:110px; height:110px; border-radius:50%; background:var(--accent); color:#fff; font-size:50px; box-shadow:0 7px 0 #D86A22}
+  .bigspeak:active{transform:translateY(4px); box-shadow:0 3px 0 #D86A22}
+  .listen{position:absolute; top:14px; right:14px; background:#EEF2FF; color:var(--brand); border-radius:999px; padding:7px 13px; font-size:16px}
+  .answer{font-size:36px; color:var(--good); min-height:46px; margin-top:8px}
+  .pop{animation:pop .3s ease}
+  @keyframes pop{0%{transform:scale(.6); opacity:.3}100%{transform:scale(1); opacity:1}}
+  .shake{animation:shake .35s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+  .controls{margin-top:14px}
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+  .choice{background:var(--card); border:3px solid var(--line); border-radius:18px; padding:18px 8px; font-size:24px; color:var(--ink); word-break:keep-all}
+  .choice:hover:not(:disabled){border-color:var(--brand)}
+  .choice .num{display:inline-block; width:26px; height:26px; line-height:26px; border-radius:50%; background:var(--bg); color:var(--muted); font-size:14px; margin-right:8px; vertical-align:middle; font-family:'Nunito',sans-serif}
+  .choice.right{background:var(--good); border-color:var(--good); color:#fff}
+  .choice.wrong{background:#FFE6E9; border-color:var(--bad); color:var(--bad)}
+
+  .typebox{display:flex; gap:10px}
+  .typebox input{flex:1; min-width:0; font-size:30px; padding:14px 16px; border:3px solid var(--line); border-radius:18px; outline:none; text-align:center; background:var(--card); color:var(--ink)}
+  .typebox input:focus{border-color:var(--brand)}
+  .blanks{text-align:center; font-size:28px; color:var(--muted); margin-top:12px; letter-spacing:5px; min-height:38px}
+  .btn{border-radius:18px; padding:13px 20px; font-size:19px; color:#fff; background:var(--brand)}
+  .btn.soft{background:var(--card); color:var(--ink); border:3px solid var(--line)}
+  .btn.go{background:var(--accent)}
+
+  .mic{display:block; margin:0 auto; width:120px; height:120px; border-radius:50%; background:var(--brand); color:#fff; font-size:52px; box-shadow:0 8px 0 var(--brand-d)}
+  .mic:active{transform:translateY(4px); box-shadow:0 4px 0 var(--brand-d)}
+  .mic.on{background:var(--bad); box-shadow:0 8px 0 #B83244; animation:pulse 1s infinite}
+  @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+  .heard{text-align:center; margin-top:12px; font-size:17px; color:var(--muted); min-height:24px}
+
+  .feedback{text-align:center; font-size:24px; min-height:36px; margin:12px 0 4px}
+  .feedback.good{color:var(--good)} .feedback.bad{color:var(--bad)}
+  .actions{display:flex; justify-content:center; gap:10px; margin-top:6px; flex-wrap:wrap}
+
+  /* 결과 */
+  .result{text-align:center; padding:20px 6px}
+  .result .stars{font-size:64px}
+  .result h2{font-size:38px; margin:8px 0 2px}
+  .result p{font-size:21px; color:var(--muted); margin:0 0 18px}
+  .review{background:var(--card); border:3px solid var(--line); border-radius:22px; padding:16px; text-align:left; margin:0 auto 18px; max-width:520px}
+  .review h3{margin:0 0 10px; font-size:19px}
+  .review ul{list-style:none; margin:0; padding:0}
+  .review li{display:flex; align-items:center; gap:10px; padding:9px 4px; border-top:1px solid var(--line); font-size:18px}
+  .review li:first-child{border-top:none}
+  .review li .w{flex:1}
+  .review li button{background:#EEF2FF; color:var(--brand); border-radius:999px; padding:5px 11px; font-size:15px}
+
+  @media (max-width:640px){
+    .modes{grid-template-columns:repeat(2,1fr)}
+    .mode:last-child{grid-column:span 2}
+    .prompt{font-size:40px} .prompt.small{font-size:30px}
+    .choices{grid-template-columns:1fr}
+    .hero h1{font-size:38px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a class="pill" href="../index.html">← 목록</a>
+    <div class="pill score">⭐ <span id="score">0</span></div>
+  </div>
+
+  <!-- 1. 시작 화면 -->
+  <section id="start" class="screen on">
+    <div class="hero">
+      <span class="badge">6학년</span>
+      <h1 class="en">Word Quiz 6</h1>
+      <p>6학년 영어 단어, 얼마나 알고 있나요?</p>
+    </div>
+
+    <div class="label">① 범위 고르기 <small>(여러 개 선택 가능)</small></div>
+    <div class="topics" id="topics"></div>
+
+    <div class="label">② 방법 고르기</div>
+    <div class="modes">
+      <button class="mode" data-mode="choose"><span class="ico">🖱️</span>골라요<small>뜻 보고 단어 고르기</small></button>
+      <button class="mode" data-mode="listen"><span class="ico">🎧</span>들어요<small>듣고 뜻 고르기</small></button>
+      <button class="mode" data-mode="type"><span class="ico">⌨️</span>써요<small>뜻 보고 철자 쓰기</small></button>
+      <button class="mode" data-mode="voice" id="voiceMode"><span class="ico">🎤</span>말해요<small>뜻 보고 영어로 말하기</small></button>
+      <button class="mode" data-mode="mix"><span class="ico">🎲</span>섞어요<small>여러 방법 섞어서</small></button>
+    </div>
+    <div class="note" id="note"></div>
+  </section>
+
+  <!-- 2. 문제 화면 -->
+  <section id="play" class="screen">
+    <div class="bar"><i id="bar"></i></div>
+    <div class="meta"><span id="topicName"></span><span id="count">1 / 10</span></div>
+
+    <div class="qcard" id="qcard">
+      <button class="listen hide" id="listenBtn">🔊 들어보기</button>
+      <div class="qtype" id="qtype"></div>
+      <div class="prompt" id="prompt"></div>
+      <div class="sub" id="sub"></div>
+      <div class="answer en" id="answer"></div>
+    </div>
+
+    <div class="controls" id="controls"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="actions">
+      <button class="btn soft" id="skip">모르겠어요</button>
+      <button class="btn go hide" id="next">다음 ▶</button>
+    </div>
+  </section>
+
+  <!-- 3. 결과 화면 -->
+  <section id="end" class="screen">
+    <div class="result">
+      <div class="stars" id="stars"></div>
+      <h2 class="en" id="endTitle"></h2>
+      <p id="endText"></p>
+      <div class="review" id="review">
+        <h3>📒 다시 볼 단어</h3>
+        <ul id="reviewList"></ul>
+      </div>
+      <div class="actions">
+        <button class="btn go" id="retryWrong">틀린 단어만 다시</button>
+        <button class="btn" id="again">새로 풀기</button>
+        <button class="btn soft" id="toStart">처음으로</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+/* =========================================================
+   ✏️ 선생님 수정 구역
+   - topic: 범위 이름 (교과서 단원 이름으로 바꿔도 좋아요)
+   - word: 영어 단어 / meaning: 우리말 뜻
+   - 같은 topic끼리 묶여서 시작 화면에 버튼으로 나옵니다.
+   - ROUNDS: 한 번에 푸는 문제 수
+   ========================================================= */
+const WORDS = [
+  // 꿈과 직업
+  { topic:"꿈과 직업", word:"future",        meaning:"미래" },
+  { topic:"꿈과 직업", word:"dream",         meaning:"꿈" },
+  { topic:"꿈과 직업", word:"scientist",     meaning:"과학자" },
+  { topic:"꿈과 직업", word:"pilot",         meaning:"조종사" },
+  { topic:"꿈과 직업", word:"designer",      meaning:"디자이너" },
+  { topic:"꿈과 직업", word:"firefighter",   meaning:"소방관" },
+  { topic:"꿈과 직업", word:"police officer",meaning:"경찰관" },
+  { topic:"꿈과 직업", word:"astronaut",     meaning:"우주 비행사" },
+  // 길 찾기
+  { topic:"길 찾기", word:"straight",    meaning:"똑바로" },
+  { topic:"길 찾기", word:"left",        meaning:"왼쪽" },
+  { topic:"길 찾기", word:"right",       meaning:"오른쪽" },
+  { topic:"길 찾기", word:"cross",       meaning:"건너다" },
+  { topic:"길 찾기", word:"block",       meaning:"구역, 블록" },
+  { topic:"길 찾기", word:"library",     meaning:"도서관" },
+  { topic:"길 찾기", word:"museum",      meaning:"박물관" },
+  { topic:"길 찾기", word:"post office", meaning:"우체국" },
+  // 건강
+  { topic:"건강", word:"cold",         meaning:"감기" },
+  { topic:"건강", word:"fever",        meaning:"열" },
+  { topic:"건강", word:"headache",     meaning:"두통" },
+  { topic:"건강", word:"stomachache",  meaning:"복통, 배탈" },
+  { topic:"건강", word:"medicine",     meaning:"약" },
+  { topic:"건강", word:"rest",         meaning:"쉬다, 휴식" },
+  { topic:"건강", word:"hospital",     meaning:"병원" },
+  { topic:"건강", word:"exercise",     meaning:"운동하다" },
+  // 계획과 경험
+  { topic:"계획과 경험", word:"vacation",  meaning:"방학" },
+  { topic:"계획과 경험", word:"weekend",   meaning:"주말" },
+  { topic:"계획과 경험", word:"travel",    meaning:"여행하다" },
+  { topic:"계획과 경험", word:"visit",     meaning:"방문하다" },
+  { topic:"계획과 경험", word:"festival",  meaning:"축제" },
+  { topic:"계획과 경험", word:"invite",    meaning:"초대하다" },
+  { topic:"계획과 경험", word:"delicious", meaning:"맛있는" },
+  { topic:"계획과 경험", word:"famous",    meaning:"유명한" },
+  // 환경
+  { topic:"환경", word:"environment", meaning:"환경" },
+  { topic:"환경", word:"recycle",     meaning:"재활용하다" },
+  { topic:"환경", word:"save",        meaning:"아끼다, 구하다" },
+  { topic:"환경", word:"protect",     meaning:"보호하다" },
+  { topic:"환경", word:"trash",       meaning:"쓰레기" },
+  { topic:"환경", word:"plant",       meaning:"(식물을) 심다" },
+  { topic:"환경", word:"earth",       meaning:"지구" },
+  { topic:"환경", word:"energy",      meaning:"에너지" }
+];
+const ROUNDS = 10;
+/* ========================================================= */
+
+const $ = s => document.querySelector(s);
+const TOPICS = [...new Set(WORDS.map(w=>w.topic))];
+let picked = new Set(TOPICS);
+let mode, deck, idx, score, solved, firstTry, hintCount, wrongList, curType;
+
+/* ---------- 도구 ---------- */
+const shuffle = a => { for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];} return a; };
+const norm = s => s.toLowerCase().replace(/[^a-z\s]/g," ").replace(/\s+/g," ").trim();
+const show = id => { document.querySelectorAll(".screen").forEach(s=>s.classList.remove("on")); $("#"+id).classList.add("on"); window.scrollTo(0,0); };
+const replay = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+
+let actx;
+function tone(freqs){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const t = actx.currentTime;
+    freqs.forEach((f,i)=>{
+      const o=actx.createOscillator(), g=actx.createGain(), s=t+i*0.11;
+      o.type="sine"; o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.22,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.2);
+      o.connect(g).connect(actx.destination); o.start(s); o.stop(s+0.22);
+    });
+  }catch(e){}
+}
+
+let enVoice=null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  enVoice = vs.find(v=>v.lang==="en-US" && /Google|Samantha|Microsoft/i.test(v.name)) || vs.find(v=>v.lang && v.lang.startsWith("en")) || null;
+}
+if("speechSynthesis" in window){ pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang="en-US"; if(enVoice) u.voice=enVoice; u.rate=0.85;
+  speechSynthesis.speak(u);
+}
+
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+if(!SR){ $("#voiceMode").disabled = true; $("#note").textContent = "🎤 말해요는 크롬(Chrome) 브라우저에서 사용할 수 있어요."; }
+
+/* ---------- 시작 화면 ---------- */
+function drawTopics(){
+  const box=$("#topics"); box.innerHTML="";
+  const all=document.createElement("button");
+  all.className="chip"+(picked.size===TOPICS.length?" on":""); all.textContent="전체";
+  all.onclick=()=>{ picked = picked.size===TOPICS.length ? new Set() : new Set(TOPICS); drawTopics(); };
+  box.appendChild(all);
+  TOPICS.forEach(t=>{
+    const b=document.createElement("button");
+    const n=WORDS.filter(w=>w.topic===t).length;
+    b.className="chip"+(picked.has(t)?" on":""); b.textContent=`${t} (${n})`;
+    b.onclick=()=>{ picked.has(t)?picked.delete(t):picked.add(t); drawTopics(); };
+    box.appendChild(b);
+  });
+}
+drawTopics();
+
+document.querySelectorAll(".mode").forEach(b=>b.addEventListener("click",()=>{
+  if(picked.size===0){ $("#note").textContent="범위를 하나 이상 골라 주세요!"; return; }
+  mode=b.dataset.mode;
+  const pool=WORDS.filter(w=>picked.has(w.topic));
+  start(shuffle([...pool]).slice(0, Math.min(ROUNDS,pool.length)));
+}));
+
+function start(list){
+  deck=list; idx=0; score=0; wrongList=[]; $("#score").textContent=0;
+  show("play"); newRound();
+}
+
+/* ---------- 문제 진행 ---------- */
+function typeFor(){
+  if(mode!=="mix") return mode;
+  const types=["choose","listen","type"]; if(SR) types.push("voice");
+  return types[Math.floor(Math.random()*types.length)];
+}
+
+function newRound(){
+  if(idx>=deck.length) return endGame();
+  const item=deck[idx];
+  solved=false; firstTry=true; hintCount=0; curType=typeFor();
+
+  $("#bar").style.width=(idx/deck.length*100)+"%";
+  $("#count").textContent=`${idx+1} / ${deck.length}`;
+  $("#topicName").textContent=item.topic;
+  $("#answer").textContent="";
+  setFeedback("","");
+  $("#skip").classList.remove("hide"); $("#next").classList.add("hide");
+
+  const prompt=$("#prompt"), sub=$("#sub"), qtype=$("#qtype"), listenBtn=$("#listenBtn");
+  prompt.className="prompt"; listenBtn.classList.add("hide");
+
+  if(curType==="listen"){
+    qtype.textContent="🎧 잘 듣고 뜻을 골라요";
+    prompt.innerHTML='<button class="bigspeak" id="bigspeak">🔊</button>';
+    sub.textContent="버튼을 누르면 다시 들을 수 있어요";
+    $("#bigspeak").onclick=()=>speak(item.word);
+    setTimeout(()=>speak(item.word),350);
+  }else{
+    qtype.textContent = curType==="choose" ? "🖱️ 알맞은 영어 단어를 골라요"
+                      : curType==="type"   ? "⌨️ 영어로 써 보세요"
+                      : "🎤 영어로 말해 보세요";
+    prompt.textContent=item.meaning;
+    if(item.meaning.length>7) prompt.classList.add("small");
+    sub.textContent="";
+  }
+  replay(prompt,"pop");
+
+  const c=$("#controls"); c.innerHTML="";
+  if(curType==="choose") buildChoices(c,item,"word");
+  if(curType==="listen") buildChoices(c,item,"meaning");
+  if(curType==="type")   buildTyping(c,item);
+  if(curType==="voice")  buildVoice(c,item);
+}
+
+function setFeedback(t,cls){ const f=$("#feedback"); f.textContent=t; f.className="feedback "+cls; }
+
+function success(){
+  if(solved) return; solved=true;
+  if(firstTry){ score++; $("#score").textContent=score; }
+  else if(!wrongList.includes(deck[idx])) wrongList.push(deck[idx]);
+  tone([523,659,784]);
+  const praise=["Great! 🎉","Good job! 👍","Excellent! 🌟","Awesome! 🙌","Perfect! 💯"];
+  setFeedback(firstTry ? praise[Math.floor(Math.random()*praise.length)] : "맞았어요! 다음엔 한 번에 해 봐요 💪","good");
+  finishRound();
+}
+function fail(msg){
+  tone([260,200]); firstTry=false;
+  setFeedback(msg,"bad"); replay($("#qcard"),"shake");
+}
+function finishRound(){
+  const item=deck[idx];
+  $("#answer").textContent=item.word;
+  $("#sub").textContent=item.meaning;
+  $("#listenBtn").classList.remove("hide");
+  setTimeout(()=>speak(item.word),250);
+  $("#controls").querySelectorAll("button, input").forEach(el=>el.disabled=true);
+  $("#skip").classList.add("hide"); $("#next").classList.remove("hide"); $("#next").focus();
+}
+
+$("#skip").onclick=()=>{
+  if(solved) return; solved=true;
+  if(!wrongList.includes(deck[idx])) wrongList.push(deck[idx]);
+  setFeedback("괜찮아요! 같이 익혀 봐요 😊","");
+  finishRound();
+};
+$("#next").onclick=()=>{ idx++; newRound(); };
+$("#listenBtn").onclick=()=>speak(deck[idx].word);
+
+/* 🖱️ 골라요 / 🎧 들어요 : 4지선다 */
+function buildChoices(c,item,field){
+  const same=WORDS.filter(w=>w.topic===item.topic && w!==item);
+  const other=WORDS.filter(w=>w.topic!==item.topic);
+  const distract=[...shuffle(same).slice(0,2), ...shuffle(other)].filter((w,i,a)=>a.findIndex(x=>x[field]===w[field])===i && w[field]!==item[field]).slice(0,3);
+  const opts=shuffle([item,...distract]);
+  const box=document.createElement("div"); box.className="choices";
+  opts.forEach((w,i)=>{
+    const b=document.createElement("button");
+    b.className="choice"+(field==="word"?" en":"");
+    b.innerHTML=`<span class="num">${i+1}</span>${w[field]}`;
+    b.onclick=()=>{
+      if(solved) return;
+      if(w===item){ b.classList.add("right"); success(); }
+      else { b.classList.add("wrong"); b.disabled=true; fail("다시 골라 볼까요?"); }
+    };
+    box.appendChild(b);
+  });
+  c.appendChild(box);
+}
+
+/* ⌨️ 써요 */
+function buildTyping(c,item){
+  c.innerHTML=`
+    <div class="typebox">
+      <input id="typed" class="en" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type here">
+      <button class="btn" id="check">확인</button>
+    </div>
+    <div class="blanks en" id="blanks"></div>
+    <div class="actions"><button class="btn soft" id="hint">💡 힌트</button><button class="btn soft" id="hear">🔊 소리 힌트</button></div>`;
+  const input=$("#typed");
+  const draw=()=>{ $("#blanks").textContent=[...item.word].map((ch,i)=> ch===" "?" / ":(i<hintCount?ch:"_")).join(" "); };
+  draw();
+  const check=()=>{
+    if(solved||!input.value.trim()) return;
+    if(norm(input.value)===norm(item.word)) success();
+    else { fail("철자를 다시 확인해 볼까요?"); input.select(); }
+  };
+  $("#check").onclick=check;
+  input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); e.stopPropagation(); check(); } });
+  $("#hint").onclick=()=>{ if(hintCount<item.word.length){ hintCount++; if(item.word[hintCount-1]===" ") hintCount++; draw(); input.focus(); } };
+  $("#hear").onclick=()=>{ speak(item.word); input.focus(); };
+  setTimeout(()=>input.focus(),50);
+}
+
+/* 🎤 말해요 */
+let rec=null, listening=false;
+function buildVoice(c,item){
+  c.innerHTML=`<button class="mic" id="mic">🎤</button><div class="heard" id="heard">마이크를 누르고 영어로 말해 보세요</div>`;
+  $("#mic").onclick=()=>listen(item);
+}
+function matches(said,target){
+  const p=" "+said+" ";
+  return p.includes(" "+target+" ") || p.includes(" "+target+"s ") || said.replace(/\s/g,"")===target.replace(/\s/g,"");
+}
+function listen(item){
+  if(solved) return;
+  if(listening && rec){ rec.stop(); return; }
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+  rec=new SR(); rec.lang="en-US"; rec.interimResults=false; rec.maxAlternatives=5;
+  rec.onstart=()=>{ listening=true; $("#mic").classList.add("on"); $("#heard").textContent="듣고 있어요... 말해 보세요!"; };
+  rec.onresult=e=>{
+    const alts=[...e.results[0]].map(r=>r.transcript);
+    $("#heard").textContent=`들린 말: "${alts[0]}"`;
+    if(alts.some(t=>matches(norm(t),norm(item.word)))) success();
+    else fail("다시 한번 말해 볼까요?");
+  };
+  rec.onerror=e=>{
+    $("#heard").textContent = e.error==="no-speech" ? "소리가 들리지 않았어요. 다시 눌러 주세요."
+      : e.error==="not-allowed" ? "마이크 사용을 허용해 주세요."
+      : e.error==="network" ? "인터넷 연결을 확인해 주세요." : "다시 한번 눌러 주세요.";
+  };
+  rec.onend=()=>{ listening=false; const m=$("#mic"); if(m) m.classList.remove("on"); };
+  rec.start();
+}
+
+/* ---------- 결과 ---------- */
+function endGame(){
+  $("#bar").style.width="100%";
+  const r=score/deck.length;
+  $("#stars").textContent = r>=0.9?"🏆":r>=0.7?"⭐⭐⭐":r>=0.4?"⭐⭐":"💪";
+  $("#endTitle").textContent = r>=0.9?"Amazing!":r>=0.7?"Great job!":"Nice try!";
+  $("#endText").textContent=`${deck.length}문제 중 ${score}문제를 한 번에 맞혔어요`;
+  const ul=$("#reviewList"); ul.innerHTML="";
+  if(wrongList.length){
+    $("#review").classList.remove("hide"); $("#retryWrong").classList.remove("hide");
+    wrongList.forEach(w=>{
+      const li=document.createElement("li");
+      li.innerHTML=`<span class="w"><b class="en">${w.word}</b> · ${w.meaning}</span>`;
+      const b=document.createElement("button"); b.textContent="🔊"; b.onclick=()=>speak(w.word);
+      li.appendChild(b); ul.appendChild(li);
+    });
+  }else{
+    $("#review").classList.add("hide"); $("#retryWrong").classList.add("hide");
+  }
+  show("end"); tone([523,659,784,1047]);
+}
+$("#retryWrong").onclick=()=>start(shuffle([...wrongList]));
+$("#again").onclick=()=>{ const pool=WORDS.filter(w=>picked.has(w.topic)); start(shuffle([...pool]).slice(0,Math.min(ROUNDS,pool.length))); };
+$("#toStart").onclick=()=>show("start");
+
+document.addEventListener("keydown",e=>{
+  if(!$("#play").classList.contains("on")) return;
+  if(e.key==="Enter" && solved){ e.preventDefault(); $("#next").click(); return; }
+  if(!solved && (curType==="choose"||curType==="listen") && /^[1-4]$/.test(e.key)){
+    const b=$("#controls").querySelectorAll(".choice")[+e.key-1]; if(b && !b.disabled) b.click();
+  }
+});
+</script>
+</body>
+</html>
