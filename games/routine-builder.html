@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Routine Builder</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&family=Noto+Sans+KR:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Nunito', 'Noto Sans KR', sans-serif;
+            background-color: #f0fdf4; /* Soft green background matching the healthy habit theme */
+            background-image: radial-gradient(#bbf7d0 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border: 2px solid #e2e8f0;
+        }
+
+        .word-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .word-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .word-btn:active {
+            transform: translateY(1px);
+        }
+
+        .sentence-display {
+            min-height: 80px;
+            background-image: repeating-linear-gradient(transparent, transparent 39px, #cbd5e1 39px, #cbd5e1 40px);
+            line-height: 40px;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(59, 130, 246, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0); }
+        }
+
+        .speaking .speaker-icon {
+            animation: pulse-ring 1s infinite;
+            color: #3b82f6;
+        }
+
+        /* Toast notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            border-radius: 8px;
+            padding: 12px;
+            position: fixed;
+            z-index: 1;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s, bottom 0.3s;
+        }
+
+        #toast.show {
+            visibility: visible;
+            opacity: 1;
+            bottom: 50px;
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 text-slate-800 flex flex-col items-center">
+
+    <div class="w-full max-w-4xl mb-2">
+        <a href="../index.html" class="inline-block bg-white px-4 py-2 rounded-full border-2 border-slate-200 text-slate-700 font-bold text-sm hover:border-blue-300 transition-colors">← 목록</a>
+    </div>
+
+    <header class="w-full max-w-4xl text-center mb-6">
+        <div class="inline-block bg-white px-4 py-1 rounded-full text-blue-600 font-bold text-sm mb-3 shadow-sm border border-blue-100">
+            <i class="fa-solid fa-compass mr-1"></i> Lesson 8. How Often Do You Exercise?
+        </div>
+        <h1 class="text-3xl md:text-5xl font-extrabold text-slate-800 mb-2">My Routine Builder <i class="fa-solid fa-wand-magic-sparkles text-yellow-400"></i></h1>
+        <p class="text-slate-600 font-medium">눈덩이처럼 쌓이는 1%의 작은 습관, 문장으로 설계해볼까요?</p>
+    </header>
+
+    <main class="w-full max-w-4xl glass-panel p-4 md:p-8 flex flex-col gap-6 relative">
+        
+        <!-- Display Board -->
+        <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-2 h-full bg-blue-400"></div>
+            <div class="flex justify-between items-start gap-4">
+                <div class="flex-1">
+                    <p class="text-xs font-bold text-blue-500 mb-2 uppercase tracking-wider">Your Sentence</p>
+                    <div id="sentence-display" class="sentence-display text-2xl md:text-3xl font-bold text-slate-700 min-h-[40px] break-words">
+                        <!-- Sentence will appear here -->
+                    </div>
+                </div>
+                <button id="btn-speak" class="w-14 h-14 bg-white rounded-full shadow-md flex items-center justify-center text-slate-400 hover:text-blue-500 hover:shadow-lg transition-all border border-slate-100 flex-shrink-0" onclick="speakSentence()">
+                    <i class="fa-solid fa-volume-high text-xl speaker-icon"></i>
+                </button>
+            </div>
+            
+            <div class="mt-4 flex gap-2 justify-end">
+                <button onclick="clearSentence()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-lg text-sm font-bold transition-colors">
+                    <i class="fa-solid fa-trash-can mr-1"></i> 지우기 (Clear)
+                </button>
+                <button onclick="copySentence()" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-bold transition-colors shadow-sm shadow-blue-200">
+                    <i class="fa-solid fa-copy mr-1"></i> 복사하기 (Copy)
+                </button>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex flex-wrap gap-2 mb-4 p-1 bg-slate-100 rounded-xl inline-flex">
+                <button onclick="setLevel(1)" id="tab-lvl1" class="level-tab px-6 py-3 rounded-lg font-bold text-sm md:text-base transition-all bg-white shadow-sm text-blue-600">
+                    Level 1 (초급)
+                </button>
+                <button onclick="setLevel(2)" id="tab-lvl2" class="level-tab px-6 py-3 rounded-lg font-bold text-sm md:text-base transition-all text-slate-500 hover:text-slate-700">
+                    Level 2 (중급)
+                </button>
+                <button onclick="setLevel(3)" id="tab-lvl3" class="level-tab px-6 py-3 rounded-lg font-bold text-sm md:text-base transition-all text-slate-500 hover:text-slate-700">
+                    Level 3 (고급)
+                </button>
+            </div>
+            <p id="level-desc" class="text-sm text-slate-500 ml-2 mb-4 font-medium"><i class="fa-solid fa-circle-info mr-1"></i> 두 개의 덩어리(행동+빈도)를 골라 문장을 완성하세요.</p>
+
+            <div id="word-bank-container" class="flex flex-col gap-6">
+                <!-- Groups will be injected here dynamically by JS -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer for lesson context -->
+    <footer class="mt-8 text-center text-slate-500 text-sm font-medium">
+        <p>완성된 문장은 활동지나 'My Routine Card'에 연필로 직접 적어보세요! <i class="fa-solid fa-pencil text-orange-400"></i></p>
+    </footer>
+
+    <!-- Toast Notification -->
+    <div id="toast"><i class="fa-solid fa-circle-check text-green-400 mr-2"></i>문장이 복사되었습니다!</div>
+
+    <script>
+        // Data structure based on the Unit 8 textbook and lesson plan
+        const vocabulary = {
+            actions: [
+                { text: "I exercise", icon: "fa-dumbbell", color: "bg-red-50 text-red-700 border-red-200 hover:bg-red-100" },
+                { text: "I have breakfast", icon: "fa-bread-slice", color: "bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100" },
+                { text: "I eat vegetables", icon: "fa-carrot", color: "bg-green-50 text-green-700 border-green-200 hover:bg-green-100" },
+                { text: "I brush my teeth", icon: "fa-tooth", color: "bg-teal-50 text-teal-700 border-teal-200 hover:bg-teal-100" },
+                { text: "I wash my hands", icon: "fa-hands-bubbles", color: "bg-cyan-50 text-cyan-700 border-cyan-200 hover:bg-cyan-100" },
+                { text: "I clean my room", icon: "fa-broom", color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100" },
+                { text: "I read books", icon: "fa-book", color: "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100" },
+                { text: "I say nice words", icon: "fa-face-smile-beam", color: "bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100" },
+                { text: "I do kind things", icon: "fa-hand-holding-heart", color: "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100" },
+                { text: "I study English", icon: "fa-language", color: "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100" },
+                { text: "I do my homework", icon: "fa-pen-to-square", color: "bg-violet-50 text-violet-700 border-violet-200 hover:bg-violet-100" },
+                { text: "I stay up late", icon: "fa-moon", color: "bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100" } // Not a good habit, but in the book!
+            ],
+            frequenciesFull: [
+                { text: "every day", icon: "fa-calendar-day" },
+                { text: "once a day", icon: "fa-1" },
+                { text: "twice a day", icon: "fa-2" },
+                { text: "three times a day", icon: "fa-3" },
+                { text: "once a week", icon: "fa-calendar-week" },
+                { text: "twice a week", icon: "fa-calendar-week" },
+                { text: "three times a week", icon: "fa-calendar-week" },
+                { text: "once a month", icon: "fa-calendar-days" }
+            ],
+            freqNumbers: [
+                { text: "once", icon: "fa-1" },
+                { text: "twice", icon: "fa-2" },
+                { text: "three times", icon: "fa-3" },
+                { text: "four times", icon: "fa-4" },
+                { text: "five times", icon: "fa-5" }
+            ],
+            freqPeriods: [
+                { text: "a day", icon: "fa-sun" },
+                { text: "a week", icon: "fa-calendar-week" },
+                { text: "a month", icon: "fa-calendar-days" }
+            ],
+            purposes: [ // For Level 3 (Lesson plan integration)
+                { text: "for my healthy body", icon: "fa-child-reaching", color: "bg-fuchsia-50 text-fuchsia-700 border-fuchsia-200 hover:bg-fuchsia-100" },
+                { text: "to build a healthy mind", icon: "fa-brain", color: "bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100" },
+                { text: "to feel better", icon: "fa-face-smile", color: "bg-pink-50 text-pink-700 border-pink-200 hover:bg-pink-100" },
+                { text: "for my balanced life", icon: "fa-scale-balanced", color: "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100" },
+                { text: "to achieve my dream", icon: "fa-star", color: "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100" },
+                { text: "to be the person I want to be", icon: "fa-seedling", color: "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100" }
+            ]
+        };
+
+        let currentLevel = 1;
+        let selectedParts = {}; // Keeps track of what the user clicked in each category
+        
+        function setLevel(level) {
+            currentLevel = level;
+            clearSentence();
+            
+            // Update tabs styling
+            document.querySelectorAll('.level-tab').forEach((tab, index) => {
+                if (index + 1 === level) {
+                    tab.classList.add('bg-white', 'shadow-sm', 'text-blue-600');
+                    tab.classList.remove('text-slate-500', 'hover:text-slate-700');
+                } else {
+                    tab.classList.remove('bg-white', 'shadow-sm', 'text-blue-600');
+                    tab.classList.add('text-slate-500', 'hover:text-slate-700');
+                }
+            });
+
+            const descEl = document.getElementById('level-desc');
+            const container = document.getElementById('word-bank-container');
+            container.innerHTML = ''; // Clear current banks
+
+            if (level === 1) {
+                descEl.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i> <strong>[행동]</strong>과 <strong>[빈도]</strong> 두 덩어리를 골라 완성하세요. (가장 기본)';
+                renderGroup(container, 'Action (어떤 행동을 하나요?)', 'action', vocabulary.actions);
+                renderGroup(container, 'Frequency (얼마나 자주 하나요?)', 'freqFull', vocabulary.frequenciesFull, "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100");
+            } 
+            else if (level === 2) {
+                descEl.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i> 빈도를 <strong>[횟수]</strong>와 <strong>[기간]</strong>으로 나누어 조합해보세요. (교과서 수준)';
+                renderGroup(container, 'Action (행동)', 'action', vocabulary.actions);
+                renderGroup(container, 'How many times? (횟수)', 'freqNum', vocabulary.freqNumbers, "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100");
+                renderGroup(container, 'A period (기간)', 'freqPeriod', vocabulary.freqPeriods, "bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100");
+            }
+            else if (level === 3) {
+                descEl.innerHTML = '<i class="fa-solid fa-circle-info mr-1"></i> 마지막에 <strong>[다짐/목적]</strong>을 추가하여 나만의 완벽한 루틴을 설계하세요! (도전)';
+                renderGroup(container, 'Action (행동)', 'action', vocabulary.actions);
+                renderGroup(container, 'How many times? (횟수)', 'freqNum', vocabulary.freqNumbers, "bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100");
+                renderGroup(container, 'A period (기간)', 'freqPeriod', vocabulary.freqPeriods, "bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100");
+                renderGroup(container, 'Why? (나의 다짐)', 'purpose', vocabulary.purposes);
+            }
+            
+            updateDisplay();
+        }
+
+        // Helper to render a group of buttons
+        function renderGroup(parent, title, categoryId, items, defaultColorClass = "") {
+            const groupDiv = document.createElement('div');
+            groupDiv.className = 'bg-slate-50/50 p-4 rounded-xl border border-slate-100';
+            
+            const titleEl = document.createElement('h3');
+            titleEl.className = 'text-sm font-bold text-slate-500 mb-3';
+            titleEl.innerText = title;
+            groupDiv.appendChild(titleEl);
+
+            const btnContainer = document.createElement('div');
+            btnContainer.className = 'flex flex-wrap gap-2';
+
+            items.forEach(item => {
+                const btn = document.createElement('button');
+                const colorClass = item.color || defaultColorClass || "bg-white text-slate-700 border-slate-200 hover:bg-slate-50";
+                
+                btn.className = `word-btn px-4 py-2 rounded-lg border-2 font-bold text-sm md:text-base ${colorClass}`;
+                btn.dataset.category = categoryId;
+                btn.dataset.text = item.text;
+                
+                btn.innerHTML = `<i class="fa-solid ${item.icon} mr-2 opacity-70"></i>${item.text}`;
+                
+                btn.onclick = () => selectWord(categoryId, item.text, btn);
+                btnContainer.appendChild(btn);
+            });
+
+            groupDiv.appendChild(btnContainer);
+            parent.appendChild(groupDiv);
+        }
+
+        function selectWord(categoryId, text, btnElement) {
+            // Un-highlight previous in this category
+            const siblings = btnElement.parentElement.querySelectorAll('button');
+            siblings.forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-blue-300', 'scale-105');
+            });
+
+            // Highlight selected
+            btnElement.classList.add('ring-4', 'ring-blue-300', 'scale-105');
+
+            // Store selection
+            selectedParts[categoryId] = text;
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const display = document.getElementById('sentence-display');
+            let sentenceArr = [];
+
+            if (currentLevel === 1) {
+                if(selectedParts.action) sentenceArr.push(selectedParts.action);
+                if(selectedParts.freqFull) sentenceArr.push(selectedParts.freqFull);
+            } 
+            else if (currentLevel === 2 || currentLevel === 3) {
+                if(selectedParts.action) sentenceArr.push(selectedParts.action);
+                if(selectedParts.freqNum) sentenceArr.push(selectedParts.freqNum);
+                if(selectedParts.freqPeriod) sentenceArr.push(selectedParts.freqPeriod);
+                if(currentLevel === 3 && selectedParts.purpose) sentenceArr.push(selectedParts.purpose);
+            }
+
+            if (sentenceArr.length === 0) {
+                display.innerHTML = '<span class="text-slate-300 font-normal italic">아래에서 단어를 선택해 문장을 만드세요.</span>';
+                return;
+            }
+
+            let rawSentence = sentenceArr.join(" ");
+            // Basic grammar formatting: capitalize first letter, add period
+            let finalSentence = rawSentence.charAt(0).toUpperCase() + rawSentence.slice(1);
+            if (!finalSentence.endsWith('.')) {
+                finalSentence += '.';
+            }
+
+            // Simple transition effect
+            display.style.opacity = 0;
+            setTimeout(() => {
+                display.innerText = finalSentence;
+                display.style.opacity = 1;
+            }, 100);
+        }
+
+        function clearSentence() {
+            selectedParts = {};
+            document.querySelectorAll('.word-btn').forEach(btn => {
+                btn.classList.remove('ring-4', 'ring-blue-300', 'scale-105');
+            });
+            updateDisplay();
+        }
+
+        function speakSentence() {
+            const display = document.getElementById('sentence-display');
+            const text = display.innerText;
+            
+            if (!text || text.includes('아래에서 단어를')) return; // Don't read placeholder
+
+            // Visual feedback
+            const btn = document.getElementById('btn-speak');
+            btn.classList.add('speaking');
+
+            // Cancel any ongoing speech
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; // Slightly slower for 6th grade learners
+            utterance.pitch = 1.1; // Slightly friendly pitch
+            
+            // Try to find a good female English voice if available (sounds friendlier usually)
+            const voices = window.speechSynthesis.getVoices();
+            const preferredVoice = voices.find(voice => voice.lang.includes('en-US') && voice.name.includes('Female')) 
+                                || voices.find(voice => voice.lang === 'en-US');
+            if (preferredVoice) utterance.voice = preferredVoice;
+
+            utterance.onend = () => {
+                btn.classList.remove('speaking');
+            };
+
+            utterance.onerror = () => {
+                btn.classList.remove('speaking');
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Ensure voices load properly (some browsers load them asynchronously)
+        window.speechSynthesis.onvoiceschanged = () => {
+            // Ready
+        };
+
+        function copySentence() {
+            const display = document.getElementById('sentence-display');
+            const text = display.innerText;
+            
+            if (!text || text.includes('아래에서 단어를')) return;
+
+            // Using execCommand as a reliable fallback for iFrames/embedded environments
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                showToast();
+            } catch (err) {
+                console.error('Unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById("toast");
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 2500);
+        }
+
+        // Initialize App on load
+        window.onload = () => {
+            setLevel(1);
+        };
+    </script>
+</body>
+</html>
