@@ -25,6 +25,7 @@ body{font-family:var(--f-ko);font-size:16px}
 header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
 h1{font-family:var(--f-en);font-weight:800;font-size:clamp(1.6rem,3.4vw,2.4rem);margin:0;line-height:1;letter-spacing:-.01em}
 h1 span{color:var(--move)}
+.home{text-decoration:none;display:inline-flex;align-items:center}
 .missions{display:flex;flex-wrap:wrap;gap:6px}
 .mchip{font-family:var(--f-en);font-weight:700;font-size:1.05rem;width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;position:relative}
 .mchip[aria-current="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
@@ -86,7 +87,7 @@ footer{color:var(--muted);font-size:.85rem;line-height:1.5}
 
 <div class="wrap">
   <header>
-    <h1>Go! <span>Mission</span> Road</h1>
+    <div class="row" style="gap:12px"><a class="btn small home" href="../index.html">← NAVI PLAY</a><h1>Go! <span>Mission</span> Road</h1></div>
     <nav class="missions" id="missions" aria-label="미션 선택"></nav>
   </header>
 
