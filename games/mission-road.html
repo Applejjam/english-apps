@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Go! Mission Road</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: storybook village map on the left, mission card + direction cards on the right; stacks on narrow screens. Single warm daylight look by choice. */
+:root{
+  --paper:#f7f1df; --ink:#2f3a2a; --muted:#6b7560;
+  --grass:#b9d08f; --grass-dk:#93b56a; --sand:#ecd9a8;
+  --move:#e07a3f; --move-bg:#fde6d4; --stop:#3d7fb8; --stop-bg:#dbeaf6;
+  --good:#3f8f4f; --bad:#c2453a; --line:#d8cdaa; --card:#fffaf0;
+  --f-en:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --f-ko:"Gowun Dodum", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  color-scheme:light;
+}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--f-ko);font-size:16px}
+.wrap{max-width:1280px;margin:0 auto;padding-inline:16px;padding-block:14px 28px;display:flex;flex-direction:column;gap:14px}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+h1{font-family:var(--f-en);font-weight:800;font-size:clamp(1.6rem,3.4vw,2.4rem);margin:0;line-height:1;letter-spacing:-.01em}
+h1 span{color:var(--move)}
+.missions{display:flex;flex-wrap:wrap;gap:6px}
+.mchip{font-family:var(--f-en);font-weight:700;font-size:1.05rem;width:42px;height:42px;border-radius:50%;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;position:relative}
+.mchip[aria-current="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.mchip.done::after{content:"★";position:absolute;top:-8px;right:-6px;font-size:.9rem;color:#e0a92a;text-shadow:0 0 2px #fff}
+main{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:980px){main{grid-template-columns:1fr}}
+.map{background:var(--grass);border-radius:18px;border:3px solid var(--ink);overflow:hidden;position:relative}
+.map svg{display:block;width:100%;height:auto}
+.where{position:absolute;left:10px;bottom:10px;background:rgba(255,250,240,.92);border:2px solid var(--ink);border-radius:999px;padding:3px 12px;font-family:var(--f-en);font-weight:700;font-size:.95rem}
+.panel{display:flex;flex-direction:column;gap:12px;min-width:0}
+.brief{background:var(--card);border:2px solid var(--ink);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.brief .tag{font-family:var(--f-en);font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.brief .say{font-family:var(--f-en);font-weight:700;font-size:1.3rem;line-height:1.3;margin:0;text-wrap:balance}
+.brief .ko{color:var(--muted);margin:0;line-height:1.5}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{font-family:var(--f-en);font-weight:700;font-size:1rem;border:2px solid var(--ink);background:var(--card);color:var(--ink);border-radius:12px;padding:6px 14px;cursor:pointer;min-height:42px}
+.btn:hover{background:#fff}
+.btn.go{background:var(--good);color:#fff;border-color:var(--good);font-size:1.25rem;padding:6px 26px}
+.btn.go:disabled{opacity:.5;cursor:default}
+.btn.small{font-size:.9rem;min-height:36px;padding:4px 10px}
+.btn:focus-visible,.card:focus-visible,.slot:focus-visible,.mchip:focus-visible{outline:3px solid var(--move);outline-offset:2px}
+.seqbox{background:var(--card);border:2px dashed var(--ink);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.seqhead{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.seqhead b{font-family:var(--f-en);font-size:1.05rem}
+.slots{display:flex;flex-direction:column;gap:6px;counter-reset:s}
+.slot{display:flex;align-items:center;gap:10px;border-radius:10px;padding:6px 10px;min-height:44px;border:2px solid transparent;background:#f3ecd8;font-family:var(--f-en);font-weight:600;font-size:1.08rem;text-align:left;cursor:pointer;color:var(--ink)}
+.slot::before{counter-increment:s;content:counter(s);flex:none;width:26px;height:26px;border-radius:50%;background:var(--ink);color:var(--paper);display:grid;place-items:center;font-size:.85rem}
+.slot.empty{color:var(--muted);font-weight:500;cursor:default;font-family:var(--f-ko);font-size:.95rem}
+.slot.move{background:var(--move-bg);border-color:var(--move)}
+.slot.stop{background:var(--stop-bg);border-color:var(--stop)}
+.slot.now{box-shadow:0 0 0 3px var(--ink)}
+.slot.err{border-color:var(--bad);background:#f8d9d4}
+.slot .x{margin-left:auto;font-size:.85rem;color:var(--muted)}
+.bank{display:flex;flex-direction:column;gap:10px}
+.bank h3{margin:0;font-size:.95rem;display:flex;align-items:center;gap:8px}
+.bank h3 i{width:14px;height:14px;border-radius:4px;display:inline-block}
+.cards{display:flex;flex-wrap:wrap;gap:8px}
+.card{font-family:var(--f-en);font-weight:600;font-size:1.05rem;border-radius:12px;padding:6px 12px;border:2px solid;cursor:pointer;text-align:left;line-height:1.2;color:var(--ink);display:flex;flex-direction:column;gap:1px}
+.card.move{background:var(--move-bg);border-color:var(--move)}
+.card.stop{background:var(--stop-bg);border-color:var(--stop)}
+.card b{font-weight:800}
+.card.move b{color:#b4511c}.card.stop b{color:#245d8f}
+.card small{font-family:var(--f-ko);font-size:.8rem;color:var(--muted);font-weight:400}
+.noko .card small{display:none}
+.card:active{transform:scale(.97)}
+.fb{min-height:1.5em;font-size:1rem;line-height:1.5;margin:0}
+.fb.bad{color:var(--bad)} .fb.good{color:var(--good)}
+.clear{position:absolute;inset:0;background:rgba(47,58,42,.55);display:grid;place-items:center;padding:16px}
+.clearbox{background:var(--card);border:3px solid var(--ink);border-radius:18px;padding:18px 20px;max-width:440px;width:100%;display:flex;flex-direction:column;gap:10px}
+.clearbox h2{margin:0;font-family:var(--f-en);font-weight:800;font-size:2rem;color:var(--good)}
+.clearbox ol{margin:0;padding-left:1.4em;font-family:var(--f-en);font-weight:600;font-size:1.1rem;line-height:1.5}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+@media (prefers-reduced-motion:reduce){.shake{animation:none}}
+footer{color:var(--muted);font-size:.85rem;line-height:1.5}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Go! <span>Mission</span> Road</h1>
+    <nav class="missions" id="missions" aria-label="미션 선택"></nav>
+  </header>
+
+  <main>
+    <div class="map" id="map">
+      <svg viewBox="0 0 900 600" role="img" aria-label="마을 지도">
+        <defs>
+          <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="4" cy="4" r="1.6" fill="#a8c47c"/></pattern>
+        </defs>
+        <rect width="900" height="600" fill="#b9d08f"/>
+        <rect width="900" height="600" fill="url(#dots)"/>
+        <!-- far village + hills -->
+        <path d="M0 150 L0 0 L360 0 Z" fill="#cfe0a6"/>
+        <path d="M0 95 Q60 20 120 60 Q170 15 240 40 L250 50 L0 175 Z" fill="#9ab7c9" opacity=".55"/>
+        <g>
+          <rect x="22" y="40" width="30" height="24" fill="#f4e7cc" stroke="#2f3a2a" stroke-width="2"/><path d="M18 42 L37 26 L56 42 Z" fill="#c4553f" stroke="#2f3a2a" stroke-width="2"/>
+          <rect x="66" y="24" width="28" height="22" fill="#f4e7cc" stroke="#2f3a2a" stroke-width="2"/><path d="M62 26 L80 11 L98 26 Z" fill="#c4553f" stroke="#2f3a2a" stroke-width="2"/>
+          <text x="14" y="84"font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" fill="#2f3a2a">Friend's town</text>
+        </g>
+        <!-- river -->
+        <path d="M-10 180 L330 -30 L380 0 L380 -10 L410 -10 L0 250 L-10 250 Z" fill="#6fb3d6"/>
+        <path d="M-10 180 L330 -30" stroke="#4a92ba" stroke-width="4" fill="none"/>
+        <path d="M0 250 L410 -10" stroke="#4a92ba" stroke-width="4" fill="none"/>
+        <path d="M40 200 q12 -8 24 0 M140 140 q12 -8 24 0 M250 70 q12 -8 24 0" stroke="#e8f4fa" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <text x="235" y="120" font-family="Baloo 2, sans-serif" font-weight="700" font-size="17" fill="#1f5b7d" transform="rotate(-32 235 120)">river</text>
+        <!-- road -->
+        <polyline points="175,610 175,545 150,450 195,340 165,240 185,160 180,135" fill="none" stroke="#7d7a72" stroke-width="46" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="175,610 175,545 150,450 195,340 165,240 185,160 180,135" fill="none" stroke="#f3eed8" stroke-width="3" stroke-dasharray="14 14" stroke-linejoin="round"/>
+        <text x="95" y="390" font-family="Baloo 2, sans-serif" font-weight="700" font-size="17" fill="#2f3a2a">road</text>
+        <!-- bridge -->
+        <g>
+          <rect x="155" y="48" width="46" height="98" rx="6" fill="#b5835a" stroke="#2f3a2a" stroke-width="3"/>
+          <line x1="160" y1="50" x2="160" y2="144" stroke="#2f3a2a" stroke-width="3"/>
+          <line x1="196" y1="50" x2="196" y2="144" stroke="#2f3a2a" stroke-width="3"/>
+          <path d="M160 62 H196 M160 80 H196 M160 98 H196 M160 116 H196 M160 134 H196" stroke="#8c5f3c" stroke-width="2"/>
+          <text x="208" y="70" font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" fill="#2f3a2a">bridge</text>
+        </g>
+        <!-- lamp -->
+        <g><line x1="248" y1="205" x2="248" y2="150" stroke="#2f3a2a" stroke-width="5"/><circle cx="248" cy="146" r="10" fill="#f7d76a" stroke="#2f3a2a" stroke-width="3"/><text x="262" y="182" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#2f3a2a">lamp</text></g>
+        <!-- bus stop -->
+        <g><line x1="222" y1="575" x2="222" y2="528" stroke="#2f3a2a" stroke-width="4"/><rect x="204" y="512" width="40" height="22" rx="5" fill="#f5c84b" stroke="#2f3a2a" stroke-width="3"/><text x="224" y="528" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="13" fill="#2f3a2a">BUS</text><text x="232" y="595" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#2f3a2a">bus stop</text></g>
+        <!-- garden ground -->
+        <path d="M300 205 L900 205 L900 600 L300 600 Z" fill="#c6db9c"/>
+        <!-- stone path -->
+        <polyline points="370,465 470,420 540,360 570,305 570,280" fill="none" stroke="#ecd9a8" stroke-width="30" stroke-linejoin="round" stroke-linecap="round"/>
+        <polyline points="370,465 470,420 540,360 570,305" fill="none" stroke="#d9c38a" stroke-width="30" stroke-dasharray="6 18" stroke-linejoin="round"/>
+        <!-- fence -->
+        <g stroke="#2f3a2a" stroke-width="2" fill="#fbf6ea">
+          <rect x="294" y="210" width="12" height="220"/><rect x="294" y="505" width="12" height="95"/>
+          <rect x="300" y="200" width="600" height="10"/>
+        </g>
+        <!-- open gate -->
+        <g><path d="M300 432 L262 412 L262 468 L300 488 Z" fill="#fbf6ea" stroke="#2f3a2a" stroke-width="3"/><line x1="275" y1="419" x2="275" y2="475" stroke="#2f3a2a" stroke-width="2"/><line x1="288" y1="426" x2="288" y2="482" stroke="#2f3a2a" stroke-width="2"/><text x="236" y="404" font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" fill="#2f3a2a">gate</text></g>
+        <!-- pond -->
+        <ellipse cx="400" cy="330" rx="55" ry="34" fill="#7fbfdc" stroke="#2f3a2a" stroke-width="3"/>
+        <path d="M378 325 q8 -6 16 0 M405 340 q8 -6 16 0" stroke="#e8f4fa" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <text x="380" y="388" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#2f3a2a">pond</text>
+        <!-- house -->
+        <g>
+          <rect x="480" y="150" width="180" height="125" fill="#fbf1dc" stroke="#2f3a2a" stroke-width="3"/>
+          <path d="M466 155 L570 82 L674 155 Z" fill="#c4553f" stroke="#2f3a2a" stroke-width="3"/>
+          <rect x="548" y="208" width="44" height="67" fill="#8c5f3c" stroke="#2f3a2a" stroke-width="3"/>
+          <circle cx="583" cy="244" r="3" fill="#f7d76a"/>
+          <rect x="606" y="178" width="38" height="34" fill="#cfe7f4" stroke="#2f3a2a" stroke-width="3"/>
+          <!-- cat in window -->
+          <g><circle cx="625" cy="200" r="9" fill="#e9a35a"/><path d="M617 194 L619 186 L624 192 Z M633 194 L631 186 L626 192 Z" fill="#e9a35a"/><circle cx="622" cy="199" r="1.4" fill="#2f3a2a"/><circle cx="628" cy="199" r="1.4" fill="#2f3a2a"/></g>
+          <!-- flowers below window -->
+          <g fill="#f3f0e6" stroke="#2f3a2a" stroke-width="1.5"><circle cx="612" cy="226" r="4"/><circle cx="626" cy="228" r="4"/><circle cx="640" cy="226" r="4"/></g>
+          <rect x="496" y="178" width="34" height="30" fill="#cfe7f4" stroke="#2f3a2a" stroke-width="3"/>
+          <text x="488" y="296" font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" fill="#2f3a2a">house</text>
+        </g>
+        <!-- bird above the house -->
+        <g transform="translate(560 40)"><path d="M0 10 Q12 -6 22 8 Q30 0 40 4 Q30 12 20 16 Q8 18 0 10 Z" fill="#4e86c4" stroke="#2f3a2a" stroke-width="2"/><circle cx="30" cy="6" r="1.6" fill="#2f3a2a"/></g>
+        <!-- bench -->
+        <g><rect x="645" y="482" width="92" height="14" rx="3" fill="#b5835a" stroke="#2f3a2a" stroke-width="3"/><rect x="645" y="500" width="92" height="12" rx="3" fill="#a3734d" stroke="#2f3a2a" stroke-width="3"/><line x1="655" y1="512" x2="655" y2="528" stroke="#2f3a2a" stroke-width="4"/><line x1="727" y1="512" x2="727" y2="528" stroke="#2f3a2a" stroke-width="4"/><text x="668" y="474" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#2f3a2a">bench</text></g>
+        <!-- box -->
+        <g><rect x="592" y="480" width="40" height="36" fill="#d9a465" stroke="#2f3a2a" stroke-width="3"/><path d="M592 492 H632 M612 480 V492" stroke="#2f3a2a" stroke-width="2"/><text x="596" y="534" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#2f3a2a">box</text></g>
+        <!-- bushes -->
+        <g fill="#6f9a4a" stroke="#2f3a2a" stroke-width="3"><circle cx="425" cy="548" r="30"/><circle cx="537" cy="548" r="30"/></g>
+        <g fill="#f3f0e6"><circle cx="415" cy="540" r="4"/><circle cx="432" cy="556" r="4"/><circle cx="530" cy="540" r="4"/><circle cx="546" cy="556" r="4"/></g>
+        <text x="455" y="595" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#2f3a2a">bushes</text>
+        <!-- tree trunk -->
+        <rect x="778" y="270" width="26" height="80" fill="#8c5f3c" stroke="#2f3a2a" stroke-width="3"/>
+        <!-- character -->
+        <g id="kid">
+          <ellipse cx="0" cy="16" rx="14" ry="5" fill="#2f3a2a" opacity=".2"/>
+          <rect x="-11" y="-12" width="10" height="16" rx="4" fill="#b5835a" stroke="#2f3a2a" stroke-width="2"/>
+          <rect x="-8" y="-14" width="17" height="26" rx="7" fill="#e07a3f" stroke="#2f3a2a" stroke-width="2.5"/>
+          <rect x="-6" y="10" width="5" height="7" fill="#3d5f8c"/><rect x="2" y="10" width="5" height="7" fill="#3d5f8c"/>
+          <circle cx="0" cy="-24" r="11" fill="#f2c9a0" stroke="#2f3a2a" stroke-width="2.5"/>
+          <path d="M-11 -26 Q-10 -37 0 -36 Q11 -37 11 -26 Q4 -31 -11 -26 Z" fill="#4a3220"/>
+          <circle cx="-4" cy="-23" r="1.6" fill="#2f3a2a"/><circle cx="4" cy="-23" r="1.6" fill="#2f3a2a"/>
+        </g>
+        <!-- tree canopy (drawn over the kid so "behind the tree" hides her) -->
+        <g>
+          <circle cx="791" cy="245" r="72" fill="#5f8f3e" stroke="#2f3a2a" stroke-width="3"/>
+          <circle cx="750" cy="268" r="34" fill="#6f9f4a"/><circle cx="828" cy="220" r="30" fill="#6f9f4a"/>
+          <text x="826" y="345" font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" fill="#2f3a2a">tree</text>
+        </g>
+        <!-- goal flag -->
+        <g id="flag"><line x1="0" y1="0" x2="0" y2="-34" stroke="#2f3a2a" stroke-width="3"/><path d="M0 -34 L22 -27 L0 -20 Z" fill="#c2453a" stroke="#2f3a2a" stroke-width="2"/></g>
+      </svg>
+      <div class="where" id="where">at the bus stop</div>
+      <div class="clear" id="clear" hidden>
+        <div class="clearbox">
+          <h2>Mission clear!</h2>
+          <p class="fb" style="margin:0">내가 만든 길 안내를 소리 내어 읽어 보세요.</p>
+          <ol id="clearList"></ol>
+          <div class="row">
+            <button class="btn" id="readAll">Read my directions</button>
+            <button class="btn go" id="next">Next mission</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="panel">
+      <div class="brief">
+        <span class="tag" id="mTag">Mission 1</span>
+        <p class="say" id="mSay"></p>
+        <p class="ko" id="mKo"></p>
+        <div class="row">
+          <button class="btn small" id="listen">Listen</button>
+          <button class="btn small" id="hintBtn">힌트</button>
+          <label class="row" style="gap:6px;font-size:.9rem;cursor:pointer"><input type="checkbox" id="koToggle" checked> 카드 한국어 뜻</label>
+        </div>
+        <p class="ko" id="hint" hidden></p>
+      </div>
+
+      <div class="seqbox">
+        <div class="seqhead">
+          <b>My directions</b>
+          <div class="row">
+            <button class="btn small" id="undo">Undo</button>
+            <button class="btn small" id="clearSeq">Clear</button>
+            <button class="btn go" id="go">Go!</button>
+          </div>
+        </div>
+        <div class="slots" id="slots"></div>
+        <p class="fb" id="fb">아래 카드를 눌러 길 안내 순서를 만들어 보세요.</p>
+      </div>
+
+      <div class="bank">
+        <h3><i style="background:var(--move)"></i>Move 움직임 (어떻게 가나요?)</h3>
+        <div class="cards" id="moveCards"></div>
+        <h3><i style="background:var(--stop)"></i>Stop 위치 (어디에 멈추나요?)</h3>
+        <div class="cards" id="stopCards"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Made by Boeun.S · 주황 카드는 움직임·방향(along, across, through, toward, around, inside, outside), 파란 카드는 위치(near, in front of, next to, behind, between)를 나타냅니다. above, below, far는 미션 문장 속에서 만날 수 있어요.</footer>
+</div>
+
+<script>
+const NODES = {
+  start:{x:175,y:545,label:"at the bus stop"},
+  bridgeFoot:{x:185,y:160,label:"at the end of the road"},
+  village:{x:118,y:66,label:"in your friend's town"},
+  lampSpot:{x:222,y:200,label:"near the lamp"},
+  gardenIn:{x:370,y:465,label:"in the garden"},
+  houseFront:{x:570,y:305,label:"in front of the house"},
+  inside:{x:570,y:252,label:"inside the house"},
+  treeFront:{x:780,y:420,label:"in front of the tree"},
+  treeBehind:{x:812,y:255,label:"behind the tree"},
+  benchFront:{x:690,y:548,label:"in front of the bench"},
+  boxSpot:{x:566,y:505,label:"next to the box"},
+  bushes:{x:481,y:552,label:"between the bushes"}
+};
+function loop(cx,cy,rx,ry,startPt,n=28){
+  const pts=[startPt];
+  for(let i=0;i<=n;i++){const a=Math.PI/2+i/n*Math.PI*2;pts.push([cx+rx*Math.cos(a),cy+ry*Math.sin(a)]);}
+  pts.push(startPt);return pts;
+}
+const CARDS = {
+  along:{type:"move",w:"along",en:"Go along the road.",ko:"길을 따라 가요",hint:"길은 버스 정류장에서 시작해요.",
+    edges:{start:["bridgeFoot",[[175,545],[150,450],[195,340],[165,240],[185,160]]]}},
+  across:{type:"move",w:"across",en:"Go across the bridge.",ko:"다리를 건너요",hint:"다리는 길 끝에 있어요. 먼저 길을 따라 가야 해요.",
+    edges:{bridgeFoot:["village",[[185,160],[178,110],[175,60],[118,66]]]}},
+  through:{type:"move",w:"through",en:"Go through the gate.",ko:"문을 통과해요",hint:"정원 문은 버스 정류장 옆에 있어요.",
+    edges:{start:["gardenIn",[[175,545],[240,505],[300,468],[370,465]]]}},
+  towardHouse:{type:"move",w:"toward",en:"Walk toward the house.",ko:"집 쪽으로 걸어요",hint:"정원 안에 있어야 집 쪽으로 걸어갈 수 있어요.",
+    edges:{gardenIn:["houseFront",[[370,465],[470,420],[540,360],[570,305]]],treeFront:["houseFront",[[780,420],[680,370],[570,305]]]}},
+  towardTree:{type:"move",w:"toward",en:"Walk toward the tree.",ko:"나무 쪽으로 걸어요",hint:"정원 안에 있어야 나무 쪽으로 걸어갈 수 있어요.",
+    edges:{gardenIn:["treeFront",[[370,465],[520,452],[680,438],[780,420]]],houseFront:["treeFront",[[570,305],[680,370],[780,420]]]}},
+  aroundTree:{type:"move",w:"around",en:"Walk around the tree.",ko:"나무 주위를 돌아요",hint:"나무를 돌려면 먼저 나무 앞에 가야 해요.",
+    edges:{treeFront:["treeFront",loop(791,320,100,100,[780,420])]}},
+  aroundPond:{type:"move",w:"around",en:"Walk around the pond.",ko:"연못 주위를 돌아요",hint:"연못은 정원 안에 있어요. 먼저 문을 통과해요.",
+    edges:{gardenIn:["gardenIn",[[370,465],...loop(400,330,82,56,[400,386]),[370,465]]]}},
+  inside:{type:"move",w:"inside",en:"Go inside the house.",ko:"집 안으로 들어가요",hint:"집에 들어가려면 먼저 집 앞에 가야 해요.",
+    edges:{houseFront:["inside",[[570,305],[570,252]]]}},
+  outside:{type:"move",w:"outside",en:"Go outside.",ko:"밖으로 나가요",hint:"밖으로 나가려면 먼저 집 안에 있어야 해요.",
+    edges:{inside:["houseFront",[[570,252],[570,305]]]}},
+  stopLamp:{type:"stop",w:"near",en:"Stop near the lamp.",ko:"가로등 가까이에 멈춰요",hint:"가로등은 길 끝, 다리 옆에 있어요.",
+    edges:{bridgeFoot:["lampSpot",[[185,160],[222,200]]]}},
+  stopBench:{type:"stop",w:"in front of",en:"Stop in front of the bench.",ko:"벤치 앞에 멈춰요",hint:"벤치는 집과 나무 근처에 있어요.",
+    edges:{houseFront:["benchFront",[[570,305],[625,420],[690,548]]],treeFront:["benchFront",[[780,420],[750,500],[690,548]]],boxSpot:["benchFront",[[566,505],[620,550],[690,548]]]}},
+  stopBox:{type:"stop",w:"next to",en:"Stop next to the box.",ko:"상자 옆에 멈춰요",hint:"상자는 벤치 옆에 있어요. 집이나 나무 쪽에서 갈 수 있어요.",
+    edges:{houseFront:["boxSpot",[[570,305],[555,420],[566,505]]],treeFront:["boxSpot",[[780,420],[650,448],[566,505]]],benchFront:["boxSpot",[[690,548],[620,550],[566,505]]]}},
+  stopBehindTree:{type:"stop",w:"behind",en:"Stop behind the tree.",ko:"나무 뒤에 멈춰요",hint:"나무 앞에 먼저 가야 나무 뒤로 숨을 수 있어요.",
+    edges:{treeFront:["treeBehind",[[780,420],[870,360],[812,255]]]}},
+  stopBushes:{type:"stop",w:"between",en:"Stop between the bushes.",ko:"덤불 사이에 멈춰요",hint:"덤불은 정원 문 근처에 있어요.",
+    edges:{gardenIn:["bushes",[[370,465],[430,505],[481,552]]]}}
+};
+const MISSIONS = [
+  {say:"Excuse me. How can I get to the house?",ko:"실례합니다. 집에 어떻게 가나요? 집 앞까지 길을 안내해 주세요.",goal:"houseFront",must:[],hint:"정원 문(gate)을 통과한 뒤 집 쪽으로(toward) 걸어가요."},
+  {say:"My friend lives far from here. Her town is across the river.",ko:"친구는 여기서 멀리 살아요. 친구네 마을은 강 건너편에 있어요.",goal:"village",must:[],hint:"길을 따라(along) 간 다음 다리를 건너요(across)."},
+  {say:"Meet me near the lamp. It's at the end of the road.",ko:"가로등 근처에서 만나요. 가로등은 길 끝에 있어요.",goal:"lampSpot",must:[],hint:"길을 따라 간 뒤 가로등 가까이(near)에 멈춰요."},
+  {say:"The cat is inside the house. The bird is above the house. Find the cat!",ko:"고양이는 집 안에 있어요. 새는 집 위에 있어요. 고양이를 찾아요!",goal:"inside",must:[],hint:"문 통과 → 집 쪽으로 → 집 안으로(inside)."},
+  {say:"I'm tired. Let's sit on the bench. Stop in front of the bench.",ko:"피곤해요. 벤치에 앉아요. 벤치 앞에 멈춰요.",goal:"benchFront",must:[],hint:"집이나 나무 쪽으로 간 뒤 벤치 앞(in front of)에 멈춰요."},
+  {say:"Let's play hide-and-seek! Hide behind the tree.",ko:"숨바꼭질하자! 나무 뒤에 숨어요.",goal:"treeBehind",must:[],hint:"나무 쪽으로 걸어간 뒤 나무 뒤(behind)에 멈춰요."},
+  {say:"Walk around the tree once. Then stop next to the box.",ko:"나무 주위를 한 바퀴 돈 다음 상자 옆에 멈춰요.",goal:"boxSpot",must:["aroundTree"],hint:"around the tree 카드를 꼭 써야 해요. 그다음 상자 옆(next to)으로!"},
+  {say:"Walk around the pond. Then stop between the bushes.",ko:"연못 주위를 돈 다음 두 덤불 사이에 멈춰요.",goal:"bushes",must:["aroundPond"],hint:"문 통과 → 연못 주위 돌기(around) → 덤불 사이(between)."},
+  {say:"Say hi to the cat inside the house. Then go outside and hide behind the tree.",ko:"집 안 고양이에게 인사한 뒤, 밖으로 나가 나무 뒤에 숨어요.",goal:"treeBehind",must:["inside","outside"],hint:"모두 6장이 필요해요. inside와 outside를 모두 써요."}
+];
+const MAX=6;
+let mi=0, seq=[], pos="start", running=false, done=new Set();
+try{JSON.parse(localStorage.getItem("mr-done")||"[]").forEach(i=>done.add(i))}catch(e){}
+const $=id=>document.getElementById(id);
+const kid=$("kid"), flag=$("flag");
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function say(t){try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="en-US";u.rate=.85;speechSynthesis.speak(u)}catch(e){}}
+function markup(c){return c.en.replace(c.w,`<b>${c.w}</b>`)}
+function placeKid(x,y,state){
+  let s=1,o=1;
+  if(state==="inside"){s=.75;o=.55}
+  if(state==="treeBehind"){o=.9}
+  kid.setAttribute("transform",`translate(${x} ${y}) scale(${s})`);
+  kid.style.opacity=o;
+}
+function setPos(n){pos=n;const p=NODES[n];placeKid(p.x,p.y,n);$("where").textContent=p.label}
+
+function renderMissions(){
+  $("missions").innerHTML=MISSIONS.map((m,i)=>`<button class="mchip${done.has(i)?" done":""}" aria-current="${i===mi}" data-i="${i}" aria-label="미션 ${i+1}">${i+1}</button>`).join("");
+}
+function loadMission(i){
+  mi=i;seq=[];const m=MISSIONS[i];
+  $("mTag").textContent=`Mission ${i+1} / ${MISSIONS.length}`;
+  $("mSay").textContent=m.say;$("mKo").textContent=m.ko;
+  $("hint").hidden=true;$("hint").textContent="힌트: "+m.hint;
+  const g=NODES[m.goal];flag.setAttribute("transform",`translate(${g.x+16} ${g.y+8})`);
+  $("clear").hidden=true;
+  setPos("start");renderMissions();renderSeq();fb("아래 카드를 눌러 길 안내 순서를 만들어 보세요.");
+}
+function renderCards(){
+  const mk=k=>{const c=CARDS[k];return `<button class="card ${c.type}" data-k="${k}">${markup(c)}<small>${c.ko}</small></button>`};
+  const keys=Object.keys(CARDS);
+  $("moveCards").innerHTML=keys.filter(k=>CARDS[k].type==="move").map(mk).join("");
+  $("stopCards").innerHTML=keys.filter(k=>CARDS[k].type==="stop").map(mk).join("");
+}
+function renderSeq(active=-1,err=-1){
+  let h="";
+  for(let i=0;i<MAX;i++){
+    const k=seq[i];
+    if(k){const c=CARDS[k];h+=`<button class="slot ${c.type}${i===active?" now":""}${i===err?" err":""}" data-i="${i}">${markup(c)}<span class="x">빼기</span></button>`}
+    else h+=`<div class="slot empty">${i===seq.length?"여기에 카드가 들어가요":""}</div>`;
+  }
+  $("slots").innerHTML=h;$("go").disabled=!seq.length||running;
+}
+function fb(t,cls=""){const e=$("fb");e.textContent=t;e.className="fb "+cls}
+
+function animate(pts){
+  return new Promise(res=>{
+    const seg=[];let total=0;
+    for(let i=1;i<pts.length;i++){const d=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);seg.push(d);total+=d}
+    const dur=Math.max(500,total/(reduce?700:210)*1000);let t0=null;
+    function step(ts){
+      if(t0===null)t0=ts;let f=Math.min(1,(ts-t0)/dur),d=f*total,i=0;
+      while(i<seg.length-1&&d>seg[i]){d-=seg[i];i++}
+      const a=pts[i],b=pts[i+1],r=seg[i]?Math.min(1,d/seg[i]):1;
+      placeKid(a[0]+(b[0]-a[0])*r,a[1]+(b[1]-a[1])*r,"");
+      if(f<1)requestAnimationFrame(step);else res();
+    }
+    requestAnimationFrame(step);
+  });
+}
+const wait=ms=>new Promise(r=>setTimeout(r,ms));
+
+async function run(){
+  if(running||!seq.length)return;running=true;$("clear").hidden=true;
+  setPos("start");renderSeq();fb("Let's go!");await wait(300);
+  for(let i=0;i<seq.length;i++){
+    const c=CARDS[seq[i]];renderSeq(i);say(c.en);
+    const e=c.edges[pos];
+    if(!e){
+      renderSeq(-1,i);$("map").classList.remove("shake");void $("map").offsetWidth;$("map").classList.add("shake");
+      fb(`${i+1}번 카드에서 멈췄어요. 지금 위치는 "${NODES[pos].label}"예요. ${c.hint}`,"bad");
+      running=false;$("go").disabled=false;return;
+    }
+    await wait(250);await animate(e[1]);setPos(e[0]);await wait(350);
+  }
+  renderSeq();running=false;
+  const m=MISSIONS[mi],missing=m.must.filter(k=>!seq.includes(k));
+  if(pos===m.goal&&!missing.length){
+    done.add(mi);try{localStorage.setItem("mr-done",JSON.stringify([...done]))}catch(e){}
+    renderMissions();fb("Great job! 미션 성공!","good");
+    $("clearList").innerHTML=seq.map(k=>`<li>${CARDS[k].en}</li>`).join("");
+    $("next").textContent=mi<MISSIONS.length-1?"Next mission":"Play again";
+    $("clear").hidden=false;
+  }else if(pos===m.goal){
+    fb(`도착은 했지만 꼭 써야 하는 카드가 빠졌어요: ${missing.map(k=>CARDS[k].en).join(", ")}`,"bad");
+  }else{
+    fb(`Almost! 지금 위치는 "${NODES[pos].label}"예요. 빨간 깃발까지 가야 해요.`,"bad");
+  }
+}
+
+document.addEventListener("click",e=>{
+  const card=e.target.closest(".card");
+  if(card&&!running){
+    if(seq.length>=MAX){fb(`카드는 ${MAX}장까지 놓을 수 있어요.`,"bad");return}
+    seq.push(card.dataset.k);say(CARDS[card.dataset.k].en);renderSeq();fb("");return;
+  }
+  const slot=e.target.closest(".slot[data-i]");
+  if(slot&&!running){seq.splice(+slot.dataset.i,1);renderSeq();return}
+  const chip=e.target.closest(".mchip");
+  if(chip&&!running){loadMission(+chip.dataset.i)}
+});
+$("go").onclick=run;
+$("undo").onclick=()=>{if(!running){seq.pop();renderSeq()}};
+$("clearSeq").onclick=()=>{if(!running){seq=[];setPos("start");renderSeq();fb("")}};
+$("listen").onclick=()=>say(MISSIONS[mi].say);
+$("hintBtn").onclick=()=>{$("hint").hidden=!$("hint").hidden};
+$("koToggle").onchange=e=>document.body.classList.toggle("noko",!e.target.checked);
+$("readAll").onclick=()=>say(seq.map(k=>CARDS[k].en).join(" "));
+$("next").onclick=()=>loadMission((mi+1)%MISSIONS.length);
+
+renderCards();loadMission(0);
+</script>
+</body>
+</html>
