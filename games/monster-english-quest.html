@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Monster English Quest | NAVI PLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Andika:wght@400;700&family=Bagel+Fat+One&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: sticker-book quest map — a grid of monster cards on the map, one chunky quest card while playing */
+:root{
+  --paper:#F2F6E9; --paper-2:#E3ECD4; --card:#FFFFFF; --ink:#1F2A44; --ink-soft:#56617A;
+  --tomato:#E2502F; --sun:#FFC93C; --leaf:#23855F; --leaf-soft:#D5F0E2; --sky:#3F86DB; --line:#CFDABF; --bad-soft:#FDE3DC;
+  --display:"Bagel Fat One","Arial Rounded MT Bold",system-ui,sans-serif;
+  --read:"Andika","Comic Sans MS",system-ui,sans-serif;
+  --ui:"Nunito",system-ui,-apple-system,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+html,body{background:var(--paper)}
+body{color:var(--ink);font-family:var(--ui);font-size:16px;
+  background-image:radial-gradient(var(--paper-2) 1.6px,transparent 1.7px);background-size:22px 22px}
+.wrap{max-width:900px;margin:0 auto;padding-block:20px 56px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance}
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(36px,7.5vw,58px);line-height:.92;margin:0;letter-spacing:.5px}
+h1 span{color:var(--tomato)}
+.top p{margin:10px 0 0;color:var(--ink-soft);font-size:17px;font-weight:700;max-width:40ch}
+.tally{display:flex;gap:10px}
+.tally div{background:var(--card);border:3px solid var(--ink);border-radius:14px;padding:8px 14px;font-weight:800;box-shadow:0 4px 0 var(--ink);white-space:nowrap}
+.tally b{font-family:var(--display);font-weight:400;font-size:24px;color:var(--tomato);font-variant-numeric:tabular-nums}
+
+.btn{font:800 16px/1.1 var(--ui);color:var(--ink);background:var(--card);border:3px solid var(--ink);border-radius:14px;
+  padding:12px 18px;box-shadow:0 4px 0 var(--ink);cursor:pointer;transition:transform .08s,box-shadow .08s;display:inline-flex;align-items:center;gap:8px}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.primary{background:var(--sun)}
+.btn.small{padding:8px 12px;font-size:14px;border-width:2px;box-shadow:0 3px 0 var(--ink)}
+.btn.big{font-size:20px;padding:16px 26px}
+.btn.live{background:var(--tomato);color:#fff;animation:pulse 1s infinite}
+.btn svg{width:18px;height:18px}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* map */
+.maphead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 16px;margin-bottom:14px}
+.maphead h2{font-family:var(--display);font-weight:400;font-size:28px;margin:0}
+.maphead p{margin:0;color:var(--ink-soft);font-weight:700;max-width:52ch}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:680px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 10px 14px;background:var(--card);
+  border:3px solid var(--ink);border-radius:20px;box-shadow:0 5px 0 var(--ink);cursor:pointer;font:inherit;color:inherit;text-align:center;transition:transform .12s}
+.mcard:hover{transform:translateY(-3px) rotate(-1deg)}
+.mcard .art{width:100%;max-width:128px;aspect-ratio:1}
+.mcard.caught{background:var(--mt)}
+.mcard.locked{cursor:default;background:var(--paper-2);border-color:var(--line);box-shadow:0 5px 0 var(--line)}
+.mcard.locked:hover{transform:none}
+.mcard.locked .art{filter:brightness(0);opacity:.13}
+.mcard.next{outline:3px dashed var(--tomato);outline-offset:5px}
+.tag{position:absolute;top:-11px;right:-6px;background:var(--tomato);color:#fff;font-weight:800;font-size:12px;letter-spacing:.08em;
+  padding:4px 9px;border-radius:999px;border:2px solid var(--ink);transform:rotate(6deg)}
+.mname{font-family:var(--display);font-size:20px;line-height:1.1}
+.mtype{font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.lockline{font-size:12px;font-weight:700;color:var(--ink-soft)}
+.stars{display:flex;gap:2px;justify-content:center}
+.st{width:20px;height:20px}
+.st path{fill:var(--line);stroke:var(--ink);stroke-width:1.5;stroke-linejoin:round}
+.st.on path{fill:var(--sun)}
+.allbanner{margin:0 0 16px;padding:14px 18px;background:var(--sun);border:3px solid var(--ink);border-radius:16px;font-weight:800;font-size:17px}
+
+/* panels */
+.panel{background:var(--card);border:3px solid var(--ink);border-radius:24px;box-shadow:0 6px 0 var(--ink);padding:24px}
+@media (max-width:560px){.panel{padding:16px}}
+.intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px;align-items:center}
+@media (max-width:640px){.intro{grid-template-columns:1fr}}
+.intro-art{background:var(--mt);border:3px solid var(--ink);border-radius:20px;padding:16px;display:grid;place-items:center}
+.intro-art .art{width:100%;max-width:240px;aspect-ratio:1;animation:bob 2.4s ease-in-out infinite}
+.chip{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--mt);
+  border:2px solid var(--ink);border-radius:999px;padding:4px 10px}
+.intro h2{font-family:var(--display);font-weight:400;font-size:clamp(34px,6vw,46px);margin:10px 0 6px;line-height:1}
+.blurb{font-family:var(--read);font-size:19px;line-height:1.5;margin:0 0 14px}
+.mission{margin:0 0 20px;padding:0;list-style:none;display:grid;gap:8px;counter-reset:m}
+.mission li{counter-increment:m;display:flex;gap:10px;align-items:center;font-weight:700}
+.mission li::before{content:counter(m);width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--card);display:grid;place-items:center;font-weight:800;flex:none}
+
+/* quest */
+.qbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.qmon{display:flex;align-items:center;gap:10px;font-weight:800}
+.qmon .art{width:52px;height:52px}
+.meter{display:flex;gap:3px;margin-top:4px}
+.seg{width:18px;height:10px;border-radius:4px;border:2px solid var(--ink);background:var(--card)}
+.seg.on{background:var(--tomato)}
+.stages{list-style:none;margin:0;padding:0;display:flex;gap:6px}
+.stages li{font-weight:800;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:2px solid var(--line);color:var(--ink-soft);background:var(--card)}
+.stages li.now{border-color:var(--ink);background:var(--sun);color:var(--ink)}
+.stages li.done{border-color:var(--leaf);background:var(--leaf-soft);color:var(--leaf)}
+.kicker{margin:0 0 12px;font-size:13px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--tomato)}
+
+.listen{display:flex;gap:18px;align-items:center;background:var(--mt);border:2px solid var(--ink);border-radius:18px;padding:16px}
+.play{width:88px;height:88px;flex:none;border-radius:50%;background:var(--sun);border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);cursor:pointer;display:grid;place-items:center}
+.play:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+.play svg{width:40px;height:40px}
+.play.on{animation:pulse 1s infinite}
+.listen .hint{margin:0 0 10px;font-weight:700;color:var(--ink)}
+.script{font-family:var(--read);font-size:19px;line-height:1.5;margin:12px 0 0;padding:10px 12px;background:var(--card);border-radius:12px;border:2px dashed var(--ink-soft)}
+
+.q{font-family:var(--read);font-size:23px;line-height:1.35;margin:22px 0 14px;font-weight:700;display:flex;gap:10px;align-items:flex-start}
+.ear{flex:none;width:36px;height:36px;border-radius:50%;border:2px solid var(--ink);background:var(--card);cursor:pointer;display:grid;place-items:center;margin-top:-2px}
+.ear svg{width:18px;height:18px}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.opts{grid-template-columns:1fr}}
+.opt{font:400 19px/1.35 var(--read);text-align:left;padding:14px 16px;background:var(--paper);color:var(--ink);border:3px solid var(--ink);
+  border-radius:16px;box-shadow:0 4px 0 var(--ink);cursor:pointer;min-width:0}
+.opt:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.opt:disabled{cursor:default}
+.opt.right{background:var(--leaf-soft);border-color:var(--leaf);box-shadow:0 4px 0 var(--leaf);animation:pop .3s}
+.opt.wrong{background:var(--bad-soft);border-color:var(--tomato);box-shadow:none;opacity:.75;text-decoration:line-through;animation:shake .35s}
+.opt:disabled:not(.right):not(.wrong){opacity:.55}
+
+.story{background:var(--paper);border:2px solid var(--ink);border-radius:18px;padding:18px 20px}
+.story-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
+.story h3{font-family:var(--display);font-weight:400;font-size:24px;margin:0}
+.passage{font-family:var(--read);font-size:20px;line-height:1.75;max-width:64ch;margin:0}
+.w{cursor:pointer;border-radius:4px}
+.w:hover,.w.tap{background:var(--sun)}
+.sent.now{background:var(--leaf-soft);border-radius:4px}
+.tip{margin:10px 0 0;font-size:14px;font-weight:700;color:var(--ink-soft)}
+
+.speak{background:var(--mt);border:2px solid var(--ink);border-radius:18px;padding:22px}
+.say-line{font-family:var(--read);font-weight:700;font-size:clamp(24px,4.6vw,32px);line-height:1.4;margin:0 0 18px}
+.tw.hit{color:var(--leaf)}
+.tw.miss{color:var(--tomato);text-decoration:underline wavy;text-underline-offset:5px}
+.mic-note{margin:14px 0 0;font-weight:700;color:var(--ink-soft)}
+
+.fb{min-height:58px;margin-top:18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-weight:800;font-size:19px}
+.fb.good{color:var(--leaf)}
+.fb.bad{color:var(--tomato)}
+
+.catch{text-align:center;display:grid;justify-items:center;gap:10px;position:relative}
+.catch .art{width:min(240px,70vw);aspect-ratio:1;animation:wobble 1.6s ease-in-out infinite}
+.catch.won .art{animation:pop .5s}
+.catch h2{font-family:var(--display);font-weight:400;font-size:clamp(28px,5.5vw,40px);margin:0;line-height:1.1}
+.catch p{margin:0;font-weight:700;color:var(--ink-soft);font-size:17px}
+.catch .stars .st{width:40px;height:40px}
+.badge{font-family:var(--display);font-size:22px;color:var(--tomato);border:4px solid var(--tomato);border-radius:12px;padding:4px 14px;transform:rotate(-8deg);animation:stamp .4s ease-out}
+
+.parent{margin-top:30px;background:var(--card);border:2px dashed var(--ink-soft);border-radius:16px;padding:14px 18px}
+.parent summary{font-weight:800;cursor:pointer}
+.parent ul{margin:10px 0 12px;padding-left:20px;line-height:1.65;max-width:68ch}
+
+.conf{position:fixed;top:-12px;width:10px;height:14px;border-radius:2px;z-index:50;pointer-events:none;animation:fall 2s ease-in forwards}
+
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}75%{transform:translateX(7px)}}
+@keyframes pop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes wobble{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes stamp{0%{transform:rotate(-8deg) scale(2);opacity:0}100%{transform:rotate(-8deg) scale(1);opacity:1}}
+@keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+*{box-sizing:border-box}
+body{margin:0}
+.home-link{display:inline-flex;align-items:center;gap:6px;margin-bottom:14px;background:var(--card);color:var(--ink);text-decoration:none;font-weight:800;font-size:15px;
+  border:2px solid var(--ink);border-radius:999px;padding:7px 14px;box-shadow:0 3px 0 var(--ink)}
+.home-link:hover{background:var(--sun)}
+.home-link:focus-visible{outline:3px solid var(--sky);outline-offset:3px}
+.foot{text-align:center;color:var(--ink-soft);font-size:14px;font-weight:700;margin-top:28px}
+.foot a{color:inherit}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a class="home-link" href="../index.html">🎈 NAVI PLAY 홈</a>
+  <header class="top">
+    <div>
+      <h1>Monster<br><span>English</span> Quest</h1>
+      <p>Listen, read, and speak in English to make eight monster friends.</p>
+    </div>
+    <div class="tally" aria-live="polite">
+      <div><b id="tFriends">0</b> / 8 friends</div>
+      <div><b id="tStars">0</b> stars</div>
+    </div>
+  </header>
+  <main id="app"></main>
+  <p class="foot"><a href="../index.html">NAVI PLAY</a> · Monster English Quest · Made by Boeun.S</p>
+</div>
+
+<script>
+/* ---------- monster art ---------- */
+const INK="#1F2A44";
+const S=`stroke="${INK}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"`;
+function eyes(a,b,y,r){const e=x=>`<circle cx="${x}" cy="${y}" r="${r}" fill="#fff" ${S}/><circle cx="${x+r*.18}" cy="${y+r*.12}" r="${r*.55}" fill="${INK}"/><circle cx="${x+r*.38}" cy="${y-r*.22}" r="${r*.2}" fill="#fff"/>`;return e(a)+e(b)}
+function cheeks(a,b,y){return `<ellipse cx="${a}" cy="${y}" rx="5" ry="3" fill="#FF8FA3" opacity=".75"/><ellipse cx="${b}" cy="${y}" rx="5" ry="3" fill="#FF8FA3" opacity=".75"/>`}
+function star(cx,cy,r,fill){let p=[];for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;p.push((cx+rr*Math.cos(a)).toFixed(1)+","+(cy+rr*Math.sin(a)).toFixed(1))}return `<polygon points="${p.join(" ")}" fill="${fill}"/>`}
+const smile=(x,y,w=12)=>`<path d="M${x} ${y} q${w/2} ${w/2} ${w} 0" fill="none" ${S}/>`;
+
+const ART={
+bubbo:()=>`<g fill="none" stroke="#7FB7E8" stroke-width="5" stroke-linecap="round"><path d="M36 76 q-7 9 0 17 q7 8 0 16"/><path d="M52 78 q7 9 0 17 q-7 8 0 16"/><path d="M68 78 q-7 9 0 17 q7 8 0 16"/><path d="M84 76 q7 9 0 17 q-7 8 0 16"/></g>
+<path d="M20 72 C20 26 100 26 100 72 q-10 9 -20 0 q-10 9 -20 0 q-10 9 -20 0 q-10 9 -20 0 Z" fill="#6EC1F0" ${S}/>
+<ellipse cx="40" cy="44" rx="9" ry="5" fill="#fff" opacity=".6" transform="rotate(-25 40 44)"/>
+${eyes(47,73,56,8)}${cheeks(37,83,66)}${smile(54,64)}
+<circle cx="103" cy="30" r="5" fill="#DDF1FF" ${S}/><circle cx="110" cy="17" r="3" fill="#DDF1FF" stroke="${INK}" stroke-width="2"/>`,
+mossling:()=>`<path d="M10 98 Q10 86 26 86 L98 86 Q110 86 110 98 Q110 104 98 104 L20 104 Q10 104 10 98Z" fill="#B5DE78" ${S}/>
+<line x1="22" y1="60" x2="16" y2="40" ${S}/><line x1="36" y1="60" x2="40" y2="40" ${S}/>
+<circle cx="29" cy="72" r="17" fill="#B5DE78" ${S}/>
+<circle cx="74" cy="62" r="30" fill="#3E9B5B" ${S}/>
+<path d="M74 62 m-4 0 a4 4 0 1 1 8 0 a10 10 0 1 1 -18 0 a16 16 0 1 1 30 1" fill="none" stroke="#9FD889" stroke-width="4" stroke-linecap="round"/>
+<path d="M70 33 C62 20 74 12 85 14 C85 26 78 32 70 33Z" fill="#7CC95A" ${S}/>
+${eyes(16,40,38,6)}${smile(23,78)}${cheeks(18,40,75)}`,
+emberpup:()=>`<path d="M84 90 C108 84 112 58 98 42 C99 56 92 58 92 48 C82 58 78 74 84 90Z" fill="#FF9A3D" ${S}/>
+<path d="M88 84 C100 80 102 66 96 58 C95 66 90 68 90 62 C85 68 84 76 88 84Z" fill="#FFD43B"/>
+<ellipse cx="58" cy="90" rx="30" ry="19" fill="#E8603C" ${S}/>
+<path d="M30 42 L34 12 L52 32Z" fill="#B8442A" ${S}/><path d="M82 42 L78 12 L60 32Z" fill="#B8442A" ${S}/>
+<circle cx="56" cy="56" r="28" fill="#F27C4C" ${S}/>
+<ellipse cx="56" cy="67" rx="14" ry="10" fill="#FFE0C2" ${S}/><ellipse cx="56" cy="62" rx="4.5" ry="3.2" fill="${INK}"/>
+${smile(50,70)}${eyes(44,68,49,7)}
+<ellipse cx="42" cy="108" rx="9" ry="5" fill="#B8442A" ${S}/><ellipse cx="72" cy="108" rx="9" ry="5" fill="#B8442A" ${S}/>`,
+pebblehoot:()=>`<path d="M30 40 L26 12 L48 30Z" fill="#7E8794" ${S}/><path d="M90 40 L94 12 L72 30Z" fill="#7E8794" ${S}/>
+<ellipse cx="22" cy="74" rx="10" ry="22" fill="#7E8794" ${S} transform="rotate(12 22 74)"/><ellipse cx="98" cy="74" rx="10" ry="22" fill="#7E8794" ${S} transform="rotate(-12 98 74)"/>
+<ellipse cx="60" cy="68" rx="36" ry="41" fill="#9AA3AE" ${S}/>
+<ellipse cx="60" cy="86" rx="20" ry="19" fill="#CED4DB"/>
+<circle cx="52" cy="80" r="2.5" fill="#9AA3AE"/><circle cx="64" cy="88" r="3" fill="#9AA3AE"/><circle cx="56" cy="96" r="2" fill="#9AA3AE"/><circle cx="69" cy="78" r="2" fill="#9AA3AE"/>
+<circle cx="45" cy="52" r="14" fill="#ECEFF2" ${S}/><circle cx="75" cy="52" r="14" fill="#ECEFF2" ${S}/>
+${eyes(45,75,52,8)}<path d="M55 62 L65 62 L60 72Z" fill="#FFC93C" ${S}/>
+<ellipse cx="50" cy="110" rx="7" ry="4" fill="#FFC93C" ${S}/><ellipse cx="70" cy="110" rx="7" ry="4" fill="#FFC93C" ${S}/>`,
+zingbee:()=>`<ellipse cx="36" cy="40" rx="20" ry="13" fill="#E3F4FF" ${S} transform="rotate(-20 36 40)"/><ellipse cx="84" cy="40" rx="20" ry="13" fill="#E3F4FF" ${S} transform="rotate(20 84 40)"/>
+<path d="M50 42 l-5 -9 l7 -2 l-5 -12" fill="none" ${S}/><path d="M70 42 l5 -9 l-7 -2 l5 -12" fill="none" ${S}/>
+<circle cx="47" cy="19" r="4" fill="#FFC93C" ${S}/><circle cx="73" cy="19" r="4" fill="#FFC93C" ${S}/>
+<circle cx="60" cy="72" r="34" fill="#FFD43B" ${S}/>
+<path d="M31 86 Q60 96 89 86" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>
+<path d="M39 98 Q60 106 81 98" fill="none" stroke="${INK}" stroke-width="7" stroke-linecap="round"/>
+${eyes(47,73,63,8)}${cheeks(37,83,73)}${smile(54,73)}
+<path d="M100 64 l8 -6 l-3 8 l8 -3" fill="none" stroke="#E09A00" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`,
+frostbun:()=>`<ellipse cx="44" cy="30" rx="10" ry="26" fill="#EAF6FF" ${S} transform="rotate(-14 44 30)"/><ellipse cx="76" cy="30" rx="10" ry="26" fill="#EAF6FF" ${S} transform="rotate(14 76 30)"/>
+<ellipse cx="44" cy="32" rx="4.5" ry="17" fill="#A9D8F5" transform="rotate(-14 44 32)"/><ellipse cx="76" cy="32" rx="4.5" ry="17" fill="#A9D8F5" transform="rotate(14 76 32)"/>
+<circle cx="60" cy="76" r="34" fill="#EAF6FF" ${S}/>
+<g stroke="#5FB3E6" stroke-width="2.5" stroke-linecap="round"><line x1="60" y1="50" x2="60" y2="62"/><line x1="54.8" y1="53" x2="65.2" y2="59"/><line x1="54.8" y1="59" x2="65.2" y2="53"/></g>
+${eyes(47,73,72,7)}${cheeks(37,83,82)}
+<path d="M57 80 l3 2.5 l3 -2.5Z" fill="#FF8FA3" stroke="${INK}" stroke-width="2" stroke-linejoin="round"/>
+<path d="M54 86 q3 3 6 0 q3 3 6 0" fill="none" ${S}/>
+<ellipse cx="44" cy="108" rx="10" ry="5" fill="#EAF6FF" ${S}/><ellipse cx="76" cy="108" rx="10" ry="5" fill="#EAF6FF" ${S}/>`,
+glowmoth:()=>`<path d="M52 34 C46 22 40 16 34 14" fill="none" ${S}/><path d="M68 34 C74 22 80 16 86 14" fill="none" ${S}/>
+<circle cx="34" cy="14" r="4" fill="#FFE27A" ${S}/><circle cx="86" cy="14" r="4" fill="#FFE27A" ${S}/>
+<ellipse cx="32" cy="56" rx="28" ry="20" fill="#8F72E6" ${S} transform="rotate(-25 32 56)"/><ellipse cx="88" cy="56" rx="28" ry="20" fill="#8F72E6" ${S} transform="rotate(25 88 56)"/>
+<ellipse cx="38" cy="90" rx="17" ry="14" fill="#B9A2F7" ${S}/><ellipse cx="82" cy="90" rx="17" ry="14" fill="#B9A2F7" ${S}/>
+${star(26,52,7,"#FFE27A")}${star(94,52,7,"#FFE27A")}${star(36,66,4,"#FFF4C2")}${star(84,66,4,"#FFF4C2")}${star(36,91,5,"#FFE27A")}${star(84,91,5,"#FFE27A")}
+<ellipse cx="60" cy="80" rx="12" ry="27" fill="#5C47B8" ${S}/>
+<circle cx="60" cy="47" r="17" fill="#7058D0" ${S}/>
+${eyes(53,67,46,5.5)}<path d="M56 53 q4 4 8 0" fill="none" stroke="${INK}" stroke-width="2.5" stroke-linecap="round"/>`,
+thundertoad:()=>`<path d="M10 100 Q10 56 60 56 Q110 56 110 100 Q110 108 100 108 L20 108 Q10 108 10 100Z" fill="#2BB3A3" ${S}/>
+<circle cx="38" cy="56" r="15" fill="#2BB3A3" ${S}/><circle cx="82" cy="56" r="15" fill="#2BB3A3" ${S}/>
+${eyes(38,82,55,9)}<path d="M34 82 Q60 96 86 82" fill="none" ${S}/>${cheeks(27,93,80)}
+<circle cx="54" cy="98" r="3" fill="#1E8C80"/><circle cx="66" cy="101" r="2.5" fill="#1E8C80"/><circle cx="74" cy="95" r="2" fill="#1E8C80"/>
+<path d="M42 30 a9 9 0 0 1 7 -14 a12 12 0 0 1 22 -2 a9 9 0 0 1 9 16 Z" fill="#DCE5EE" ${S}/>
+<path d="M61 32 L55 44 L61 44 L57 56 L68 41 L62 41 L66 32Z" fill="#FFD43B" ${S}/>`
+};
+const art=(m,cls="art")=>`<svg class="${cls}" viewBox="0 0 120 120" aria-hidden="true">${ART[m.id]()}</svg>`;
+
+/* ---------- content (AR 3.0–3.9) ---------- */
+/* first option is always the correct one; options are shuffled on screen */
+const MONSTERS=[
+{id:"bubbo",name:"Bubbo",type:"Water",tint:"#DDF0FC",
+ blurb:"A gentle jellyfish monster who lives in a quiet pond and blows bubbles when he is happy.",
+ listen:[
+  {audio:"Bubbo can blow giant bubbles, but only when he is very happy.",q:"When can Bubbo blow giant bubbles?",opts:["When he is very happy","When it is raining","At night","When he is hungry"]},
+  {audio:"After the storm, the pond was full of leaves, so Bubbo spent the whole afternoon cleaning it.",q:"What did Bubbo do in the afternoon?",opts:["He cleaned the pond","He took a long nap","He swam in the sea","He ate the leaves"]}],
+ story:{title:"Bubbo and the Lost Shell",text:"Bubbo lived in a quiet pond at the edge of the forest. Every morning, he floated to the top and counted the lily pads. One day, he noticed that his favorite shell was missing. Bubbo searched under the rocks and behind the tall reeds, but he could not find it anywhere. He felt worried, so he asked his friend Frog for help. Frog pointed to a shiny spot near the shore. “I think a crow carried something over there,” she said. Bubbo swam as fast as he could. There, sitting in the warm mud, was his shell. Bubbo hugged it and thanked Frog with a big, bubbly smile."},
+ read:[
+  {q:"Where did Bubbo live?",opts:["In a quiet pond at the edge of the forest","In a deep ocean","In a river in the city","In a puddle in a garden"]},
+  {q:"Why did Bubbo ask Frog for help?",opts:["He could not find his shell","He was very hungry","He wanted to play a game","He forgot his way home"]},
+  {q:"In the story, Bubbo “felt worried.” What does worried mean?",opts:["Afraid that something is wrong","Very happy and excited","Tired and sleepy","Angry at a friend"]}],
+ speak:["Bubbo searched under the rocks and behind the tall reeds.","I think a crow carried something over there."]},
+
+{id:"mossling",name:"Mossling",type:"Grass",tint:"#E2F3CF",
+ blurb:"A tiny snail monster with a garden on his back. He is slow, but he never gives up.",
+ listen:[
+  {audio:"Mossling carries a tiny garden on his back, and flowers bloom there every spring.",q:"What grows on Mossling’s back every spring?",opts:["Flowers","Mushrooms","Apples","Rocks"]},
+  {audio:"Mossling gets very sleepy on sunny days, so he likes to rest in the shade.",q:"Why does Mossling rest in the shade?",opts:["He gets sleepy on sunny days","He is cold","He is hiding from a bird","It is raining"]}],
+ story:{title:"The Slowest Racer",text:"Mossling was the slowest creature in Greenleaf Valley. When the animals held a race, everyone laughed when he signed up. The rabbit zoomed ahead, and the squirrel jumped from tree to tree. Mossling just kept moving, one tiny step at a time. Halfway through the race, a heavy rain began to fall. The path turned into slippery mud, and the fast runners kept falling down. Mossling did not slip at all, because his sticky foot held on to the ground. Slowly but surely, he crossed the finish line first. That night, nobody laughed. Instead, they all cheered for the little green snail."},
+ read:[
+  {q:"Why did the animals laugh when Mossling signed up?",opts:["He was the slowest creature in the valley","He wore a funny hat","He fell down at the start","He sang a silly song"]},
+  {q:"Why didn’t Mossling slip in the mud?",opts:["His sticky foot held on to the ground","He wore rain boots","He stayed under a tree","He jumped over the mud"]},
+  {q:"What lesson does this story teach?",opts:["Keep going, even if you are slow","Always run as fast as you can","Never race in the rain","It is fun to laugh at others"]}],
+ speak:["Slowly but surely, he crossed the finish line first.","They all cheered for the little green snail."]},
+
+{id:"emberpup",name:"Emberpup",type:"Fire",tint:"#FFE3D3",
+ blurb:"A warm-hearted puppy monster with a glowing tail. He wants to help, but he has to be careful.",
+ listen:[
+  {audio:"Emberpup’s tail glows orange when he is calm and bright red when he is excited.",q:"What color is Emberpup’s tail when he is excited?",opts:["Bright red","Orange","Blue","Yellow"]},
+  {audio:"Emberpup never goes near the river, because water makes his tail flicker out.",q:"Why does Emberpup stay away from the river?",opts:["Water makes his tail go out","He cannot swim","The fish scare him","The river is too far away"]}],
+ story:{title:"A Warm Idea",text:"Winter came early to Snowcap Village. The wind was icy, and the children could not play outside for very long. Emberpup wanted to help, but he was nervous. Last year, his fiery tail had melted a snowman by accident. He sat alone and thought very hard. Then he had an idea. He gathered flat stones and warmed them with his tail. He placed the warm stones in a circle in the middle of the playground. The children stood on the stones, and their toes stayed toasty. They built a new snowman just outside the circle, far away from Emberpup’s tail."},
+ read:[
+  {q:"Why was Emberpup nervous about helping?",opts:["Last year his tail melted a snowman","He was afraid of the children","He lost his favorite stone","He did not like the cold"]},
+  {q:"What did Emberpup use to keep the children warm?",opts:["Warm stones","Thick blankets","A big campfire","Hot soup"]},
+  {q:"Why did the children build the snowman outside the circle?",opts:["So it would not melt","Because it was too big","To hide it from Emberpup","Because the teacher said so"]}],
+ speak:["He gathered flat stones and warmed them with his tail.","The children stood on the stones, and their toes stayed toasty."]},
+
+{id:"pebblehoot",name:"Pebblehoot",type:"Rock",tint:"#E6E9EE",
+ blurb:"A stone owl who cannot fly very high, but who remembers every path on Echo Mountain.",
+ listen:[
+  {audio:"Pebblehoot collects shiny pebbles and keeps them in a hole inside an old tree.",q:"Where does Pebblehoot keep her pebbles?",opts:["In a hole inside an old tree","In a dark cave","Under the river","In a basket"]},
+  {audio:"Although Pebblehoot looks very serious, she loves telling silly jokes to her friends.",q:"What does Pebblehoot love to do?",opts:["Tell silly jokes","Sleep all day","Sing loud songs","Eat pebbles"]}],
+ story:{title:"The Owl Who Remembered",text:"Pebblehoot was a stone owl who lived on top of Echo Mountain. She could not fly very high because her wings were heavy, but she had an amazing memory. She remembered every path, every cave, and every stream on the mountain. One foggy evening, a group of young deer got lost. They could not see the trail, and they began to cry. Pebblehoot heard them and hooted loudly. “Follow my voice,” she called. Step by step, she guided them down the mountain using only her memory. When they reached the meadow, the deer’s mother thanked her again and again."},
+ read:[
+  {q:"What was special about Pebblehoot?",opts:["She had an amazing memory","She was the fastest flier","She could swim very well","She was bigger than a bear"]},
+  {q:"Why couldn’t the young deer find the trail?",opts:["It was foggy, so they could not see","Snow covered the trail","They were fast asleep","A storm washed it away"]},
+  {q:"How did Pebblehoot guide the deer?",opts:["With her voice and her memory","She carried them on her back","She held up a bright lamp","She drew them a map"]}],
+ speak:["She remembered every path, every cave, and every stream.","Step by step, she guided them down the mountain."]},
+
+{id:"zingbee",name:"Zingbee",type:"Electric",tint:"#FFF2C4",
+ blurb:"A fuzzy bee monster whose wings make tiny sparks. She has never made a big light before.",
+ listen:[
+  {audio:"Zingbee drinks flower nectar every morning, which gives her energy for the whole day.",q:"What gives Zingbee energy for the day?",opts:["Flower nectar","Honey cake","Rain water","A long nap"]},
+  {audio:"When Zingbee is scared, her fur stands up and makes a crackling sound.",q:"What happens when Zingbee is scared?",opts:["Her fur stands up and crackles","She hides under a leaf","She turns blue","She sings a song"]}],
+ story:{title:"The Day the Lights Went Out",text:"On the night of the big festival, all the lights in Honeycomb Town suddenly went out. The music stopped, and everyone gasped in the dark. The mayor looked around nervously. “We need light, or the festival will be ruined,” she said. Zingbee buzzed forward. Her wings could make tiny sparks of electricity, but she had never tried to make a big light before. She took a deep breath and flapped her wings faster and faster. Soon, a bright yellow glow filled the town square. The crowd cheered, the band started playing again, and Zingbee danced in the air above them all night long."},
+ read:[
+  {q:"What happened at the beginning of the story?",opts:["All the lights went out","It started to rain","The band went home","The mayor got lost"]},
+  {q:"Why was the mayor nervous?",opts:["The festival might be ruined","She lost her hat","Zingbee was late","She could not dance"]},
+  {q:"How did Zingbee make the big light?",opts:["She flapped her wings faster and faster","She turned on the street lamps","She lit many candles","She sang a magic song"]}],
+ speak:["Her wings could make tiny sparks of electricity.","The crowd cheered, and the band started playing again."]},
+
+{id:"frostbun",name:"Frostbun",type:"Ice",tint:"#DCEFFC",
+ blurb:"A snowy bunny monster who loves winter more than anything. Summer is hard for her.",
+ listen:[
+  {audio:"Frostbun can freeze a cup of juice just by touching it with her nose.",q:"How does Frostbun freeze a cup of juice?",opts:["She touches it with her nose","She blows on it","She puts it in the snow","She sings to it"]},
+  {audio:"Frostbun’s footprints sparkle like tiny diamonds after she hops across the snow.",q:"What do Frostbun’s footprints look like?",opts:["Tiny diamonds","Little flowers","Red hearts","Gray stones"]}],
+ story:{title:"Frostbun’s Summer Problem",text:"Frostbun loved snow more than anything. In winter, she hopped happily across the frozen lake and made ice sculptures for her friends. But when summer arrived, the sun got hotter every day. Frostbun’s ears began to drip, and she felt weak and tired. Her friends wanted to help her. Bubbo brought cool water from the pond, and Mossling made a shady roof out of big leaves. Pebblehoot remembered a deep cave where the air was always cold. Together, they carried Frostbun to the cave. She rested there until autumn, and then she came out smiling, ready to play again."},
+ read:[
+  {q:"Why did Frostbun feel weak and tired?",opts:["The summer sun was too hot","She was very hungry","She was lonely","She ran too far"]},
+  {q:"Which friend remembered the cold cave?",opts:["Pebblehoot","Bubbo","Mossling","Zingbee"]},
+  {q:"What does this story mostly show?",opts:["Friends help each other","Snow is more fun than sun","Summer is the best season","Caves are scary places"]}],
+ speak:["She hopped happily across the frozen lake.","Together, they carried Frostbun to the cave."]},
+
+{id:"glowmoth",name:"Glowmoth",type:"Star",tint:"#ECE4FD",
+ blurb:"A moth monster whose wings shine like stars. She has a secret that only you will know.",
+ listen:[
+  {audio:"Glowmoth’s wings glow brighter when she is happy and dimmer when she is sad.",q:"When do Glowmoth’s wings get dimmer?",opts:["When she is sad","When she is happy","At lunchtime","When she is asleep"]},
+  {audio:"Every full moon, Glowmoth and her cousins draw shapes in the sky with their light.",q:"When do Glowmoth and her cousins draw shapes in the sky?",opts:["Every full moon","Every morning","On their birthdays","When it snows"]}],
+ story:{title:"The Moth Who Was Afraid of the Dark",text:"Glowmoth’s wings shone like little stars, but she had a secret. She was afraid of the dark. Every night, she stayed close to the lamps in the village and never flew into the forest. One evening, she heard a tiny voice calling from the trees. A baby bird had fallen out of its nest. Glowmoth’s heart was pounding, but she knew the bird needed help. She flew into the dark forest, and her glowing wings lit up the path. She found the baby bird and showed its parents where it was. On the way home, Glowmoth realized something. With her own light, the dark was not so scary after all."},
+ read:[
+  {q:"What was Glowmoth’s secret?",opts:["She was afraid of the dark","She could not fly","She had lost her glow","She did not like birds"]},
+  {q:"Why did Glowmoth fly into the forest?",opts:["To help a baby bird","To find some food","To play hide-and-seek","To look at the stars"]},
+  {q:"What did Glowmoth realize at the end?",opts:["Her own light made the dark less scary","The forest was too big for her","Birds are too noisy","Lamps are better than stars"]}],
+ speak:["Her glowing wings lit up the path.","With her own light, the dark was not so scary after all."]},
+
+{id:"thundertoad",name:"Thundertoad",type:"Storm",tint:"#D3F1EC",
+ blurb:"A storm toad with the loudest croak in the swamp. Is a loud voice a problem or a gift?",
+ listen:[
+  {audio:"Thundertoad can tell when rain is coming, because his skin tingles a few hours before it starts.",q:"How does Thundertoad know that rain is coming?",opts:["His skin tingles","He looks at the clouds","A bird tells him","He hears thunder"]},
+  {audio:"Thundertoad likes to sit on a big lily pad and watch the lightning far away.",q:"Where does Thundertoad like to sit?",opts:["On a big lily pad","High in a tree","Under a rock","Inside a cave"]}],
+ story:{title:"The Loudest Croak",text:"Thundertoad had the loudest croak in the whole swamp. When he croaked, the water shook and the birds flew away. The other animals often covered their ears and asked him to be quiet. Thundertoad felt embarrassed, so he stopped croaking altogether. Weeks later, a big storm was coming. The animals were busy eating and playing, and they did not notice the dark clouds. Thundertoad knew he had to warn them. He took a deep breath and croaked as loudly as he could. Everyone heard him and hurried to safety. After the storm, the animals said, “Your voice is a gift. Thank you for using it.”"},
+ read:[
+  {q:"Why did Thundertoad stop croaking?",opts:["He felt embarrassed","He was sick","He lost his voice","He moved away"]},
+  {q:"Why didn’t the animals notice the storm?",opts:["They were busy eating and playing","They were fast asleep","They lived far away","The clouds were very small"]},
+  {q:"The animals said, “Your voice is a gift.” What do they mean?",opts:["His voice is special and useful","His voice is wrapped in paper","His voice is too loud","His voice is a big problem"]}],
+ speak:["He took a deep breath and croaked as loudly as he could.","Your voice is a gift. Thank you for using it."]}
+];
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const app=$("#app");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const SPEAKER=`<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${INK}"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a7.5 7.5 0 0 1 0 11"/></svg>`;
+const MIC=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>`;
+const starSVG=on=>`<svg class="st ${on?"on":""}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z"/></svg>`;
+const starsRow=n=>`<div class="stars" aria-label="${n} of 3 stars">${[1,2,3].map(i=>starSVG(i<=n)).join("")}</div>`;
+const PRAISE=["Great job!","Awesome!","You got it!","Super!","Excellent!","Nice work!"];
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+
+/* progress (this browser only) */
+const KEY="navi_meq_progress_v1";
+let PROG={caught:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||"null");if(s&&s.caught)PROG=s}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(PROG))}catch(e){}}
+function tally(){const v=Object.values(PROG.caught);$("#tFriends").textContent=v.length;$("#tStars").textContent=v.reduce((a,b)=>a+b,0)}
+
+/* speech out */
+let VOICE=null,speakToken=0;
+const HAS_TTS="speechSynthesis" in window;
+function pickVoice(){if(!HAS_TTS)return;const vs=speechSynthesis.getVoices().filter(v=>/^en[-_]/i.test(v.lang)||v.lang==="en");
+  const pref=["Samantha","Google US English","Microsoft Aria","Microsoft Jenny","Ava","Allison","Karen"];
+  VOICE=pref.map(p=>vs.find(v=>v.name.includes(p))).find(Boolean)||vs.find(v=>/en[-_]US/i.test(v.lang))||vs[0]||null}
+if(HAS_TTS){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function say(text,opt={}){const tok=++speakToken;
+  if(!HAS_TTS){opt.onend&&opt.onend();return tok}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);if(VOICE)u.voice=VOICE;u.lang="en-US";u.rate=opt.rate||.9;u.pitch=1.05;
+    const done=()=>{if(tok===speakToken&&opt.onend)opt.onend()};u.onend=done;u.onerror=done;speechSynthesis.speak(u)}catch(e){opt.onend&&opt.onend()}
+  return tok}
+function stopSpeech(){speakToken++;try{HAS_TTS&&speechSynthesis.cancel()}catch(e){}}
+
+/* sound effects */
+let AC=null;
+function tone(fs,dur=.12,type="triangle",vol=.16){try{AC=AC||new(window.AudioContext||window.webkitAudioContext)();const t=AC.currentTime;
+  fs.forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;const s=t+i*dur;
+    g.gain.setValueAtTime(.0001,s);g.gain.exponentialRampToValueAtTime(vol,s+.02);g.gain.exponentialRampToValueAtTime(.0001,s+dur);
+    o.connect(g).connect(AC.destination);o.start(s);o.stop(s+dur+.03)})}catch(e){}}
+const sGood=()=>tone([660,880],.11);
+const sBad=()=>tone([240,190],.14,"square",.06);
+const sWin=()=>tone([523,659,784,1047],.14);
+
+/* speech in */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let micBlocked=!SR;
+const norm=s=>s.toLowerCase().replace(/[’‘]/g,"'").replace(/[^a-z' ]/g," ").split(/\s+/).filter(Boolean);
+
+/* ---------- map ---------- */
+function unlocked(i){return i===0||!!PROG.caught[MONSTERS[i-1].id]}
+function renderHome(){
+  stopSpeech();tally();
+  const all=MONSTERS.every(m=>PROG.caught[m.id]);
+  const nextIdx=MONSTERS.findIndex((m,i)=>unlocked(i)&&!PROG.caught[m.id]);
+  app.innerHTML=`
+  <section>
+    <div class="maphead"><h2>Monster Map</h2><p>Finish a mission to make a new friend. The next monster appears after you befriend the one before it.</p></div>
+    ${all?`<p class="allbanner">You made all 8 friends! Play again and try to earn 3 stars for every monster.</p>`:""}
+    <div class="grid">${MONSTERS.map((m,i)=>{
+      const c=PROG.caught[m.id],open=unlocked(i);
+      if(!open)return `<button class="mcard locked" disabled aria-label="Locked monster">${art(m)}<span class="mname">???</span><span class="lockline">Befriend ${esc(MONSTERS[i-1].name)} first</span></button>`;
+      return `<button class="mcard ${c?"caught":""} ${i===nextIdx?"next":""}" data-i="${i}" style="--mt:${m.tint}">
+        ${i===nextIdx?`<span class="tag">NEW</span>`:""}${art(m)}<span class="mname">${esc(m.name)}</span><span class="mtype">${m.type} type</span>${c?starsRow(c):`<span class="lockline">Tap to start</span>`}</button>`}).join("")}
+    </div>
+  </section>
+  <details class="parent" id="parentBox">
+    <summary>부모님께 (사용 안내)</summary>
+    <ul>
+      <li>지문과 문제는 AR 3.0–3.9 수준(미국 초등 3학년)으로 썼어요. 세부 내용뿐 아니라 원인과 결과, 낱말 뜻, 추론, 이야기의 교훈까지 물어봐요.</li>
+      <li>몬스터 1마리 미션 = 듣기 2문제 → 이야기 읽기 1편과 문제 3개 → 문장 말하기 2개예요. 틀려도 다시 고를 수 있고, 실수가 적을수록 별을 더 받아요.</li>
+      <li>듣기와 “Read to me”는 기기의 영어 음성으로 읽어 줘요. 소리가 안 나면 무음 모드와 볼륨을 확인해 주세요. 지문 속 낱말을 누르면 그 낱말만 천천히 읽어 줘요.</li>
+      <li>듣기에서 한 번 틀리면 “Show the words” 버튼이 나타나 문장을 글로 볼 수 있어요.</li>
+      <li>말하기: 마이크 음성 인식이 되는 환경이면 자동으로 확인해요. 크롬(Chrome)에서 가장 잘 돼요. 마이크를 쓸 수 없는 환경에서는 아이가 문장을 소리 내어 말한 뒤 부모님이 “I said it!”을 눌러 주세요.</li>
+      <li>진행 기록은 지금 쓰는 브라우저에만 저장돼요.</li>
+    </ul>
+    <button class="btn small" id="reset">Reset progress</button>
+  </details>`;
+  app.querySelectorAll(".mcard[data-i]").forEach(b=>b.addEventListener("click",()=>renderIntro(+b.dataset.i)));
+  const r=$("#reset");let armed=false,tm;
+  r.addEventListener("click",()=>{if(!armed){armed=true;r.textContent="Tap again to erase all friends";tm=setTimeout(()=>{armed=false;r.textContent="Reset progress"},3500);return}
+    clearTimeout(tm);PROG={caught:{}};save();renderHome()});
+}
+
+function renderIntro(i){
+  stopSpeech();const m=MONSTERS[i],c=PROG.caught[m.id];
+  app.innerHTML=`<section class="panel intro" style="--mt:${m.tint}">
+    <div class="intro-art">${art(m)}</div>
+    <div>
+      <span class="chip">${m.type} type</span>
+      <h2>${esc(m.name)}</h2>
+      <p class="blurb">${esc(m.blurb)}</p>
+      ${c?`<div style="margin:-4px 0 14px">${starsRow(c)}</div>`:""}
+      <ol class="mission">
+        <li>Listen to 2 clues about ${esc(m.name)}</li>
+        <li>Read “${esc(m.story.title)}” and answer 3 questions</li>
+        <li>Say 2 sentences out loud</li>
+      </ol>
+      <div class="row"><button class="btn primary big" id="go">${c?"Play again":"Start mission"}</button><button class="btn" id="back">Back to map</button></div>
+    </div></section>`;
+  $("#back").onclick=renderHome;
+  $("#go").onclick=()=>startQuest(i);
+  say(`Hi! I'm ${m.name}. Do you want to be my friend?`);
+}
+
+/* ---------- quest ---------- */
+let Q=null;
+function startQuest(i){
+  const m=MONSTERS[i];
+  Q={i,m,idx:0,mistakes:0,locked:false,tasks:[
+    {kind:"listen",n:0},{kind:"listen",n:1},
+    {kind:"read",n:0},{kind:"read",n:1},{kind:"read",n:2},
+    {kind:"speak",n:0},{kind:"speak",n:1},{kind:"catch"}]};
+  renderQuest();
+}
+function renderQuest(){
+  stopSpeech();Q.locked=false;
+  const {m}=Q,t=Q.tasks[Q.idx],steps=Q.tasks.length-1;
+  const order=["listen","read","speak"],cur=order.indexOf(t.kind);
+  app.innerHTML=`<div style="--mt:${m.tint}">
+    <div class="qbar">
+      <button class="btn small" id="quit">← Map</button>
+      <div class="qmon">${art(m)}<div>${esc(m.name)}<div class="meter" aria-label="${Q.idx} of ${steps} steps done">${Array.from({length:steps},(_,k)=>`<span class="seg ${k<Q.idx?"on":""}"></span>`).join("")}</div></div></div>
+      <ol class="stages">${order.map((s,k)=>`<li class="${t.kind==="catch"||k<cur?"done":k===cur?"now":""}">${s}</li>`).join("")}</ol>
+    </div>
+    <section class="panel" id="panel"></section></div>`;
+  $("#quit").onclick=renderHome;
+  const p=$("#panel");
+  ({listen:panelListen,read:panelRead,speak:panelSpeak,catch:panelCatch})[t.kind](p,t);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function setFb(html,kind){const f=$("#fb");if(!f)return;f.className="fb "+(kind||"");f.innerHTML=html}
+function success(msg){
+  sGood();const pr=msg||pick(PRAISE);say(pr);
+  setFb(`<span>${esc(pr)}</span><button class="btn primary" id="next">Next →</button>`,"good");
+  $("#next").onclick=()=>{Q.idx++;renderQuest()};$("#next").focus({preventScroll:true});
+}
+function optsHTML(opts){return `<div class="opts">${shuffle(opts.map((t,i)=>({t,ok:i===0}))).map((o,k)=>`<button class="opt" id="opt${k}" data-ok="${o.ok?1:0}">${esc(o.t)}</button>`).join("")}</div>`}
+function bindOpts(p,onWrong){
+  p.querySelectorAll(".opt").forEach(b=>b.addEventListener("click",()=>{
+    if(Q.locked)return;
+    if(b.dataset.ok==="1"){Q.locked=true;b.classList.add("right");p.querySelectorAll(".opt").forEach(x=>x.disabled=true);success()}
+    else{b.classList.add("wrong");b.disabled=true;Q.mistakes++;sBad();setFb("Not quite. Try another answer!","bad");say("Try again!");onWrong&&onWrong()}
+  }));
+}
+const qHTML=q=>`<h3 class="q"><span>${esc(q)}</span><button class="ear" id="hearQ" aria-label="Hear the question">${SPEAKER}</button></h3>`;
+
+function panelListen(p,t){
+  const d=Q.m.listen[t.n];
+  p.innerHTML=`<p class="kicker">Listening clue ${t.n+1} of 2</p>
+    <div class="listen">
+      <button class="play" id="play" aria-label="Play the clue">${SPEAKER}</button>
+      <div style="min-width:0">
+        <p class="hint">Press play and listen carefully. You can listen as many times as you like.</p>
+        <div class="row"><button class="btn small" id="slow">Play slowly</button><button class="btn small" id="showText" hidden>Show the words</button></div>
+        <p class="script" id="script" hidden>${esc(d.audio)}</p>
+      </div>
+    </div>
+    ${qHTML(d.q)}${optsHTML(d.opts)}<div class="fb" id="fb" aria-live="polite"></div>`;
+  const play=$("#play");
+  const run=rate=>{play.classList.add("on");say(d.audio,{rate,onend:()=>play.classList.remove("on")})};
+  play.onclick=()=>run(.9);$("#slow").onclick=()=>run(.68);
+  $("#hearQ").onclick=()=>say(d.q);
+  $("#showText").onclick=()=>{$("#script").hidden=false;$("#showText").hidden=true};
+  bindOpts(p,()=>{if($("#script").hidden)$("#showText").hidden=false});
+  setTimeout(()=>run(.9),450);
+}
+
+function passageHTML(text){
+  const sents=text.match(/[^.!?]+[.!?]+[”"]?/g)||[text];
+  return sents.map((s,i)=>`<span class="sent" data-s="${i}">${s.split(/(\s+)/).map(tok=>/^\s+$/.test(tok)||!tok?tok:`<span class="w">${esc(tok)}</span>`).join("")}</span>`).join("");
+}
+function panelRead(p,t){
+  const st=Q.m.story,d=Q.m.read[t.n];
+  p.innerHTML=`<p class="kicker">Story question ${t.n+1} of 3</p>
+    <article class="story">
+      <div class="story-head"><h3>${esc(st.title)}</h3><button class="btn small" id="readAll">${SPEAKER}<span>Read to me</span></button></div>
+      <p class="passage" id="passage">${passageHTML(st.text)}</p>
+      <p class="tip">Tap any word to hear it.</p>
+    </article>
+    ${qHTML(d.q)}${optsHTML(d.opts)}<div class="fb" id="fb" aria-live="polite"></div>`;
+  const pas=$("#passage");
+  pas.addEventListener("click",e=>{const w=e.target.closest(".w");if(!w)return;
+    const word=w.textContent.replace(/[^A-Za-z’'-]/g,"");if(!word)return;
+    pas.querySelectorAll(".w.tap").forEach(x=>x.classList.remove("tap"));w.classList.add("tap");
+    say(word,{rate:.7,onend:()=>w.classList.remove("tap")})});
+  const btn=$("#readAll");let reading=false;
+  btn.onclick=()=>{
+    if(reading){stopSpeech();reading=false;btn.lastElementChild.textContent="Read to me";pas.querySelectorAll(".now").forEach(x=>x.classList.remove("now"));return}
+    reading=true;btn.lastElementChild.textContent="Stop";
+    const sents=[...pas.querySelectorAll(".sent")];
+    const step=k=>{pas.querySelectorAll(".now").forEach(x=>x.classList.remove("now"));
+      if(k>=sents.length||!reading){reading=false;btn.lastElementChild.textContent="Read to me";return}
+      sents[k].classList.add("now");say(sents[k].textContent,{rate:.88,onend:()=>step(k+1)})};
+    step(0)};
+  $("#hearQ").onclick=()=>{reading=false;btn.lastElementChild.textContent="Read to me";pas.querySelectorAll(".now").forEach(x=>x.classList.remove("now"));say(d.q)};
+  bindOpts(p);
+}
+
+function panelSpeak(p,t){
+  const line=Q.m.speak[t.n];let tries=0;
+  const words=line.split(/\s+/);
+  p.innerHTML=`<p class="kicker">Speaking ${t.n+1} of 2</p>
+    <div class="speak">
+      <p class="say-line" id="line">${words.map(w=>`<span class="tw" data-n="${esc(norm(w).join(""))}">${esc(w)}</span>`).join(" ")}</p>
+      <div class="row">
+        <button class="btn" id="hear">${SPEAKER}<span>Hear it</span></button>
+        <button class="btn primary" id="mic">${MIC}<span>Say it</span></button>
+        <button class="btn primary" id="selfok" hidden>I said it!</button>
+      </div>
+      <p class="mic-note" id="micNote" hidden></p>
+    </div>
+    <div class="fb" id="fb" aria-live="polite"></div>`;
+  const mic=$("#mic"),selfok=$("#selfok"),note=$("#micNote");
+  const fallback=()=>{mic.hidden=true;selfok.hidden=false;note.hidden=false;
+    note.textContent="Listen first, then say the sentence out loud. A grown-up can tap “I said it!” when you finish."};
+  if(micBlocked)fallback();
+  $("#hear").onclick=()=>say(line,{rate:.85});
+  selfok.onclick=()=>{if(Q.locked)return;Q.locked=true;selfok.disabled=true;mic.disabled=true;
+    $("#line").querySelectorAll(".tw").forEach(x=>{x.classList.remove("miss");x.classList.add("hit")});success("Wonderful speaking!")};
+  mic.onclick=()=>{
+    if(Q.locked)return;stopSpeech();
+    let done=false,got=false,rec;
+    const finish=()=>{mic.classList.remove("live");mic.lastElementChild.textContent="Say it"};
+    const fail=code=>{if(done)return;done=true;finish();
+      if(["not-allowed","service-not-allowed","audio-capture","network","exception"].includes(code)){micBlocked=true;fallback();setFb("The microphone is not available here. Say it out loud instead!","bad")}
+      else{setFb("I didn’t hear you. Tap “Say it” and speak a little louder.","bad")}};
+    try{rec=new SR();rec.lang="en-US";rec.interimResults=false;rec.maxAlternatives=3}catch(e){fail("exception");return}
+    rec.onresult=e=>{got=true;done=true;finish();
+      const alts=[...e.results[0]].map(a=>a.transcript);
+      const target=$("#line").querySelectorAll(".tw");
+      let best=null,bestScore=-1;
+      alts.forEach(a=>{const heard=new Set(norm(a));let hit=0;target.forEach(x=>{if(heard.has(x.dataset.n))hit++});if(hit>bestScore){bestScore=hit;best=heard}});
+      target.forEach(x=>{const ok=best.has(x.dataset.n);x.classList.toggle("hit",ok);x.classList.toggle("miss",!ok)});
+      const score=bestScore/target.length;
+      if(score>=.7){Q.locked=true;mic.disabled=true;selfok.disabled=true;success(score>=.95?"Perfect speaking!":"Great speaking!")}
+      else{tries++;sBad();setFb("Almost! Listen again and try the red words.","bad");
+        if(tries>=2){selfok.hidden=false}}
+    };
+    rec.onerror=e=>fail(e.error||"error");
+    rec.onend=()=>{if(!got)fail("no-speech")};
+    try{rec.start();mic.classList.add("live");mic.lastElementChild.textContent="Listening…";setFb("","")}catch(e){fail("exception")}
+  };
+}
+
+function panelCatch(p){
+  const m=Q.m;
+  p.innerHTML=`<div class="catch" id="catch">
+    ${art(m)}
+    <h2>${esc(m.name)} wants to be your friend!</h2>
+    <p>You finished the mission. Give ${esc(m.name)} a Friend Badge.</p>
+    <button class="btn primary big" id="befriend">Make friends</button>
+  </div>`;
+  say(`You did it! ${m.name} wants to be your friend!`);
+  $("#befriend").onclick=()=>{
+    const stars=Q.mistakes===0?3:Q.mistakes<=2?2:1;
+    PROG.caught[m.id]=Math.max(stars,PROG.caught[m.id]||0);save();tally();
+    sWin();confetti();
+    const next=MONSTERS[Q.i+1];
+    const c=$("#catch");c.classList.add("won");
+    c.innerHTML=`${art(m)}<span class="badge">FRIEND!</span>
+      <h2>${esc(m.name)} is your friend now!</h2>
+      ${starsRow(stars)}
+      <p>${stars===3?"No mistakes at all. Amazing!":stars===2?"Only a few mistakes. Great work!":"You kept trying. Play again to earn more stars!"}</p>
+      <div class="row" style="justify-content:center;margin-top:8px">
+        ${next?`<button class="btn primary big" id="nextM">Meet the next monster</button>`:""}
+        <button class="btn${next?"":" primary big"}" id="toMap">Back to map</button>
+      </div>`;
+    say(`${m.name} is your friend now! You got ${stars} ${stars===1?"star":"stars"}.`);
+    $("#toMap").onclick=renderHome;
+    if(next)$("#nextM").onclick=()=>renderIntro(Q.i+1);
+  };
+}
+
+function confetti(){
+  if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;
+  const cols=["#E2502F","#FFC93C","#23855F","#3F86DB","#8F72E6","#6EC1F0"];
+  for(let i=0;i<40;i++){const s=document.createElement("span");s.className="conf";
+    s.style.left=Math.random()*100+"vw";s.style.background=cols[i%cols.length];s.style.animationDelay=(Math.random()*.6)+"s";s.style.animationDuration=(1.6+Math.random()*1.2)+"s";
+    document.body.appendChild(s);setTimeout(()=>s.remove(),3200)}
+}
+
+renderHome();
+</script>
+
+</body>
+</html>
