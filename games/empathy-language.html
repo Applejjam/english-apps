@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>공감의 언어 탐구 | NAVI PLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF8EF; --card:#FFFFFF; --ink:#2B2D42; --soft:#6B7083;
+  --teal:#2A9D8F; --teal-l:#D8F3EF; --coral:#F07167; --coral-l:#FDE2DF;
+  --sun:#F4A261; --sun-l:#FFF0DC; --violet:#7B6CF6; --violet-l:#ECE9FF;
+  --line:#EADFD0; --ok:#2E9E5B; --bad:#D64545;
+  --r:20px; --shadow:0 6px 18px rgba(60,40,20,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Jua',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.5}
+.k{font-family:'Jua',sans-serif;font-weight:400}
+button{font-family:inherit;cursor:pointer;border:none}
+header{background:linear-gradient(135deg,#2A9D8F,#3FB8A9);color:#fff;padding:18px 16px 14px;text-align:center}
+header .brand{font-size:.8rem;letter-spacing:.15em;opacity:.85;font-weight:800}
+header h1{font-family:'Jua';font-size:clamp(1.4rem,4vw,2.1rem);font-weight:400;margin:2px 0}
+header .concepts{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.chip{background:rgba(255,255,255,.22);padding:3px 12px;border-radius:99px;font-size:.85rem;font-family:'Jua'}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:2px solid var(--line);position:sticky;top:0;z-index:10}
+nav button{flex:1 0 auto;background:var(--bg);color:var(--ink);padding:9px 14px;border-radius:14px;font-family:'Jua';font-size:1rem;white-space:nowrap;border:2px solid transparent}
+nav button .tag{display:inline-block;width:24px;height:24px;line-height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:.85rem;margin-right:5px;text-align:center}
+nav button.on{border-color:var(--teal);background:var(--teal-l)}
+main{max-width:980px;margin:0 auto;padding:18px 16px 60px}
+section{display:none;animation:fade .3s}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.stage{font-family:'Jua';color:var(--teal);font-size:.95rem}
+h2{font-family:'Jua';font-weight:400;font-size:1.6rem;margin:2px 0 6px}
+h3{font-family:'Jua';font-weight:400;font-size:1.2rem;margin-bottom:8px}
+.q{background:var(--violet-l);border-left:5px solid var(--violet);padding:10px 14px;border-radius:12px;margin:10px 0;font-family:'Jua';font-size:1.05rem}
+.muted{color:var(--soft);font-size:.92rem}
+.grid{display:grid;gap:12px}
+.g5{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.pick{background:#fff;border:3px solid var(--line);border-radius:18px;padding:14px 8px;text-align:center;transition:.15s;font-weight:800;color:var(--ink)}
+.pick:hover{transform:translateY(-3px);border-color:var(--sun)}
+.pick .e{font-size:2.6rem;display:block;line-height:1.2}
+.pick .w{font-size:.95rem;margin-top:4px;display:block}
+.pick.right{border-color:var(--ok);background:#E5F6EC}
+.pick.wrong{border-color:var(--bad);background:#FBE6E6;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.hide-words .pick .w{visibility:hidden}
+.btn{background:var(--teal);color:#fff;padding:11px 20px;border-radius:14px;font-family:'Jua';font-size:1.05rem;box-shadow:0 3px 0 #1E7A6F}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.coral{background:var(--coral);box-shadow:0 3px 0 #C2524A}
+.btn.sun{background:var(--sun);box-shadow:0 3px 0 #C77E40}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.big{font-size:1.3rem;padding:14px 28px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{text-align:center}
+.bubble{display:inline-block;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 16px;margin:4px;font-size:1.15rem;font-weight:800}
+.bubble.a{border-color:var(--teal)}
+.bubble.b{border-color:var(--coral)}
+.hearts{position:fixed;right:14px;bottom:14px;background:#fff;border-radius:99px;padding:8px 16px;box-shadow:var(--shadow);font-family:'Jua';font-size:1.1rem;z-index:20}
+.feedback{min-height:32px;font-family:'Jua';font-size:1.15rem;margin-top:10px}
+.feedback.ok{color:var(--ok)} .feedback.no{color:var(--bad)}
+.chain{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;justify-content:center;margin:14px 0}
+.link{flex:1 1 180px;border-radius:16px;padding:12px;text-align:center;min-height:110px;display:flex;flex-direction:column;justify-content:center}
+.link .lab{font-family:'Jua';font-size:.9rem;opacity:.75}
+.link .big{font-size:2.2rem}
+.cause{background:var(--sun-l)} .effect{background:var(--coral-l)} .action{background:var(--teal-l)}
+.arrow{align-self:center;font-size:1.6rem;color:var(--soft)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.role{border:3px solid var(--line);background:#fff;border-radius:18px;padding:16px;text-align:left}
+.role.on{border-color:var(--coral);background:var(--coral-l)}
+.role .e{font-size:2rem}
+.mic{width:96px;height:96px;border-radius:50%;background:var(--coral);color:#fff;font-size:2.4rem;box-shadow:0 5px 0 #C2524A}
+.mic.rec{animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(240,113,103,.25),0 5px 0 #C2524A}}
+.heard{background:var(--bg);border-radius:12px;padding:10px;margin-top:10px;min-height:44px;font-size:1.1rem}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.lv{border:3px solid var(--line);border-radius:18px;padding:14px;background:#fff;text-align:left}
+.lv.on{border-color:var(--teal);background:var(--teal-l)}
+.lv b{font-family:'Jua';font-weight:400;font-size:1.2rem}
+.sentence{font-size:1.4rem;font-weight:800;margin:14px 0;line-height:2.2}
+.blank{display:inline-block;min-width:140px;border-bottom:3px dashed var(--teal);text-align:center;color:var(--teal)}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:58px;padding:10px;border-radius:14px;background:var(--bg);margin:8px 0}
+.tile{background:#fff;border:2px solid var(--violet);color:var(--ink);padding:8px 14px;border-radius:12px;font-weight:800;font-size:1.1rem}
+.answer{border:2px dashed var(--violet);background:#fff}
+input[type=text],textarea{width:100%;border:2px solid var(--line);border-radius:12px;padding:10px 12px;font-family:'Nunito';font-size:1.08rem;font-weight:600;color:var(--ink);background:#fff}
+textarea{min-height:70px;resize:vertical}
+label.f{display:block;font-family:'Jua';margin:12px 0 4px}
+.checks{list-style:none;margin-top:10px}
+.checks li{padding:4px 0;font-size:.98rem}
+.checks li::before{content:'⬜ '}
+.checks li.ok::before{content:'✅ '}
+.pill-wrap{display:flex;justify-content:center;margin-top:16px}
+.pill{width:min(560px,100%);border-radius:90px;overflow:hidden;box-shadow:var(--shadow);display:flex;min-height:170px}
+.pill .l{flex:0 0 32%;background:var(--coral);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Jua';font-size:1.1rem;padding:10px;text-align:center}
+.pill .l .e{font-size:2.6rem}
+.pill .r{flex:1;background:#fff;padding:18px 28px 18px 20px;font-size:1.05rem;font-weight:700;white-space:pre-wrap;border:3px solid var(--coral);border-left:none;border-radius:0 90px 90px 0}
+.stars button{background:none;font-size:1.8rem;filter:grayscale(1);opacity:.4}
+.stars button.on{filter:none;opacity:1}
+.refl{border-left:5px solid var(--teal);padding-left:12px;margin:14px 0}
+.dim{font-size:.8rem;background:var(--teal-l);color:var(--teal);padding:2px 8px;border-radius:99px;font-family:'Jua'}
+.navi-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.navi-map .step{background:var(--bg);border-radius:16px;padding:14px}
+.navi-map .L{font-family:'Jua';font-size:2rem;color:var(--teal);line-height:1}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-family:'Jua';background:var(--bg);padding:6px 12px;border-radius:99px}
+footer{text-align:center;color:var(--soft);font-size:.85rem;padding:20px}
+.progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:var(--sun);width:0;transition:.4s}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:absolute;left:0;top:0;width:100%}
+  .hearts,nav,header{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">NAVI PLAY · LESSON 2</div>
+  <h1>배려를 전하는 공감의 언어 탐구</h1>
+  <div class="concepts"><span class="chip">🔗 인과관계 Causation</span><span class="chip">🤝 책임 Responsibility</span><span class="chip">👀 관점 Perspective</span></div>
+</header>
+
+<nav id="nav">
+  <button data-go="home" class="on">🏠 시작</button>
+  <button data-go="n"><span class="tag">N</span>원인 탐정</button>
+  <button data-go="a"><span class="tag">A</span>듣고 찾기</button>
+  <button data-go="v1"><span class="tag">V</span>말하기 미션</button>
+  <button data-go="v2"><span class="tag">V</span>수준별 쓰기</button>
+  <button data-go="i"><span class="tag">I</span>성찰과 실천</button>
+</nav>
+
+<main>
+<!-- HOME -->
+<section id="home" class="on">
+  <div class="card center">
+    <div style="font-size:3.4rem">🤒💬🤝</div>
+    <h2>What's wrong? 친구의 마음을 묻는 말</h2>
+    <p class="muted">아픈 친구에게 증상을 묻고, 원인을 생각하고, 마음을 담아 조언해 봐요.</p>
+    <div class="q">🧭 중심 아이디어: 상대의 상황을 묻고 원인을 이해할 때, 우리는 책임 있는 배려의 말을 건넬 수 있다.</div>
+    <button class="btn big" data-go="n">탐구 시작하기 ▶</button>
+  </div>
+  <div class="card">
+    <h3>NAVI 탐구 지도</h3>
+    <div class="navi-map">
+      <div class="step"><div class="L">N</div><b class="k">Notice & Navigate</b><p class="muted">왜 아프게 되었을까? 원인과 증상을 연결해요.</p></div>
+      <div class="step"><div class="L">A</div><b class="k">Ask & Find</b><p class="muted">What's wrong? 묻고, 듣고, 증상과 조언을 찾아요.</p></div>
+      <div class="step"><div class="L">V</div><b class="k">Voice & Choice</b><p class="muted">역할과 수준을 골라 말하고 써요.</p></div>
+      <div class="step"><div class="L">I</div><b class="k">Interact & Reflect</b><p class="muted">알약 편지를 나누고, 나의 배움과 실천을 돌아봐요.</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>오늘의 말 🔑</h3>
+    <div class="center">
+      <span class="bubble a">What's wrong?</span>
+      <span class="bubble b">I have a cold.</span>
+      <span class="bubble a">Get some rest.</span>
+      <span class="bubble b">Thank you.</span>
+      <span class="bubble a">You'll get better.</span>
+    </div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="btn ghost" onclick="say(['What\'s wrong?','I have a cold.','Get some rest.','Thank you.','You\'ll get better.'])">🔊 들어 보기</button>
+      <span class="toggle">🐢 말 빠르기 <select id="rate" style="font-family:Jua;border:none;background:none;font-size:1rem"><option value="0.7">천천히</option><option value="0.9" selected>보통</option><option value="1.05">빠르게</option></select></span>
+    </div>
+  </div>
+</section>
+
+<!-- N : 원인 탐정 -->
+<section id="n">
+  <div class="card">
+    <div class="stage">N · Notice & Navigate</div>
+    <h2>🔍 원인 탐정: 왜 아프게 되었을까?</h2>
+    <div class="q">🔗 인과관계: 어떤 일이 원인이 되어 어떤 증상이 생겼을까요?</div>
+    <div class="progress"><i id="nProg"></i></div>
+    <div class="chain">
+      <div class="link cause"><span class="lab">원인 Cause</span><span class="big" id="nCauseE"></span><b id="nCauseT"></b><span class="muted" id="nCauseK"></span></div>
+      <div class="arrow">➜</div>
+      <div class="link effect"><span class="lab">증상 Symptom</span><span class="big" id="nEffE">❓</span><b id="nEffT">What's wrong?</b></div>
+      <div class="arrow">➜</div>
+      <div class="link action"><span class="lab">조언 Advice</span><span class="big" id="nActE">❓</span><b id="nActT">…</b></div>
+    </div>
+    <p class="center k" id="nAsk">1단계: 이 친구는 어디가 아플까요? 예측해 보세요.</p>
+    <div class="grid g5" id="nPicks" style="margin-top:10px"></div>
+    <div class="feedback center" id="nFb"></div>
+    <div class="center" style="margin-top:8px"><button class="btn sun" id="nNext" style="display:none">다음 사건 ▶</button></div>
+  </div>
+  <div class="card">
+    <h3>🤝 책임 생각하기</h3>
+    <p class="muted">원인을 알면 예방할 수 있어요. 아프지 않으려면 나는 무엇을 할 수 있을까요?</p>
+    <div class="bubble" style="font-size:1rem">Don't eat too fast.</div>
+    <div class="bubble" style="font-size:1rem">Don't eat too much candy.</div>
+    <div class="bubble" style="font-size:1rem">Go to bed early.</div>
+    <div class="bubble" style="font-size:1rem">Wear a warm coat.</div>
+  </div>
+</section>
+
+<!-- A : 듣기 게임 -->
+<section id="a">
+  <div class="card">
+    <div class="stage">A · Ask & Find</div>
+    <h2>👂 듣고 찾기 게임</h2>
+    <p class="muted">대화를 듣고 알맞은 그림을 골라요. 처음엔 증상, 다음엔 조언!</p>
+    <div class="row" style="margin:10px 0">
+      <label class="toggle"><input type="checkbox" id="showWords"> 글자 보기 (도움)</label>
+      <span class="muted">라운드 <b id="aRound">1</b> / 6</span>
+    </div>
+    <div class="progress"><i id="aProg"></i></div>
+    <div class="center" style="margin:14px 0">
+      <button class="btn big coral" id="aPlay">🔊 대화 듣기</button>
+      <p class="k" id="aStep" style="margin-top:10px">1단계: 친구는 어디가 아플까요?</p>
+    </div>
+    <div class="grid g5 hide-words" id="aPicks"></div>
+    <div class="feedback center" id="aFb"></div>
+    <div class="center"><button class="btn sun" id="aNext" style="display:none">다음 ▶</button></div>
+  </div>
+</section>
+
+<!-- V1 : 말하기 미션 -->
+<section id="v1">
+  <div class="card">
+    <div class="stage">V · Voice & Choice</div>
+    <h2>🎤 말하기 미션: 역할을 골라 말해요</h2>
+    <div class="q">👀 관점: 아픈 친구의 자리에 서 볼까요, 도와주는 친구의 자리에 서 볼까요?</div>
+    <div class="roles" id="roles">
+      <button class="role on" data-role="sick"><span class="e">🤒</span><br><b class="k">아픈 친구 되기</b><br><span class="muted">“What's wrong?”을 듣고 내 증상을 말해요.</span></button>
+      <button class="role" data-role="care"><span class="e">🧑‍⚕️</span><br><b class="k">도와주는 친구 되기</b><br><span class="muted">친구에게 묻고, 증상에 맞는 조언을 해요.</span></button>
+    </div>
+  </div>
+  <div class="card center">
+    <div style="font-size:3.6rem" id="sEmo">🤕</div>
+    <p class="k" style="font-size:1.25rem" id="sMission"></p>
+    <p class="muted" id="sHint"></p>
+    <div class="row" style="justify-content:center;margin:14px 0">
+      <button class="mic" id="micBtn" title="눌러서 말하기">🎙️</button>
+    </div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="sModel">🔊 예시 듣기</button>
+      <button class="btn ghost" id="sPeer">🙋 친구가 확인했어요</button>
+      <button class="btn sun" id="sNext">다음 카드 ▶</button>
+    </div>
+    <div class="heard" id="sHeard"><span class="muted">마이크를 누르고 영어로 말해 보세요.</span></div>
+    <div class="feedback" id="sFb"></div>
+    <p class="muted" style="margin-top:6px">💛 친구가 천천히 말해도 기다려 줘요.</p>
+    <p class="muted" id="micWarn" style="display:none">이 브라우저는 음성 인식을 지원하지 않아요. 짝과 말하고 ‘친구가 확인했어요’를 눌러 주세요. (크롬 권장)</p>
+    <button class="btn ghost" id="diagBtn" style="margin-top:10px;font-size:.95rem">🔧 마이크 점검</button>
+    <div id="diag" style="display:none;text-align:left;background:var(--bg);border-radius:14px;padding:14px;margin-top:10px">
+      <b class="k">🔧 마이크 점검표</b>
+      <ul class="checks" id="dList"></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost" id="dPerm" style="font-size:.95rem">① 마이크 허용하기</button>
+        <button class="btn ghost" id="dTry" style="font-size:.95rem">② “Hello” 말해서 테스트</button>
+      </div>
+      <div class="heard" id="dTest"><span class="muted">①을 누른 뒤 ②를 눌러 “Hello”라고 말해 보세요.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- V2 : 수준별 쓰기 -->
+<section id="v2">
+  <div class="card">
+    <div class="stage">V · Voice & Choice</div>
+    <h2>✏️ 수준별 문장 쓰기</h2>
+    <p class="muted">내게 맞는 단계를 골라 시작해요. 자신 있으면 다음 단계로 올라가요!</p>
+    <div class="levels" id="levels">
+      <button class="lv on" data-lv="1"><b>🌱 1단계</b><br><span class="muted">그림 보고 단어 골라 문장 완성</span></button>
+      <button class="lv" data-lv="2"><b>🌿 2단계</b><br><span class="muted">낱말 카드를 순서대로 배열</span></button>
+      <button class="lv" data-lv="3"><b>🌳 3단계</b><br><span class="muted">원인·증상·조언을 담은 알약 편지 쓰기</span></button>
+    </div>
+  </div>
+
+  <div class="card" id="lv1">
+    <h3>🌱 1단계 · 빈칸 채우기 <span class="muted" id="l1Count"></span></h3>
+    <div class="center"><span style="font-size:3.4rem" id="l1Emo"></span></div>
+    <div class="sentence center" id="l1Sent"></div>
+    <div class="row" style="justify-content:center" id="l1Opts"></div>
+    <div class="feedback center" id="l1Fb"></div>
+    <div class="center"><button class="btn sun" id="l1Next" style="display:none">다음 ▶</button></div>
+  </div>
+
+  <div class="card" id="lv2" style="display:none">
+    <h3>🌿 2단계 · 문장 배열하기 <span class="muted" id="l2Count"></span></h3>
+    <div class="center"><span style="font-size:3.4rem" id="l2Emo"></span><p class="muted" id="l2Ko"></p></div>
+    <p class="k">완성 문장</p>
+    <div class="tiles answer" id="l2Ans"></div>
+    <p class="k">낱말 카드 (눌러서 옮기기)</p>
+    <div class="tiles" id="l2Bank"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="l2Reset">↺ 다시</button>
+      <button class="btn" id="l2Check">확인하기</button>
+      <button class="btn sun" id="l2Next" style="display:none">다음 ▶</button>
+    </div>
+    <div class="feedback center" id="l2Fb"></div>
+  </div>
+
+  <div class="card" id="lv3" style="display:none">
+    <h3>🌳 3단계 · 친구에게 보내는 알약 편지</h3>
+    <p class="muted">친구의 상황을 상상하고(관점), 원인을 생각해(인과), 도움이 되는 말을 건네요(책임).</p>
+    <label class="f">💌 받는 친구 이름 (To.)</label>
+    <input type="text" id="l3To" placeholder="예) Minji">
+    <label class="f">🤒 친구의 증상</label>
+    <div class="row" id="l3Sym"></div>
+    <label class="f">① 친구에게 묻기 (질문)</label>
+    <input type="text" id="l3Q" placeholder="What's wrong?">
+    <label class="f">② 친구의 증상과 할 수 없는 것 (원인을 넣어도 좋아요)</label>
+    <textarea id="l3S" placeholder="You have a stomachache. You can't play soccer today."></textarea>
+    <label class="f">③ 나의 조언 (증상에 맞게!)</label>
+    <textarea id="l3A" placeholder="Don't eat too fast. Get some rest."></textarea>
+    <label class="f">④ 마음을 전하는 말</label>
+    <input type="text" id="l3H" placeholder="You'll get better.">
+    <p class="muted" style="margin-top:8px">💡 도움 단어: get some rest · take this medicine · go see a doctor · go see a dentist · drink warm water · can't go swimming · can't play soccer · can't go outside</p>
+    <h3 style="margin-top:14px">🔎 쓰기 점검 카드</h3>
+    <ul class="checks" id="l3Checks"></ul>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="btn coral" id="l3Make">💊 알약 편지 만들기</button>
+    </div>
+    <div id="printArea">
+      <div class="pill-wrap" id="pillWrap" style="display:none">
+        <div class="pill"><div class="l"><span class="e" id="pE">💊</span><span id="pTo">To.</span></div><div class="r" id="pBody"></div></div>
+      </div>
+    </div>
+    <div class="row" style="justify-content:center;margin-top:12px;display:none" id="pBtns">
+      <button class="btn ghost" id="pRead">🔊 읽어 보기</button>
+      <button class="btn ghost" id="pCopy">📋 글 복사 (게시판 공유)</button>
+      <button class="btn ghost" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+    <div class="feedback center" id="l3Fb"></div>
+  </div>
+</section>
+
+<!-- I : 성찰 -->
+<section id="i">
+  <div class="card">
+    <div class="stage">I · Interact & Reflect</div>
+    <h2>🪞 나의 배움 돌아보기</h2>
+    <h3>I Can ⭐ 스스로 점검</h3>
+    <div id="icans"></div>
+  </div>
+  <div class="card">
+    <h3>💭 개념으로 생각하기</h3>
+    <div class="refl"><span class="dim">🔗 인과관계</span><p class="k" style="margin-top:4px">친구가 아프게 된 원인을 알면, 어떤 말을 해 줄 수 있나요?</p><textarea id="r1" placeholder="예) 너무 빨리 먹어서 배가 아프면 Don't eat too fast.라고 말해 줄 수 있어요."></textarea></div>
+    <div class="refl"><span class="dim">👀 관점</span><p class="k" style="margin-top:4px">내가 아플 때, 어떤 말을 들으면 기분이 좋았나요?</p><textarea id="r2"></textarea></div>
+    <div class="refl"><span class="dim">🤝 책임</span><p class="k" style="margin-top:4px">아프지 않기 위해, 그리고 아픈 친구를 위해 내가 할 일은 무엇인가요?</p><textarea id="r3"></textarea></div>
+  </div>
+  <div class="card">
+    <h3>🧭 나의 학습 돌아보기</h3>
+    <div class="refl"><span class="dim">동기·책임</span><p class="k" style="margin-top:4px">오늘 가장 열심히 도전한 활동은? 왜 그 활동을 골랐나요?</p><textarea id="r4"></textarea></div>
+    <div class="refl"><span class="dim">전략·통제</span><p class="k" style="margin-top:4px">어려울 때 내가 쓴 방법을 골라 보세요.</p>
+      <div class="row" id="strats"></div></div>
+    <div class="refl"><span class="dim">메타·성찰</span><p class="k" style="margin-top:4px">다음 시간에 더 잘하고 싶은 점은?</p><textarea id="r5"></textarea></div>
+  </div>
+  <div class="card">
+    <h3>🌱 Take Action: 나의 실천 약속</h3>
+    <p class="muted">배운 말을 교실 밖 삶에서 어떻게 쓸까요?</p>
+    <div class="row" id="acts"></div>
+    <input type="text" id="actOwn" placeholder="나만의 실천 약속을 써 보세요." style="margin-top:10px">
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn" id="saveRefl">💾 저장하기</button>
+      <button class="btn ghost" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+    <div class="feedback center" id="rFb"></div>
+  </div>
+</section>
+</main>
+
+<div class="hearts" title="공감 하트">💗 <span id="hearts">0</span></div>
+<footer>NAVI PLAY · 배려를 전하는 공감의 언어 탐구 · Made by Boeun.S</footer>
+
+<script>
+/* ---------- 데이터 ---------- */
+const SYM=[
+ {id:'cold',w:'cold',en:'a cold',ko:'감기',e:'🤒',cE:'🌧️',c:'I played outside in the rain.',cK:'비를 맞으며 밖에서 놀았어요.',adv:['drink','rest','medicine'],cant:"go outside"},
+ {id:'runny',w:'runny nose',en:'a runny nose',ko:'콧물',e:'🤧',cE:'🌬️',c:"I didn't wear a warm coat.",cK:'따뜻한 외투를 입지 않았어요.',adv:['drink','doctor','rest'],cant:"go swimming"},
+ {id:'head',w:'headache',en:'a headache',ko:'두통',e:'🤕',cE:'🎮🌙',c:'I played games late at night.',cK:'밤늦게까지 게임을 했어요.',adv:['rest','medicine'],cant:"play soccer"},
+ {id:'stom',w:'stomachache',en:'a stomachache',ko:'복통',e:'😣',cE:'🍔💨',c:'I ate too fast.',cK:'음식을 너무 빨리 먹었어요.',adv:['doctor','rest','medicine'],cant:"eat lunch"},
+ {id:'tooth',w:'toothache',en:'a toothache',ko:'치통',e:'😖',cE:'🍬🍭',c:'I ate too much candy.',cK:'사탕을 너무 많이 먹었어요.',adv:['dentist'],cant:"eat ice cream"}
+];
+const ADV={
+ rest:{t:'Get some rest.',e:'🛏️',k:['rest']},
+ medicine:{t:'Take this medicine.',e:'💊',k:['medicine']},
+ doctor:{t:'Go see a doctor.',e:'👩‍⚕️',k:['doctor']},
+ dentist:{t:'Go see a dentist.',e:'🦷',k:['dentist']},
+ drink:{t:'Drink warm water.',e:'🍵',k:['warmwater','water']}
+};
+const $=s=>document.querySelector(s);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const store={get(k,d){try{const v=localStorage.getItem('navi_l2_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('navi_l2_'+k,JSON.stringify(v))}catch(e){}}};
+
+/* ---------- 하트 ---------- */
+let hearts=store.get('hearts',0);$('#hearts').textContent=hearts;
+function addHeart(n=1){hearts+=n;$('#hearts').textContent=hearts;store.set('hearts',hearts)}
+
+/* ---------- 음성 합성 ---------- */
+let voices=[];
+function loadVoices(){voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang))}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function say(lines,done){
+ if(!('speechSynthesis' in window)){done&&done();return}
+ speechSynthesis.cancel();
+ const rate=parseFloat($('#rate').value);
+ lines.forEach((t,i)=>{
+  const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate;
+  if(voices.length){u.voice=voices[i%2===0?0:Math.min(1,voices.length-1)]}
+  u.pitch=i%2===0?1.0:1.25;
+  if(i===lines.length-1&&done)u.onend=done;
+  speechSynthesis.speak(u);
+ });
+}
+
+/* ---------- 탭 이동 ---------- */
+function go(id){
+ document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===id));
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+
+/* ---------- N: 원인 탐정 ---------- */
+let nOrder=shuffle(SYM),nIdx=0,nStage=1;
+function nRender(){
+ const s=nOrder[nIdx];nStage=1;
+ $('#nProg').style.width=(nIdx/nOrder.length*100)+'%';
+ $('#nCauseE').textContent=s.cE;$('#nCauseT').textContent=s.c;$('#nCauseK').textContent=s.cK;
+ $('#nEffE').textContent='❓';$('#nEffT').textContent="What's wrong?";
+ $('#nActE').textContent='❓';$('#nActT').textContent='…';
+ $('#nAsk').textContent='1단계: 이 친구는 어디가 아플까요? 예측해 보세요.';
+ $('#nFb').textContent='';$('#nFb').className='feedback center';$('#nNext').style.display='none';
+ say([s.c]);
+ const box=$('#nPicks');box.innerHTML='';
+ SYM.forEach(o=>{
+  const b=document.createElement('button');b.className='pick';
+  b.innerHTML=`<span class="e">${o.e}</span><span class="w">${o.w}</span>`;
+  b.onclick=()=>{
+   if(nStage!==1)return;
+   if(o.id===s.id){
+    b.classList.add('right');nStage=2;
+    $('#nEffE').textContent=s.e;$('#nEffT').textContent='I have '+s.en+'.';
+    $('#nFb').textContent='맞아요! 원인과 증상이 연결되었어요 🔗';$('#nFb').className='feedback center ok';
+    say(["What's wrong?",'I have '+s.en+'.']);addHeart();
+    setTimeout(nAdvice,900);
+   }else{b.classList.add('wrong');$('#nFb').textContent='다시 생각해 볼까요? 원인을 다시 읽어 봐요.';$('#nFb').className='feedback center no'}
+  };
+  box.appendChild(b);
+ });
+}
+function nAdvice(){
+ const s=nOrder[nIdx];
+ $('#nAsk').textContent='2단계: 이 친구에게 어떤 조언을 해 줄까요? (여러 개 정답 가능)';
+ const box=$('#nPicks');box.innerHTML='';
+ Object.entries(ADV).forEach(([k,a])=>{
+  const b=document.createElement('button');b.className='pick';
+  b.innerHTML=`<span class="e">${a.e}</span><span class="w">${a.t}</span>`;
+  b.onclick=()=>{
+   if(nStage!==2)return;
+   if(s.adv.includes(k)){
+    b.classList.add('right');nStage=3;
+    $('#nActE').textContent=a.e;$('#nActT').textContent=a.t;
+    $('#nFb').textContent='좋은 조언이에요! 원인 → 증상 → 조언 완성 💗';$('#nFb').className='feedback center ok';
+    say([a.t,"You'll get better."]);addHeart();
+    $('#nNext').style.display='inline-block';
+    if(nIdx===nOrder.length-1){$('#nNext').textContent='듣기 게임으로 ▶';$('#nProg').style.width='100%'}
+   }else{b.classList.add('wrong');$('#nFb').textContent='이 증상에는 다른 조언이 더 알맞아요.';$('#nFb').className='feedback center no'}
+  };
+  box.appendChild(b);
+ });
+}
+$('#nNext').onclick=()=>{
+ if(nIdx===nOrder.length-1){nOrder=shuffle(SYM);nIdx=0;$('#nNext').textContent='다음 사건 ▶';go('a');nRender();return}
+ nIdx++;nRender();
+};
+
+/* ---------- A: 듣기 게임 ---------- */
+let aRound=0,aStage=1,aCur=null,aAdv=null,aDone=false;
+const A_TOTAL=6;
+$('#showWords').onchange=e=>$('#aPicks').classList.toggle('hide-words',!e.target.checked);
+function aNew(){
+ aCur=SYM[Math.floor(Math.random()*SYM.length)];
+ aAdv=aCur.adv[Math.floor(Math.random()*aCur.adv.length)];
+ aStage=1;aDone=false;
+ $('#aRound').textContent=aRound+1;$('#aProg').style.width=(aRound/A_TOTAL*100)+'%';
+ $('#aStep').textContent='1단계: 친구는 어디가 아플까요?';
+ $('#aFb').textContent='';$('#aFb').className='feedback center';$('#aNext').style.display='none';
+ aDraw(SYM.map(s=>({id:s.id,e:s.e,w:s.w})));
+}
+function aDraw(items){
+ const box=$('#aPicks');box.innerHTML='';
+ shuffle(items).forEach(it=>{
+  const b=document.createElement('button');b.className='pick';
+  b.innerHTML=`<span class="e">${it.e}</span><span class="w">${it.w}</span>`;
+  b.onclick=()=>aPick(it.id,b);box.appendChild(b);
+ });
+}
+function aPlay(){
+ if(aStage===1)say(["What's wrong?",'I have '+aCur.en+'.']);
+ else say(['I have '+aCur.en+'.',ADV[aAdv].t]);
+}
+$('#aPlay').onclick=aPlay;
+function aPick(id,b){
+ if(aDone)return;
+ if(aStage===1){
+  if(id===aCur.id){
+   b.classList.add('right');addHeart();
+   $('#aFb').textContent='정답! I have '+aCur.en+'. 🎉';$('#aFb').className='feedback center ok';
+   aStage=2;
+   setTimeout(()=>{
+    $('#aStep').textContent='2단계: 친구가 해 준 조언은 무엇일까요? 다시 들어 보세요.';
+    $('#aFb').textContent='';
+    aDraw(Object.entries(ADV).map(([k,a])=>({id:k,e:a.e,w:a.t})));
+    aPlay();
+   },1000);
+  }else{b.classList.add('wrong');$('#aFb').textContent='다시 들어 볼까요? 🔊';$('#aFb').className='feedback center no'}
+ }else{
+  if(id===aAdv){
+   b.classList.add('right');addHeart();aDone=true;
+   $('#aFb').textContent=ADV[aAdv].t+' 잘 들었어요! 💗';$('#aFb').className='feedback center ok';
+   aRound++;
+   $('#aNext').style.display='inline-block';
+   $('#aNext').textContent=aRound>=A_TOTAL?'말하기 미션으로 ▶':'다음 ▶';
+   if(aRound>=A_TOTAL)$('#aProg').style.width='100%';
+  }else{b.classList.add('wrong');$('#aFb').textContent='조언을 다시 들어 볼까요?';$('#aFb').className='feedback center no'}
+ }
+}
+$('#aNext').onclick=()=>{if(aRound>=A_TOTAL){aRound=0;go('v1')}aNew()};
+
+/* ---------- V1: 말하기 미션 ---------- */
+let role='sick',sCur=SYM[0],sStep=0,sDone=false;
+document.querySelectorAll('#roles .role').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#roles .role').forEach(x=>x.classList.remove('on'));
+ b.classList.add('on');role=b.dataset.role;sNew();
+});
+const norm=t=>t.toLowerCase().replace(/[^a-z]/g,'');
+function sNew(){
+ sCur=SYM[Math.floor(Math.random()*SYM.length)];sStep=0;sDone=false;
+ $('#sEmo').textContent=sCur.e;$('#sFb').textContent='';
+ $('#sHeard').innerHTML='<span class="muted">마이크를 누르고 영어로 말해 보세요.</span>';
+ sMission();
+}
+function sMission(){
+ if(role==='sick'){
+  $('#sMission').textContent=`친구가 "What's wrong?"이라고 물어요. 내 증상을 말해 보세요!`;
+  $('#sHint').textContent=`힌트: ${sCur.ko} → I have ...`;
+  say(["What's wrong?"]);
+ }else if(sStep===0){
+  $('#sMission').textContent='친구가 아파 보여요. 먼저 무엇이 문제인지 물어보세요!';
+  $('#sHint').textContent='힌트: What’s ... ?';
+ }else{
+  $('#sMission').textContent=`친구: "I have ${sCur.en}." 증상에 맞는 조언을 해 주세요!`;
+  $('#sHint').textContent='힌트: '+sCur.adv.map(k=>ADV[k].e).join(' ');
+ }
+}
+/* 초등 학습자 발음을 고려한 허용 표현(음성 인식이 자주 잘못 받아 적는 형태 포함) */
+const SYM_ALIAS={
+ cold:['cold','code','called','coal','colt','gold','coled'],
+ runny:['runnynose','runningnose','funnynose','runynose','runnynos','honeynose','nose'],
+ head:['headache','headake','headach','headegg','hedake','headech','headaches','head'],
+ stom:['stomachache','stomach','stomache','stomachake','stomic','tummy'],
+ tooth:['toothache','tooth','toothake','toothach','tooache','toothaches']
+};
+const ADV_ALIAS={
+ rest:['rest','rist','wrest','reste'],
+ medicine:['medicine','medicin','madison','medison','medicines'],
+ doctor:['doctor','docter','dactor','doctors'],
+ dentist:['dentist','dentis','dennis','dentists'],
+ drink:['warmwater','water','drink']
+};
+function sTargetOk(text){
+ const n=norm(text);
+ if(role==='sick')return SYM_ALIAS[sCur.id].some(w=>n.includes(w));
+ if(sStep===0)return ['wrong','rong','strong','whatsrong'].some(w=>n.includes(w));
+ return sCur.adv.some(k=>ADV_ALIAS[k].some(w=>n.includes(w)));
+}
+function sModelLines(){
+ if(role==='sick')return['I have '+sCur.en+'.'];
+ if(sStep===0)return["What's wrong?"];
+ return[ADV[sCur.adv[0]].t];
+}
+function sSuccess(viaPeer){
+ if(sDone)return;
+ addHeart();
+ if(role==='care'&&sStep===0){
+  sStep=1;$('#sFb').textContent=(viaPeer?'친구가 확인했어요! ':'')+'좋아요! 이제 친구의 대답을 들어 봐요.';$('#sFb').className='feedback ok';
+  say(['I have '+sCur.en+'.'],()=>sMission());
+  setTimeout(sMission,2500);return;
+ }
+ sDone=true;
+ $('#sFb').textContent=(viaPeer?'친구가 확인했어요! ':'')+(role==='sick'?'아픈 마음을 영어로 잘 전했어요 💗':'따뜻한 조언이에요! You\'re a good friend 💗');
+ $('#sFb').className='feedback ok';
+ if(role==='care')say(['Thank you.']);
+}
+$('#sModel').onclick=()=>say(sModelLines());
+$('#sPeer').onclick=()=>sSuccess(true);
+$('#sNext').onclick=sNew;
+/* ---------- 음성 인식 엔진 (안정화 버전) ---------- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const UA=navigator.userAgent;
+const BROWSER=/Whale/i.test(UA)?'웨일':/SamsungBrowser/i.test(UA)?'삼성 인터넷':/KAKAOTALK|NAVER\(|Instagram|FBAN|FBAV|Line\//i.test(UA)?'앱 내부 브라우저':/Edg\//.test(UA)?'엣지':/(iPhone|iPad)/.test(UA)||(/Macintosh/.test(UA)&&'ontouchend' in document)?'iOS 사파리':/Chrome\//.test(UA)?'크롬':/Safari\//.test(UA)?'사파리':'기타';
+const ERR_MSG={
+ 'not-allowed':'🔒 마이크 권한이 막혀 있어요. 주소창 왼쪽 자물쇠(또는 ⓘ) → 마이크 ‘허용’ → 새로고침 해 주세요.',
+ 'service-not-allowed':'🚫 이 브라우저에서는 음성 인식 서비스를 쓸 수 없어요. 크롬에서 열어 주세요.',
+ 'no-speech':'🤫 소리가 들리지 않았어요. 마이크에 가까이 대고 또박또박 말해 보세요.',
+ 'audio-capture':'🎙️ 마이크를 찾을 수 없어요. 마이크 연결이나 다른 프로그램(줌 등)을 확인해 주세요.',
+ 'network':'🌐 음성 인식 서버에 연결하지 못했어요. 인터넷(학교 방화벽) 상태를 확인해 주세요.',
+ 'language-not-supported':'🌏 영어 음성 인식을 지원하지 않는 환경이에요. 크롬을 사용해 주세요.'
+};
+let rec=null,recOn=false,recTimer=null,lastHeard=[],gotFinal=false,recMode='game';
+function micUI(on){recOn=on;$('#micBtn').classList.toggle('rec',on)}
+function judge(alts){
+ if(recMode==='test'){$('#dTest').textContent=alts[0]?'✅ 인식 성공: "'+alts[0]+'"':'다시 시도해 주세요.';return}
+ if(alts.some(sTargetOk))sSuccess(false);
+ else{$('#sFb').textContent='거의 다 왔어요! 🔊 예시를 듣고 다시 말해 볼까요?';$('#sFb').className='feedback no'}
+}
+function startRec(mode){
+ if(!SR){$('#micWarn').style.display='block';$('#diag').style.display='block';runDiag();return}
+ if(recOn){try{rec.stop()}catch(e){}return}
+ recMode=mode||'game';
+ try{speechSynthesis.cancel()}catch(e){}
+ rec=new SR();                 // 매번 새로 만들어 이전 상태가 꼬이지 않게 함
+ rec.lang='en-US';rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=5;
+ lastHeard=[];gotFinal=false;
+ rec.onstart=()=>{micUI(true);(recMode==='test'?$('#dTest'):$('#sHeard')).innerHTML='<span class="muted">듣고 있어요… 🎧 지금 말해 보세요!</span>'};
+ rec.onresult=e=>{
+  const alts=[];let final=false;
+  for(let r=e.resultIndex;r<e.results.length;r++){
+   const res=e.results[r];
+   for(let j=0;j<res.length;j++)alts.push(res[j].transcript);   // 반복자(spread) 대신 인덱스로 읽기
+   if(res.isFinal)final=true;
+  }
+  if(alts.length){lastHeard=alts;(recMode==='test'?$('#dTest'):$('#sHeard')).textContent='🗣️ '+alts[0]}
+  if(final){gotFinal=true;judge(alts)}
+ };
+ rec.onerror=e=>{
+  micUI(false);clearTimeout(recTimer);
+  if(e.error==='aborted')return;
+  const msg=ERR_MSG[e.error]||('⚠️ 음성 인식 오류('+e.error+'). 새로고침 후 다시 시도해 주세요.');
+  (recMode==='test'?$('#dTest'):$('#sHeard')).textContent=msg;
+  if(e.error!=='no-speech'){$('#diag').style.display='block';runDiag()}
+ };
+ rec.onend=()=>{micUI(false);clearTimeout(recTimer);if(!gotFinal&&lastHeard.length)judge(lastHeard)};
+ try{rec.start();recTimer=setTimeout(()=>{try{rec.stop()}catch(e){}},8000)}
+ catch(err){micUI(false);$('#sHeard').textContent='⚠️ 마이크를 시작하지 못했어요. 잠시 후 다시 눌러 주세요.'}
+}
+$('#micBtn').onclick=()=>startRec('game');
+if(!SR)$('#micWarn').style.display='block';
+
+/* ---------- 마이크 점검 ---------- */
+async function runDiag(){
+ const L=[];const ok=(t,g)=>L.push(`<li class="${g?'ok':''}">${t}</li>`);
+ ok('보안 연결(https): '+(location.protocol==='https:'||location.hostname==='localhost'?'정상':'⚠️ https 주소로 열어 주세요'),location.protocol==='https:'||location.hostname==='localhost');
+ const goodB=BROWSER==='크롬'||BROWSER==='엣지';
+ ok('브라우저: '+BROWSER+(goodB?' (권장)':BROWSER==='iOS 사파리'?' — 설정 › Siri 및 받아쓰기 켜기가 필요해요':' — ⚠️ 크롬으로 열어 주세요'),goodB);
+ ok('음성 인식 기능: '+(SR?'지원':'⚠️ 지원하지 않음'),!!SR);
+ ok('독립 창에서 열림: '+(window.self===window.top?'정상':'⚠️ 다른 페이지 안에 들어가 있어요. 새 탭으로 열어 주세요'),window.self===window.top);
+ let perm='확인 불가';
+ try{if(navigator.permissions){const p=await navigator.permissions.query({name:'microphone'});perm=p.state}}catch(e){}
+ ok('마이크 권한: '+({granted:'허용됨',denied:'⚠️ 차단됨 → 자물쇠 아이콘에서 허용',prompt:'아직 묻지 않음 (아래 버튼으로 허용)'}[perm]||perm),perm==='granted');
+ $('#dList').innerHTML=L.join('');
+}
+$('#diagBtn').onclick=()=>{const d=$('#diag');d.style.display=d.style.display==='block'?'none':'block';if(d.style.display==='block')runDiag()};
+$('#dPerm').onclick=async()=>{
+ try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());$('#dTest').textContent='✅ 마이크 허용 완료! 이제 테스트해 보세요.'}
+ catch(e){$('#dTest').textContent=e.name==='NotFoundError'?'🎙️ 마이크 장치를 찾을 수 없어요.':'🔒 마이크가 차단되었어요. 주소창 자물쇠에서 허용해 주세요.'}
+ runDiag();
+};
+$('#dTry').onclick=()=>startRec('test');
+
+/* ---------- V2: 수준별 쓰기 ---------- */
+document.querySelectorAll('#levels .lv').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#levels .lv').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ ['1','2','3'].forEach(n=>$('#lv'+n).style.display=n===b.dataset.lv?'block':'none');
+});
+// 1단계
+let l1Items=[],l1i=0;
+function l1Build(){
+ l1Items=shuffle([
+  ...SYM.map(s=>({e:s.e,pre:'I have a',ans:s.w,opts:shuffle(SYM.map(x=>x.w)).slice(0,0),type:'sym',s})),
+  ...SYM.slice(0,3).map(s=>({e:ADV[s.adv[0]].e,pre:'',ans:ADV[s.adv[0]].t,type:'adv',s}))
+ ]).slice(0,6);l1i=0;l1Render();
+}
+function l1Render(){
+ const it=l1Items[l1i];$('#l1Count').textContent=`(${l1i+1}/${l1Items.length})`;
+ $('#l1Fb').textContent='';$('#l1Next').style.display='none';$('#l1Emo').textContent=it.e;
+ let opts,sent;
+ if(it.type==='sym'){
+  const others=shuffle(SYM.filter(x=>x.w!==it.ans)).slice(0,2).map(x=>x.w);
+  opts=shuffle([it.ans,...others]);
+  sent=`<span class="bubble a" style="font-size:1rem">What's wrong?</span><br>I have a <span class="blank" id="l1B">&nbsp;</span>.`;
+  if(it.ans==='cold')sent=sent;
+ }else{
+  const parts=it.ans.replace('.','').split(' ');const verb=parts.slice(0,-1).join(' ');const last=parts[parts.length-1];
+  it.real=last;
+  const pool=['rest','medicine','doctor','dentist','water'].filter(w=>w!==last);
+  opts=shuffle([last,...shuffle(pool).slice(0,2)]);
+  sent=`${verb} <span class="blank" id="l1B">&nbsp;</span>.`;
+ }
+ $('#l1Sent').innerHTML=sent;
+ const box=$('#l1Opts');box.innerHTML='';
+ opts.forEach(o=>{const b=document.createElement('button');b.className='tile';b.textContent=o;
+  b.onclick=()=>{
+   const ok=it.type==='sym'?o===it.ans:o===it.real;
+   if(ok){$('#l1B').textContent=o;$('#l1Fb').textContent='정답! 소리 내어 읽어 봐요 🔊';$('#l1Fb').className='feedback center ok';addHeart();
+    say([it.type==='sym'?'I have a '+o+'.':it.ans]);$('#l1Next').style.display='inline-block';
+    if(l1i===l1Items.length-1)$('#l1Next').textContent='2단계 도전 ▶';}
+   else{b.style.borderColor='var(--bad)';$('#l1Fb').textContent='그림을 다시 보고 골라 봐요.';$('#l1Fb').className='feedback center no'}
+  };box.appendChild(b)});
+}
+$('#l1Next').onclick=()=>{if(l1i===l1Items.length-1){$('#l1Next').textContent='다음 ▶';document.querySelector('[data-lv="2"]').click();l1Build();return}l1i++;l1Render()};
+// 2단계
+let l2Items=[],l2i=0,l2Ans=[];
+function l2Build(){
+ l2Items=shuffle([
+  ...SYM.map(s=>({e:s.e,ko:`${s.ko}가 있다고 말해요.`,t:`I have ${s.en}.`})),
+  ...SYM.map(s=>({e:s.e+'➜'+ADV[s.adv[0]].e,ko:`${s.ko}가 있는 친구에게 조언해요.`,t:ADV[s.adv[0]].t})),
+  {e:'😣🍔',ko:'너무 빨리 먹지 말라고 말해요.',t:"Don't eat too fast."},
+  {e:'🤧🏊',ko:'오늘 수영하러 갈 수 없다고 말해요.',t:"I can't go swimming today."}
+ ]).slice(0,6);l2i=0;l2Render();
+}
+function l2Render(){
+ const it=l2Items[l2i];l2Ans=[];
+ $('#l2Count').textContent=`(${l2i+1}/${l2Items.length})`;$('#l2Emo').textContent=it.e;$('#l2Ko').textContent=it.ko;
+ $('#l2Fb').textContent='';$('#l2Next').style.display='none';$('#l2Check').style.display='inline-block';
+ const words=it.t.replace(/\.$/,'').split(' ').concat(['.']);
+ it.words=words;
+ let mixed=shuffle(words);let guard=0;while(mixed.join(' ')===words.join(' ')&&guard++<10)mixed=shuffle(words);
+ it.bank=mixed.map((w,i)=>({w,i,used:false}));l2Draw();
+}
+function l2Draw(){
+ const it=l2Items[l2i];
+ $('#l2Ans').innerHTML='';$('#l2Bank').innerHTML='';
+ l2Ans.forEach((t,pos)=>{const b=document.createElement('button');b.className='tile';b.textContent=t.w;
+  b.onclick=()=>{t.used=false;l2Ans.splice(pos,1);l2Draw()};$('#l2Ans').appendChild(b)});
+ it.bank.forEach(t=>{if(t.used)return;const b=document.createElement('button');b.className='tile';b.textContent=t.w;
+  b.onclick=()=>{t.used=true;l2Ans.push(t);l2Draw()};$('#l2Bank').appendChild(b)});
+}
+$('#l2Reset').onclick=()=>{l2Items[l2i].bank.forEach(t=>t.used=false);l2Ans=[];l2Draw()};
+$('#l2Check').onclick=()=>{
+ const it=l2Items[l2i];const got=l2Ans.map(t=>t.w).join(' ');
+ if(got===it.words.join(' ')){
+  $('#l2Fb').textContent='완벽해요! 첫 글자 대문자와 마침표까지 👍';$('#l2Fb').className='feedback center ok';addHeart(2);say([it.t]);
+  $('#l2Check').style.display='none';$('#l2Next').style.display='inline-block';
+  if(l2i===l2Items.length-1)$('#l2Next').textContent='3단계 도전 ▶';
+ }else if(l2Ans.length<it.words.length){$('#l2Fb').textContent='아직 남은 카드가 있어요.';$('#l2Fb').className='feedback center no'}
+ else{$('#l2Fb').textContent='순서를 다시 살펴볼까요? 문장은 대문자로 시작해요.';$('#l2Fb').className='feedback center no'}
+};
+$('#l2Next').onclick=()=>{if(l2i===l2Items.length-1){$('#l2Next').textContent='다음 ▶';document.querySelector('[data-lv="3"]').click();l2Build();return}l2i++;l2Render()};
+// 3단계
+let l3Sym=SYM[0];
+SYM.forEach((s,i)=>{const b=document.createElement('button');b.className='pick';b.style.padding='8px 12px';
+ b.innerHTML=`<span class="e" style="font-size:1.8rem">${s.e}</span><span class="w">${s.w}</span>`;
+ b.onclick=()=>{document.querySelectorAll('#l3Sym .pick').forEach(x=>x.classList.remove('right'));b.classList.add('right');l3Sym=s;l3Check()};
+ if(i===0)b.classList.add('right');$('#l3Sym').appendChild(b)});
+const sentences=t=>t.split(/(?<=[.!?])\s+/).map(x=>x.trim()).filter(Boolean);
+function l3Check(){
+ const q=$('#l3Q').value.trim(),s=$('#l3S').value.trim(),a=$('#l3A').value.trim(),h=$('#l3H').value.trim();
+ const all=[q,s,a,h].filter(Boolean);const sents=all.flatMap(sentences);
+ const nS=norm(s),nA=norm(a);
+ const checks=[
+  ['친구에게 증상을 묻는 질문이 있나요? (What’s wrong?)',norm(q).includes('wrong')||norm(q).includes('howareyou')],
+  ['증상을 나타내는 말을 썼나요?',nS.includes(norm(l3Sym.w))],
+  ['증상 앞에 a를 썼나요? (a headache)',l3Sym.id==='cold'?/\ba\s+cold\b/i.test(s):new RegExp('\\ba\\s+'+l3Sym.w,'i').test(s)],
+  ['증상에 맞는 조언을 썼나요?',l3Sym.adv.some(k=>ADV[k].k.some(w=>nA.includes(w)))||nA.includes('donteat')],
+  ['문장의 첫 글자를 대문자로 썼나요?',sents.length>0&&sents.every(x=>/^[A-Z]/.test(x))],
+  ['문장 끝에 마침표(.)나 물음표(?)를 썼나요?',all.length>0&&all.every(x=>/[.?!]$/.test(x))],
+  ['마음을 전하는 말을 썼나요? (You’ll get better.)',h.length>3]
+ ];
+ $('#l3Checks').innerHTML=checks.map(([t,ok])=>`<li class="${ok?'ok':''}">${t}</li>`).join('');
+ return checks.filter(c=>c[1]).length;
+}
+['#l3Q','#l3S','#l3A','#l3H','#l3To'].forEach(id=>$(id).addEventListener('input',l3Check));
+l3Check();
+let l3Made=false;
+$('#l3Make').onclick=()=>{
+ const n=l3Check();
+ const to=$('#l3To').value.trim()||'my friend';
+ const body=[$('#l3Q').value,$('#l3S').value,$('#l3A').value,$('#l3H').value].map(x=>x.trim()).filter(Boolean).join('\n');
+ if(!body){$('#l3Fb').textContent='편지 내용을 먼저 써 주세요.';$('#l3Fb').className='feedback center no';return}
+ $('#pE').textContent=l3Sym.e;$('#pTo').textContent='To. '+to;$('#pBody').textContent=body+'\n— From. ______';
+ $('#pillWrap').style.display='flex';$('#pBtns').style.display='flex';
+ $('#l3Fb').textContent=n>=6?'마음이 가득 담긴 알약 편지 완성! 친구에게 전해 주세요 💊💗':`점검 카드 ${n}/7 완료! 남은 항목을 고쳐 쓰면 더 멋진 편지가 돼요.`;
+ $('#l3Fb').className='feedback center '+(n>=6?'ok':'');
+ if(!l3Made){addHeart(3);l3Made=true}
+};
+$('#pRead').onclick=()=>say(sentences($('#pBody').textContent.replace('— From. ______','').replace(/\n/g,' ')));
+$('#pCopy').onclick=()=>{
+ const t=$('#pTo').textContent+'\n'+$('#pBody').textContent;
+ (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{$('#l3Fb').textContent='복사했어요! 온라인 게시판에 붙여 넣어 공유해요.';$('#l3Fb').className='feedback center ok'}).catch(()=>{$('#l3Fb').textContent='복사가 안 되면 글을 길게 눌러 복사해 주세요.'});
+};
+
+/* ---------- I: 성찰 ---------- */
+const ICANS=['증상을 묻고 답할 수 있어요. (What’s wrong? – I have a cold.)','아픈 친구에게 증상에 맞는 조언을 할 수 있어요.','원인과 증상을 연결해 설명할 수 있어요.','증상에 맞게 조언하는 글을 쓸 수 있어요.'];
+const STRATS=['🔊 예시 다시 듣기','🖼️ 그림 단서 보기','🙋 친구에게 묻기','📖 도움 단어 보기','🔁 여러 번 연습하기','🔎 점검 카드로 고치기'];
+const ACTS=['아픈 친구에게 What’s wrong?이라고 먼저 묻기','가족이 아플 때 영어 조언 한마디 건네기','아프지 않도록 내 생활 습관 지키기','알약 편지를 실제로 친구에게 전하기'];
+let refl=store.get('refl',{stars:[0,0,0,0],strats:[],acts:[]});
+function chipToggle(boxId,list,key){
+ const box=$(boxId);box.innerHTML='';
+ list.forEach(t=>{const b=document.createElement('button');b.className='btn ghost';b.style.fontSize='.95rem';b.textContent=t;
+  const on=()=>refl[key].includes(t);
+  const paint=()=>{b.style.background=on()?'var(--teal-l)':'#fff';b.style.borderColor=on()?'var(--teal)':'var(--line)'};
+  b.onclick=()=>{if(on())refl[key]=refl[key].filter(x=>x!==t);else refl[key].push(t);paint()};paint();box.appendChild(b)});
+}
+function iRender(){
+ $('#icans').innerHTML='';
+ ICANS.forEach((t,i)=>{
+  const d=document.createElement('div');d.className='row';d.style.justifyContent='space-between';d.style.padding='6px 0';d.style.borderBottom='1px dashed var(--line)';
+  d.innerHTML=`<span>${t}</span><span class="stars"></span>`;
+  const st=d.querySelector('.stars');
+  for(let k=1;k<=3;k++){const b=document.createElement('button');b.textContent='⭐';
+   if(refl.stars[i]>=k)b.classList.add('on');
+   b.onclick=()=>{refl.stars[i]=k;iRender()};st.appendChild(b)}
+  $('#icans').appendChild(d);
+ });
+ chipToggle('#strats',STRATS,'strats');chipToggle('#acts',ACTS,'acts');
+ ['r1','r2','r3','r4','r5'].forEach(k=>{if(refl[k]!==undefined)$('#'+k).value=refl[k]});
+ if(refl.own)$('#actOwn').value=refl.own;
+}
+$('#saveRefl').onclick=()=>{
+ ['r1','r2','r3','r4','r5'].forEach(k=>refl[k]=$('#'+k).value);refl.own=$('#actOwn').value;
+ store.set('refl',refl);addHeart(2);
+ $('#rFb').textContent='저장했어요! 이 기기에서 다시 열면 이어서 볼 수 있어요 🌱';$('#rFb').className='feedback center ok';
+};
+
+/* ---------- 시작 ---------- */
+nRender();aNew();sNew();l1Build();l2Build();iRender();
+if('speechSynthesis' in window)speechSynthesis.cancel();
+</script>
+</body>
+</html>
