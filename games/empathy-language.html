@@ -108,6 +108,11 @@ label.f{display:block;font-family:'Jua';margin:12px 0 4px}
 footer{text-align:center;color:var(--soft);font-size:.85rem;padding:20px}
 .progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
 .progress i{display:block;height:100%;background:var(--sun);width:0;transition:.4s}
+header{position:relative}
+.home-link{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.22);color:#fff;text-decoration:none;font-family:'Jua';font-size:.95rem;padding:6px 12px;border-radius:99px}
+.home-link:hover{background:rgba(255,255,255,.35)}
+.btn.link{display:inline-block;text-decoration:none}
+@media (max-width:520px){.home-link{position:static;display:inline-block;margin-bottom:6px}}
 @media print{
   body *{visibility:hidden}
   #printArea,#printArea *{visibility:visible}
@@ -118,6 +123,7 @@ footer{text-align:center;color:var(--soft);font-size:.85rem;padding:20px}
 </head>
 <body>
 <header>
+  <a class="home-link" href="../index.html">🎈 NAVI PLAY 홈</a>
   <div class="brand">NAVI PLAY · LESSON 2</div>
   <h1>배려를 전하는 공감의 언어 탐구</h1>
   <div class="concepts"><span class="chip">🔗 인과관계 Causation</span><span class="chip">🤝 책임 Responsibility</span><span class="chip">👀 관점 Perspective</span></div>
@@ -360,12 +366,13 @@ footer{text-align:center;color:var(--soft);font-size:.85rem;padding:20px}
       <button class="btn ghost" onclick="window.print()">🖨️ 인쇄</button>
     </div>
     <div class="feedback center" id="rFb"></div>
+    <div class="center" style="margin-top:14px"><a class="btn sun big link" href="../index.html">🎈 NAVI PLAY 첫 화면으로 돌아가기</a></div>
   </div>
 </section>
 </main>
 
 <div class="hearts" title="공감 하트">💗 <span id="hearts">0</span></div>
-<footer>NAVI PLAY · 배려를 전하는 공감의 언어 탐구 · Made by Boeun.S</footer>
+<footer><a href="../index.html" style="color:inherit">NAVI PLAY</a> · 배려를 전하는 공감의 언어 탐구 · Made by Boeun.S</footer>
 
 <script>
 /* ---------- 데이터 ---------- */
