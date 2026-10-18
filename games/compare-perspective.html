@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>비교로 넓히는 관점 | NAVI PLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFF7F0; --card:#FFFFFF; --ink:#2A2D3E; --soft:#6E6A78;
+  --main:#E8743B; --main-l:#FDE6D8; --navy:#34437A; --navy-l:#E3E8F8;
+  --grn:#2F9E6E; --grn-l:#DDF4EA; --yel:#F2B33D; --yel-l:#FFF2D6;
+  --line:#F0E0D2; --ok:#2E9E5B; --bad:#D64545;
+  --r:20px; --shadow:0 6px 18px rgba(80,40,10,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Jua',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.5}
+.k{font-family:'Jua',sans-serif;font-weight:400}
+button{font-family:inherit;cursor:pointer;border:none}
+header{position:relative;background:linear-gradient(135deg,#34437A,#E8743B);color:#fff;padding:18px 16px 14px;text-align:center}
+header .brand{font-size:.8rem;letter-spacing:.15em;opacity:.85;font-weight:800}
+header h1{font-family:'Jua';font-size:clamp(1.4rem,4vw,2.1rem);font-weight:400;margin:2px 0}
+header .concepts{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.chip{background:rgba(255,255,255,.22);padding:3px 12px;border-radius:99px;font-size:.85rem;font-family:'Jua'}
+.home-link{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.22);color:#fff;text-decoration:none;font-family:'Jua';font-size:.95rem;padding:6px 12px;border-radius:99px}
+.home-link:hover{background:rgba(255,255,255,.35)}
+@media (max-width:560px){.home-link{position:static;display:inline-block;margin-bottom:6px}}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:2px solid var(--line);position:sticky;top:0;z-index:10}
+nav button{flex:1 0 auto;background:var(--bg);color:var(--ink);padding:9px 14px;border-radius:14px;font-family:'Jua';font-size:1rem;white-space:nowrap;border:2px solid transparent}
+nav button .tag{display:inline-block;width:24px;height:24px;line-height:24px;border-radius:50%;background:var(--main);color:#fff;font-size:.85rem;margin-right:5px;text-align:center}
+nav button.on{border-color:var(--main);background:var(--main-l)}
+main{max-width:980px;margin:0 auto;padding:18px 16px 70px}
+section{display:none;animation:fade .3s}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.stage{font-family:'Jua';color:var(--main);font-size:.95rem}
+h2{font-family:'Jua';font-weight:400;font-size:1.6rem;margin:2px 0 6px}
+h3{font-family:'Jua';font-weight:400;font-size:1.2rem;margin-bottom:8px}
+.q{background:var(--navy-l);border-left:5px solid var(--navy);padding:10px 14px;border-radius:12px;margin:10px 0;font-family:'Jua';font-size:1.05rem}
+.muted{color:var(--soft);font-size:.92rem}
+.btn{background:var(--main);color:#fff;padding:11px 20px;border-radius:14px;font-family:'Jua';font-size:1.05rem;box-shadow:0 3px 0 #B5552A;text-decoration:none;display:inline-block}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.navy{background:var(--navy);box-shadow:0 3px 0 #222D57}
+.btn.yel{background:var(--yel);box-shadow:0 3px 0 #C28A20;color:#3A2A00}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.big{font-size:1.3rem;padding:14px 28px}
+.btn.right{background:var(--ok);box-shadow:0 3px 0 #1E7040} .btn.wrong{background:var(--bad);box-shadow:0 3px 0 #9C2E2E}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{text-align:center}
+.bubble{display:inline-block;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 16px;margin:4px;font-size:1.08rem;font-weight:800}
+.bubble.a{border-color:var(--navy)} .bubble.b{border-color:var(--main)}
+.badge{position:fixed;right:14px;bottom:14px;background:#fff;border-radius:99px;padding:8px 16px;box-shadow:var(--shadow);font-family:'Jua';font-size:1.1rem;z-index:20}
+.feedback{min-height:32px;font-family:'Jua';font-size:1.15rem;margin-top:10px}
+.feedback.ok{color:var(--ok)} .feedback.no{color:var(--bad)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:620px;margin:12px auto}
+.item{background:var(--bg);border-radius:18px;padding:12px;text-align:center;display:flex;flex-direction:column;justify-content:flex-end;min-height:190px}
+.item .em{line-height:1.1;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;margin:0 auto}
+.item .nm{font-family:'Jua';font-size:1.15rem;margin-top:6px}
+.bar{height:14px;background:#fff;border-radius:99px;overflow:hidden;margin-top:6px;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--navy)}
+.val{font-weight:800;color:var(--navy);font-size:.95rem}
+.forms{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.forms div{background:var(--bg);border-radius:14px;padding:10px;min-height:90px}
+.forms b{font-family:'Jua';font-size:1.05rem;display:block;text-align:center;color:var(--main)}
+.forms span{display:inline-block;background:#fff;border-radius:8px;padding:2px 8px;margin:2px;font-weight:800}
+.big-word{font-family:'Nunito';font-weight:800;font-size:3rem;color:var(--navy)}
+.rule{background:var(--yel-l);border-radius:14px;padding:12px 14px;margin-top:12px;display:none}
+.tile{background:#fff;border:2px solid var(--navy);color:var(--ink);padding:8px 14px;border-radius:12px;font-weight:800;font-size:1.08rem}
+.tile.right{border-color:var(--ok);background:#E5F6EC} .tile.wrong{border-color:var(--bad);background:#FBE6E6}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:58px;padding:10px;border-radius:14px;background:var(--bg);margin:8px 0}
+.answer{border:2px dashed var(--navy);background:#fff}
+.clues{background:var(--yel-l);border-radius:16px;padding:12px 18px;font-size:1.15rem;font-weight:700;max-width:620px;margin:10px auto}
+.people{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:12px 0}
+.person{background:#fff;border:3px solid var(--line);border-radius:18px;padding:10px 16px;text-align:center;min-width:100px}
+.person .e{font-size:2.4rem}
+.person.used{opacity:.35}
+.ladder{display:flex;gap:10px;justify-content:center;align-items:flex-end;min-height:130px;background:var(--bg);border-radius:16px;padding:12px;margin:8px auto;max-width:620px}
+.rung{background:var(--navy);color:#fff;border-radius:12px 12px 4px 4px;width:90px;display:flex;align-items:flex-start;justify-content:center;padding-top:6px;font-family:'Jua'}
+.mic{width:96px;height:96px;border-radius:50%;background:var(--main);color:#fff;font-size:2.4rem;box-shadow:0 5px 0 #B5552A}
+.mic.rec{animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(232,116,59,.25),0 5px 0 #B5552A}}
+.heard{background:var(--bg);border-radius:12px;padding:10px;margin-top:10px;min-height:44px;font-size:1.1rem}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.role{border:3px solid var(--line);background:#fff;border-radius:18px;padding:16px;text-align:left}
+.role.on{border-color:var(--main);background:var(--main-l)}
+.role .e{font-size:2rem}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.lv{border:3px solid var(--line);border-radius:18px;padding:14px;background:#fff;text-align:left}
+.lv.on{border-color:var(--main);background:var(--main-l)}
+.lv b{font-family:'Jua';font-weight:400;font-size:1.2rem}
+.sentence{font-size:1.35rem;font-weight:800;margin:14px 0;line-height:2.2}
+.blank{display:inline-block;min-width:120px;border-bottom:3px dashed var(--main);text-align:center;color:var(--main)}
+input[type=text],input[type=number],textarea,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:9px 11px;font-family:'Nunito';font-size:1.05rem;font-weight:600;color:var(--ink);background:#fff}
+textarea{min-height:64px;resize:vertical}
+label.f{display:block;font-family:'Jua';margin:12px 0 4px}
+.crow{background:var(--bg);border-radius:16px;padding:12px;margin:10px 0}
+.crow .grid{display:grid;grid-template-columns:1.3fr .7fr 1fr 1.3fr .7fr;gap:8px;align-items:center}
+@media (max-width:640px){.crow .grid{grid-template-columns:1fr 1fr}}
+.crow .win{font-family:'Jua';color:var(--grn);margin-top:6px}
+.checks{list-style:none;margin-top:6px}
+.checks li{padding:3px 0;font-size:.95rem}
+.checks li::before{content:'⬜ '}
+.checks li.ok::before{content:'✅ '}
+.champ{width:min(520px,100%);margin:16px auto 0;border:4px solid var(--main);border-radius:24px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.champ .top{background:linear-gradient(135deg,#E8743B,#F2B33D);color:#fff;text-align:center;padding:14px;font-family:'Jua';font-size:1.5rem}
+.champ .body{padding:16px 20px;font-weight:700;font-size:1.08rem;white-space:pre-wrap}
+.stars button{background:none;font-size:1.8rem;filter:grayscale(1);opacity:.4}
+.stars button.on{filter:none;opacity:1}
+.refl{border-left:5px solid var(--main);padding-left:12px;margin:14px 0}
+.dim{font-size:.8rem;background:var(--main-l);color:var(--main);padding:2px 8px;border-radius:99px;font-family:'Jua'}
+.navi-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.navi-map .step{background:var(--bg);border-radius:16px;padding:14px}
+.navi-map .L{font-family:'Jua';font-size:2rem;color:var(--main);line-height:1}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-family:'Jua';background:var(--bg);padding:6px 12px;border-radius:99px}
+.progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:var(--yel);width:0;transition:.4s}
+footer{text-align:center;color:var(--soft);font-size:.85rem;padding:20px}
+@media print{
+  body *{visibility:hidden}
+  #printArea,#printArea *{visibility:visible}
+  #printArea{position:absolute;left:0;top:0;width:100%}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="home-link" href="../index.html">🎈 NAVI PLAY 홈</a>
+  <div class="brand">NAVI PLAY · LESSON 6</div>
+  <h1>관계 속에서 넓어지는 우리의 관점</h1>
+  <div class="concepts"><span class="chip">🧩 형태 Form</span><span class="chip">🔗 연결 Connection</span><span class="chip">👀 관점 Perspective</span></div>
+</header>
+
+<nav id="nav">
+  <button data-go="home" class="on">🏠 시작</button>
+  <button data-go="n"><span class="tag">N</span>-er 형태 탐정</button>
+  <button data-go="a1"><span class="tag">A</span>듣고 판단하기</button>
+  <button data-go="a2"><span class="tag">A</span>읽고 연결하기</button>
+  <button data-go="v1"><span class="tag">V</span>말하기 미션</button>
+  <button data-go="v2"><span class="tag">V</span>수준별 쓰기</button>
+  <button data-go="i"><span class="tag">I</span>성찰과 실천</button>
+</nav>
+
+<main>
+<!-- HOME -->
+<section id="home" class="on">
+  <div class="card center">
+    <div style="font-size:3.2rem">🦒📏🐘⚖️🐆</div>
+    <h2>Which is bigger? Who is taller?</h2>
+    <p class="muted">두 대상을 비교하는 말의 <b>형태</b>를 발견하고, than으로 이어진 관계를 <b>연결</b>하며, 누구와 비교하느냐에 따라 달라지는 <b>관점</b>을 탐구해요.</p>
+    <div class="q">🧭 중심 아이디어: 비교는 관계 속에서 이루어지며, 무엇과 비교하느냐에 따라 같은 대상도 다르게 보인다.</div>
+    <button class="btn big" data-go="n">탐구 시작하기 ▶</button>
+  </div>
+  <div class="card">
+    <h3>NAVI 탐구 지도</h3>
+    <div class="navi-map">
+      <div class="step"><div class="L">N</div><b class="k">Notice & Navigate</b><p class="muted">tall → taller, big → bigger, heavy → heavier. -er의 규칙을 발견해요.</p></div>
+      <div class="step"><div class="L">A</div><b class="k">Ask & Find</b><p class="muted">비교하는 말을 듣고 맞는지 판단하고, 단서를 연결해 순서를 찾아요.</p></div>
+      <div class="step"><div class="L">V</div><b class="k">Voice & Choice</b><p class="muted">역할을 골라 비교해 말하고, 우리 반 비교 탐구 카드를 써요.</p></div>
+      <div class="step"><div class="L">I</div><b class="k">Interact & Reflect</b><p class="muted">‘오늘은 내가 챔피언’ 카드를 나누고, 관점이 넓어진 배움을 돌아봐요.</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>오늘의 말 🔑</h3>
+    <div class="center">
+      <span class="bubble a">Which is faster?</span>
+      <span class="bubble b">The red car is faster than the blue car.</span><br>
+      <span class="bubble a">That's right. 👍</span>
+      <span class="bubble b">That's not right. 👎</span>
+    </div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="btn ghost" onclick="say(['Which is faster?','The red car is faster than the blue car.','That\'s right.','That\'s not right.'])">🔊 들어 보기</button>
+      <span class="toggle">🐢 말 빠르기 <select id="rate" style="width:auto;font-family:Jua;border:none;background:none;font-size:1rem;padding:0"><option value="0.7">천천히</option><option value="0.9" selected>보통</option><option value="1.05">빠르게</option></select></span>
+    </div>
+  </div>
+</section>
+
+<!-- N -->
+<section id="n">
+  <div class="card">
+    <div class="stage">N · Notice & Navigate</div>
+    <h2>🧩 -er 형태 탐정: 비교할 때 낱말은 어떻게 변할까?</h2>
+    <div class="q">🧩 형태: tall은 taller, big은 bigger, heavy는 heavier가 돼요. 어떤 규칙이 숨어 있을까요?</div>
+    <div class="progress"><i id="fProg"></i></div>
+    <div class="center">
+      <div class="big-word" id="fWord"></div>
+      <div class="muted" id="fKo"></div>
+      <div class="row" style="justify-content:center;margin-top:12px" id="fOpts"></div>
+      <div class="feedback center" id="fFb"></div>
+    </div>
+    <div class="forms">
+      <div><b>그냥 + er</b><p id="col-er"></p></div>
+      <div><b>끝 글자 하나 더 + er</b><p id="col-dbl"></p></div>
+      <div><b>y → i + er</b><p id="col-ier"></p></div>
+    </div>
+    <div class="rule" id="fRule">
+      <b class="k">🔎 내가 발견한 규칙</b>
+      <p>① 대부분은 뒤에 <b>-er</b>을 붙여요. (tall → taller, fast → faster)</p>
+      <p>② ‘모음 하나 + 자음 하나’로 끝나는 짧은 낱말은 끝 자음을 <b>한 번 더</b> 쓰고 -er. (big → bigger, hot → hotter)</p>
+      <p>③ <b>y</b>로 끝나면 y를 <b>i</b>로 바꾸고 -er. (heavy → heavier, happy → happier)</p>
+      <p class="muted">그리고 두 대상을 연결하는 다리 낱말은 <b>than</b>! “A is taller <b>than</b> B.”</p>
+      <div class="center" style="margin-top:8px"><button class="btn yel" id="fAgain">한 번 더 도전 ↻</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- A1 듣고 판단 -->
+<section id="a1">
+  <div class="card">
+    <div class="stage">A · Ask & Find · 듣기</div>
+    <h2>👂 듣고 판단하기: That's right? That's not right?</h2>
+    <p class="muted">그림을 보고, 친구가 비교한 말이 맞으면 👍, 틀리면 👎를 눌러요.</p>
+    <div class="row" style="margin:10px 0"><span class="muted">라운드 <b id="aRound">1</b> / 8</span>
+      <label class="toggle"><input type="checkbox" id="aShow"> 문장 보기 (도움)</label></div>
+    <div class="progress"><i id="aProg"></i></div>
+    <div class="pair" id="aPair"></div>
+    <div class="center"><button class="btn big navy" id="aPlay">🔊 친구의 말 듣기</button></div>
+    <p class="center k" id="aText" style="display:none;font-size:1.15rem;margin-top:8px"></p>
+    <div class="row" style="justify-content:center;margin-top:12px" id="aJudge">
+      <button class="btn big" style="background:var(--grn);box-shadow:0 3px 0 #1E7040" id="aYes">👍 That's right.</button>
+      <button class="btn big" style="background:var(--bad);box-shadow:0 3px 0 #9C2E2E" id="aNo">👎 That's not right.</button>
+    </div>
+    <div class="center" id="aFix" style="display:none;margin-top:10px"><p class="k">그럼 바르게 고친 문장은?</p><div class="row" style="justify-content:center" id="aFixOpts"></div></div>
+    <div class="feedback center" id="aFb"></div>
+    <div class="center"><button class="btn yel" id="aNext" style="display:none">다음 ▶</button></div>
+  </div>
+</section>
+
+<!-- A2 읽고 연결 -->
+<section id="a2">
+  <div class="card">
+    <div class="stage">A · Ask & Find · 읽기</div>
+    <h2>🔗 읽고 연결하기: 비교 단서로 순서 세우기</h2>
+    <div class="q">🔗 연결: 따로 떨어진 비교 문장들을 이으면 전체 순서가 보여요!</div>
+    <div class="row"><span class="muted">문제 <b id="rRound">1</b> / 5</span><button class="btn ghost" id="rRead" style="font-size:.95rem">🔊 단서 읽어 주기</button></div>
+    <div class="progress"><i id="rProg"></i></div>
+    <div class="clues" id="rClues"></div>
+    <p class="k center" id="rAsk"></p>
+    <div class="people" id="rPeople"></div>
+    <div class="ladder" id="rLadder"></div>
+    <div class="row" style="justify-content:center"><button class="btn ghost" id="rReset">↺ 다시</button></div>
+    <div class="feedback center" id="rFb"></div>
+    <div class="center" id="rPersp" style="display:none;margin-top:8px">
+      <div class="q" id="rPQ"></div>
+      <div class="row" style="justify-content:center" id="rPOpts"></div>
+    </div>
+    <div class="center"><button class="btn yel" id="rNext" style="display:none">다음 ▶</button></div>
+  </div>
+</section>
+
+<!-- V1 말하기 -->
+<section id="v1">
+  <div class="card">
+    <div class="stage">V · Voice & Choice · 말하기</div>
+    <h2>🎤 말하기 미션: 역할을 골라 말해요</h2>
+    <div class="roles" id="roles">
+      <button class="role on" data-role="compare"><span class="e">⚖️</span><br><b class="k">비교하는 친구 되기</b><br><span class="muted">그림을 보고 “A is ___er than B.”로 비교해 말해요.</span></button>
+      <button class="role" data-role="judge"><span class="e">🧑‍⚖️</span><br><b class="k">판단하는 친구 되기</b><br><span class="muted">친구의 비교를 듣고 “That's right / That's not right.”로 답해요.</span></button>
+    </div>
+  </div>
+  <div class="card center">
+    <div class="pair" id="sPair"></div>
+    <p class="k" style="font-size:1.25rem" id="sMission"></p>
+    <p class="muted" id="sHint"></p>
+    <div class="row" style="justify-content:center;margin:14px 0"><button class="mic" id="micBtn" title="눌러서 말하기">🎙️</button></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="sModel">🔊 예시 듣기</button>
+      <button class="btn ghost" id="sPeer">🙋 친구가 확인했어요</button>
+      <button class="btn yel" id="sNext">다음 카드 ▶</button>
+    </div>
+    <div class="heard" id="sHeard"><span class="muted">마이크를 누르고 영어로 말해 보세요.</span></div>
+    <div class="feedback" id="sFb"></div>
+    <p class="muted" style="margin-top:6px">💛 친구의 의견이 나와 달라도 존중하며 말해요.</p>
+    <p class="muted" id="micWarn" style="display:none">이 브라우저는 음성 인식을 지원하지 않아요. 짝과 말하고 ‘친구가 확인했어요’를 눌러 주세요. (크롬 권장)</p>
+    <button class="btn ghost" id="diagBtn" style="margin-top:10px;font-size:.95rem">🔧 마이크 점검</button>
+    <div id="diag" style="display:none;text-align:left;background:var(--bg);border-radius:14px;padding:14px;margin-top:10px">
+      <b class="k">🔧 마이크 점검표</b>
+      <ul class="checks" id="dList"></ul>
+      <div class="row" style="margin-top:8px">
+        <button class="btn ghost" id="dPerm" style="font-size:.95rem">① 마이크 허용하기</button>
+        <button class="btn ghost" id="dTry" style="font-size:.95rem">② “Hello” 말해서 테스트</button>
+      </div>
+      <div class="heard" id="dTest"><span class="muted">①을 누른 뒤 ②를 눌러 “Hello”라고 말해 보세요.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- V2 쓰기 -->
+<section id="v2">
+  <div class="card">
+    <div class="stage">V · Voice & Choice · 쓰기</div>
+    <h2>✏️ 수준별 쓰기</h2>
+    <p class="muted">내게 맞는 단계를 골라 시작해요. 자신 있으면 다음 단계로 올라가요!</p>
+    <div class="levels" id="levels">
+      <button class="lv on" data-lv="1"><b>🌱 1단계</b><br><span class="muted">알맞은 비교 형태 고르기</span></button>
+      <button class="lv" data-lv="2"><b>🌿 2단계</b><br><span class="muted">낱말 카드를 순서대로 배열</span></button>
+      <button class="lv" data-lv="3"><b>🌳 3단계</b><br><span class="muted">우리 반 비교 탐구 카드 쓰기</span></button>
+    </div>
+  </div>
+  <div class="card" id="lv1">
+    <h3>🌱 1단계 · 비교 형태 고르기 <span class="muted" id="l1Count"></span></h3>
+    <div class="pair" id="l1Pair"></div>
+    <div class="sentence center" id="l1Sent"></div>
+    <div class="row" style="justify-content:center" id="l1Opts"></div>
+    <div class="feedback center" id="l1Fb"></div>
+    <div class="center"><button class="btn yel" id="l1Next" style="display:none">다음 ▶</button></div>
+  </div>
+  <div class="card" id="lv2" style="display:none">
+    <h3>🌿 2단계 · 문장 배열하기 <span class="muted" id="l2Count"></span></h3>
+    <div class="pair" id="l2Pair"></div>
+    <p class="k">완성 문장</p>
+    <div class="tiles answer" id="l2Ans"></div>
+    <p class="k">낱말 카드 (눌러서 옮기기)</p>
+    <div class="tiles" id="l2Bank"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="l2Reset">↺ 다시</button>
+      <button class="btn" id="l2Check">확인하기</button>
+      <button class="btn yel" id="l2Next" style="display:none">다음 ▶</button>
+    </div>
+    <div class="feedback center" id="l2Fb"></div>
+  </div>
+  <div class="card" id="lv3" style="display:none">
+    <h3>🌳 3단계 · 우리 반 비교 탐구 카드 (오늘은 내가 챔피언!)</h3>
+    <p class="muted">내 물건이나 친구와 직접 재 보고 숫자를 적은 다음, 그 결과를 비교하는 문장을 써요. 문장이 숫자와 맞는지 확인해 줘요.</p>
+    <div id="cRows"></div>
+    <label class="f">👀 관점 넓히기: 다른 대상과 비교하면 결과가 어떻게 달라질까요?</label>
+    <input type="text" id="cPersp" placeholder="예) But Jisu's pencil is longer than my pencil.">
+    <ul class="checks" id="cPChecks"></ul>
+    <div class="row" style="justify-content:center;margin-top:12px"><button class="btn" id="cMake">🏆 챔피언 카드 만들기</button></div>
+    <div id="printArea"><div class="champ" id="champ" style="display:none"><div class="top">🏆 Today, I'm the Champion!</div><div class="body" id="champBody"></div></div></div>
+    <div class="row" style="justify-content:center;margin-top:12px;display:none" id="cBtns">
+      <button class="btn ghost" id="cRead">🔊 읽어 보기</button>
+      <button class="btn ghost" id="cCopy">📋 글 복사</button>
+      <button class="btn ghost" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+    <div class="feedback center" id="cFb"></div>
+  </div>
+</section>
+
+<!-- I -->
+<section id="i">
+  <div class="card">
+    <div class="stage">I · Interact & Reflect</div>
+    <h2>🪞 나의 배움 돌아보기</h2>
+    <h3>I Can ⭐ 스스로 점검</h3>
+    <div id="icans"></div>
+  </div>
+  <div class="card">
+    <h3>💭 개념으로 생각하기</h3>
+    <div class="refl"><span class="dim">🧩 형태</span><p class="k" style="margin-top:4px">big → bigger, heavy → heavier처럼 형태가 바뀌는 규칙을 친구에게 설명해 볼까요?</p><textarea id="r1"></textarea></div>
+    <div class="refl"><span class="dim">🔗 연결</span><p class="k" style="margin-top:4px">“A is taller than B.”와 “C is taller than A.”를 연결하면 무엇을 알 수 있나요?</p><textarea id="r2"></textarea></div>
+    <div class="refl"><span class="dim">👀 관점</span><p class="k" style="margin-top:4px">누구와 비교하느냐에 따라 ‘나’는 어떻게 달라 보이나요? 친구와 비교할 때 지켜야 할 마음은?</p><textarea id="r3"></textarea></div>
+  </div>
+  <div class="card">
+    <h3>🧭 나의 학습 돌아보기</h3>
+    <div class="refl"><span class="dim">동기·책임</span><p class="k" style="margin-top:4px">오늘 가장 열심히 도전한 활동은? 왜 그 활동을 골랐나요?</p><textarea id="r4"></textarea></div>
+    <div class="refl"><span class="dim">전략·통제</span><p class="k" style="margin-top:4px">어려울 때 내가 쓴 방법을 골라 보세요.</p><div class="row" id="strats"></div></div>
+    <div class="refl"><span class="dim">메타·성찰</span><p class="k" style="margin-top:4px">다음 시간에 더 잘하고 싶은 점은?</p><textarea id="r5"></textarea></div>
+  </div>
+  <div class="card">
+    <h3>🌱 Take Action: 나의 실천 약속</h3>
+    <div class="row" id="acts"></div>
+    <input type="text" id="actOwn" placeholder="나만의 실천 약속을 써 보세요." style="margin-top:10px">
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn" id="saveRefl">💾 저장하기</button>
+      <button class="btn ghost" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+    <div class="feedback center" id="rfFb"></div>
+    <div class="center" style="margin-top:14px"><a class="btn yel big" href="../index.html">🎈 NAVI PLAY 첫 화면으로 돌아가기</a></div>
+  </div>
+</section>
+</main>
+
+<div class="badge" title="관점 렌즈">🔭 <span id="lens">0</span></div>
+<footer><a href="../index.html" style="color:inherit">NAVI PLAY</a> · 관계 속에서 넓어지는 우리의 관점 · Made by Boeun.S</footer>
+
+<script>
+/* ===== 도구 ===== */
+const $=s=>document.querySelector(s);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const store={get(k,d){try{const v=localStorage.getItem('navi_l6_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('navi_l6_'+k,JSON.stringify(v))}catch(e){}}};
+const compact=t=>t.toLowerCase().replace(/[^a-z]/g,'');
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+let lens=store.get('lens',0);$('#lens').textContent=lens;
+function addLens(n=1){lens+=n;$('#lens').textContent=lens;store.set('lens',lens)}
+
+/* ===== 음성 합성 ===== */
+let voices=[];
+function loadVoices(){try{voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang))}catch(e){}}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function say(lines,done){
+ if(!('speechSynthesis' in window)){done&&done();return}
+ speechSynthesis.cancel();const rate=parseFloat($('#rate').value);
+ lines.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate;
+  if(voices.length)u.voice=voices[i%2===0?0:Math.min(1,voices.length-1)];u.pitch=i%2===0?1.0:1.25;
+  if(i===lines.length-1&&done)u.onend=done;speechSynthesis.speak(u)});
+}
+function go(id){
+ document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id===id));
+ document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+
+/* ===== 비교급 형태 ===== */
+const ADJ={big:{c:'bigger',k:'큰',r:'dbl'},long:{c:'longer',k:'긴',r:'er'},heavy:{c:'heavier',k:'무거운',r:'ier'},fast:{c:'faster',k:'빠른',r:'er'},tall:{c:'taller',k:'키가 큰',r:'er'},strong:{c:'stronger',k:'힘이 센',r:'er'},
+ small:{c:'smaller',k:'작은',r:'er'},short:{c:'shorter',k:'짧은·키가 작은',r:'er'},old:{c:'older',k:'나이 든',r:'er'},young:{c:'younger',k:'어린',r:'er'},
+ hot:{c:'hotter',k:'뜨거운',r:'dbl'},thin:{c:'thinner',k:'얇은',r:'dbl'},wet:{c:'wetter',k:'젖은',r:'dbl'},
+ happy:{c:'happier',k:'행복한',r:'ier'},easy:{c:'easier',k:'쉬운',r:'ier'},funny:{c:'funnier',k:'웃긴',r:'ier'},busy:{c:'busier',k:'바쁜',r:'ier'}};
+function wrongForms(a){
+ const s=new Set();
+ s.add(a+'er');s.add('more '+a);
+ if(!a.endsWith('y'))s.add(a+a.slice(-1)+'er');
+ s.delete(ADJ[a].c);return shuffle([...s]).slice(0,2);
+}
+
+/* ===== N: 형태 탐정 ===== */
+let fList=[],fI=0,fLock=false;
+function fStart(){
+ const er=shuffle(['tall','long','fast','strong','small','old','young']).slice(0,4);
+ const dbl=shuffle(['big','hot','thin','wet']).slice(0,3);
+ const ier=shuffle(['heavy','happy','easy','funny','busy']).slice(0,3);
+ fList=shuffle([...er,...dbl,...ier]);fI=0;['er','dbl','ier'].forEach(c=>$('#col-'+c).innerHTML='');$('#fRule').style.display='none';fRender();
+}
+function fRender(){
+ fLock=false;const a=fList[fI];$('#fProg').style.width=(fI/fList.length*100)+'%';
+ $('#fWord').textContent=a+' → ?';$('#fKo').textContent=ADJ[a].k+' → 더 '+ADJ[a].k.replace(/·.*$/,'');
+ $('#fFb').textContent='';
+ const box=$('#fOpts');box.innerHTML='';
+ shuffle([ADJ[a].c,...wrongForms(a)]).forEach(o=>{const b=document.createElement('button');b.className='tile';b.textContent=o;
+  b.onclick=()=>{if(fLock)return;
+   if(o===ADJ[a].c){fLock=true;b.classList.add('right');addLens();say([a,o]);$('#fWord').textContent=a+' → '+o;
+    $('#fFb').textContent={er:'그냥 -er을 붙였어요!',dbl:'끝 글자를 한 번 더 썼어요!',ier:'y가 i로 바뀌었어요!'}[ADJ[a].r];$('#fFb').className='feedback center ok';
+    $('#col-'+ADJ[a].r).insertAdjacentHTML('beforeend',`<span>${a} → ${o}</span>`);
+    setTimeout(()=>{fI++;if(fI>=fList.length){$('#fProg').style.width='100%';$('#fWord').textContent='🎉';$('#fKo').textContent='';$('#fOpts').innerHTML='';$('#fFb').textContent='세 칸의 낱말을 보고 규칙을 말해 보세요!';$('#fRule').style.display='block'}else fRender()},1200)}
+   else{b.classList.add('wrong');$('#fFb').textContent='낱말의 끝 글자를 살펴볼까요?';$('#fFb').className='feedback center no'}};
+  box.appendChild(b)});
+}
+$('#fAgain').onclick=fStart;
+
+/* ===== 비교 쌍 생성 ===== */
+const CNAMES={red:'#E5484D',blue:'#3B82F6',yellow:'#FACC15',green:'#22C55E',pink:'#F472B6',orange:'#FB923C',purple:'#A855F7',white:'#F4F4F4',black:'#3A3A3A',brown:'#8B5A2B'};
+const TEMPL=[
+ {adj:'fast',noun:'car',e:'🚗',unit:'km/h',min:60,max:200},
+ {adj:'long',noun:'umbrella',e:'☂️',unit:'cm',min:50,max:110},
+ {adj:'long',noun:'pencil',e:'✏️',unit:'cm',min:8,max:19},
+ {adj:'heavy',noun:'box',e:'📦',unit:'kg',min:2,max:20},
+ {adj:'heavy',noun:'bag',e:'🎒',unit:'kg',min:1,max:8},
+ {adj:'big',noun:'balloon',e:'🎈',unit:'cm',min:20,max:60},
+ {adj:'tall',noun:'flower',e:'🌷',unit:'cm',min:10,max:60},
+ {adj:'fast',noun:'dog',e:'🐕',unit:'km/h',min:20,max:50,colors:['brown','white','black']},
+ {adj:'tall',people:true,e:'🧍',unit:'cm',min:130,max:165},
+ {adj:'strong',people:true,e:'🏋️',unit:'kg',min:5,max:40},
+ {adj:'fast',people:true,e:'🏃',unit:'초 (50m)',min:7,max:12,lowerWins:true}
+];
+const FACTS=[
+ {adj:'fast',a:['the cheetah','🐆',110],b:['the horse','🐎',70],unit:'km/h'},
+ {adj:'tall',a:['the giraffe','🦒',5],b:['the zebra','🦓',1.5],unit:'m'},
+ {adj:'big',a:['the elephant','🐘',300],b:['the dog','🐕',60],unit:'cm'},
+ {adj:'heavy',a:['the watermelon','🍉',6],b:['the apple','🍎',0.3],unit:'kg'},
+ {adj:'tall',a:['the building','🏢',60],b:['the tree','🌳',12],unit:'m'},
+ {adj:'long',a:['the train','🚆',200],b:['the bus','🚌',12],unit:'m'}
+];
+const PEOPLE=['Hajun','Minh','Diego','Yeji','Lena','Tina','Eddy','Jisu','Tom','Kate'];
+function makePair(opt){
+ opt=opt||{};
+ if(!opt.noFacts&&Math.random()<.3){const f=rand(FACTS);
+  const A={ph:f.a[0],key:f.a[0].replace('the ',''),e:f.a[1],val:f.a[2]},B={ph:f.b[0],key:f.b[0].replace('the ',''),e:f.b[1],val:f.b[2]};
+  return {adj:f.adj,unit:f.unit,items:shuffle([A,B]),win:A,lose:B,who:false};}
+ const t=rand(TEMPL);let A,B;
+ if(t.people){const [n1,n2]=shuffle(PEOPLE);let v1=ri(t.min,t.max),v2;do{v2=ri(t.min,t.max)}while(Math.abs(v1-v2)<Math.max(2,(t.max-t.min)*.12));
+  A={ph:n1,key:n1.toLowerCase(),e:t.e,val:v1};B={ph:n2,key:n2.toLowerCase(),e:t.e,val:v2};}
+ else{const [c1,c2]=shuffle(t.colors||Object.keys(CNAMES));let v1=ri(t.min,t.max),v2;do{v2=ri(t.min,t.max)}while(Math.abs(v1-v2)<(t.max-t.min)*.15);
+  A={ph:`the ${c1} ${t.noun}`,key:c1,e:t.e,val:v1,col:c1};B={ph:`the ${c2} ${t.noun}`,key:c2,e:t.e,val:v2,col:c2};}
+ const aWins=t.lowerWins?A.val<B.val:A.val>B.val;
+ return {adj:t.adj,unit:t.unit,items:[A,B],win:aWins?A:B,lose:aWins?B:A,who:!!t.people,lowerWins:!!t.lowerWins};
+}
+const qOf=p=>`${p.who?'Who':'Which'} is ${ADJ[p.adj].c}?`;
+const sentOf=(p,w,l)=>`${cap(w.ph)} is ${ADJ[p.adj].c} than ${l.ph}.`;
+function pairHTML(p){
+ const mx=Math.max(...p.items.map(i=>i.val));
+ return p.items.map(it=>{
+  const ratio=it.val/mx;const sz=(p.adj==='big'||p.adj==='tall')?(1.6+2.4*ratio):2.8;
+  const bg=it.col?`background:${CNAMES[it.col]};width:${sz*1.35}rem;height:${sz*1.35}rem;`:'';
+  return `<div class="item"><div><span class="em" style="font-size:${sz}rem;${bg}">${it.e}</span></div>
+   <div class="nm">${it.ph.replace(/^the /,'')}</div>
+   <div class="bar"><i style="width:${Math.round((p.lowerWins?(Math.min(...p.items.map(x=>x.val))/it.val):ratio)*100)}%"></i></div>
+   <div class="val">${it.val} ${p.unit}${p.lowerWins?' ⏱️':''}</div></div>`}).join('');
+}
+
+/* ===== A1: 듣고 판단 ===== */
+let aRound=0,aP=null,aTrue=true,aStmt='',aDone=false;const A_TOTAL=8;
+function aNew(){
+ aP=makePair();aTrue=Math.random()<.5;aDone=false;
+ aStmt=aTrue?sentOf(aP,aP.win,aP.lose):sentOf(aP,aP.lose,aP.win);
+ $('#aPair').innerHTML=pairHTML(aP);$('#aText').textContent='🗣️ '+qOf(aP)+' — '+aStmt;
+ $('#aRound').textContent=aRound+1;$('#aProg').style.width=(aRound/A_TOTAL*100)+'%';
+ $('#aFb').textContent='';$('#aNext').style.display='none';$('#aFix').style.display='none';$('#aJudge').style.display='flex';
+ if(aP.lowerWins)$('#aText').textContent+='  (⏱️ 기록이 짧을수록 빨라요)';
+}
+$('#aPlay').onclick=()=>say([qOf(aP),aStmt]);
+$('#aShow').onchange=e=>$('#aText').style.display=e.target.checked?'block':'none';
+function aFinish(msg){aDone=true;aRound++;$('#aFb').textContent=msg;$('#aFb').className='feedback center ok';$('#aJudge').style.display='none';
+ $('#aNext').style.display='inline-block';$('#aNext').textContent=aRound>=A_TOTAL?'읽기 활동으로 ▶':'다음 ▶';if(aRound>=A_TOTAL)$('#aProg').style.width='100%'}
+function aJudge(saidRight){
+ if(aDone)return;
+ if(saidRight===aTrue){addLens();say([saidRight?"That's right.":"That's not right."]);
+  if(aTrue)aFinish("👍 That's right! 그림과 문장이 연결돼요.");
+  else{$('#aJudge').style.display='none';$('#aFb').textContent="👎 That's not right! 잘 찾았어요.";$('#aFb').className='feedback center ok';
+   $('#aFix').style.display='block';const box=$('#aFixOpts');box.innerHTML='';
+   shuffle([{t:sentOf(aP,aP.win,aP.lose),ok:true},{t:aStmt,ok:false}]).forEach(o=>{const b=document.createElement('button');b.className='tile';b.textContent=o.t;
+    b.onclick=()=>{if(aDone)return;if(o.ok){b.classList.add('right');addLens();say([o.t]);$('#aFix').style.display='none';aFinish('✏️ 바르게 고쳤어요! '+o.t)}else b.classList.add('wrong')};box.appendChild(b)})}
+ }else{$('#aFb').textContent='그림의 숫자를 다시 비교해 볼까요? 🔍';$('#aFb').className='feedback center no'}
+}
+$('#aYes').onclick=()=>aJudge(true);$('#aNo').onclick=()=>aJudge(false);
+$('#aNext').onclick=()=>{if(aRound>=A_TOTAL){aRound=0;go('a2')}aNew()};
+
+/* ===== A2: 읽고 연결 ===== */
+const RADJ=[{adj:'tall',most:'가장 키가 큰',least:'가장 키가 작은',e:['🧍','🧍‍♀️','🧑','👦','👧']},{adj:'fast',most:'가장 빠른',least:'가장 느린',e:['🏃','🏃‍♀️','🚴','🧒','👟']},{adj:'strong',most:'가장 힘이 센',least:'가장 힘이 약한',e:['🏋️','💪','🧑','👦','👧']},{adj:'old',most:'가장 나이가 많은',least:'가장 어린',e:['🧑','👦','👧','🧒','👩']}];
+let rEmo={},rRound=0,rOrder=[],rPicked=[],rA=null,rDone=false,rClues=[];const R_TOTAL=5;
+function rNew(){
+ rA=rand(RADJ);const n=rRound<2?3:4;const names=shuffle(PEOPLE).slice(0,n);rOrder=names;rPicked=[];rDone=false;
+ const c=ADJ[rA.adj].c;rEmo={};const em=shuffle(rA.e);shuffle(names).forEach((nm,i)=>rEmo[nm]=em[i%em.length]);rClues=[];for(let i=0;i<n-1;i++)rClues.push(`${names[i]} is ${c} than ${names[i+1]}.`);rClues=shuffle(rClues);
+ $('#rClues').innerHTML=rClues.map(s=>'🔗 '+s).join('<br>');
+ $('#rAsk').textContent=`단서를 연결해서 ${rA.most} 사람부터 차례로 눌러요.`;
+ $('#rRound').textContent=rRound+1;$('#rProg').style.width=(rRound/R_TOTAL*100)+'%';
+ $('#rFb').textContent='';$('#rNext').style.display='none';$('#rPersp').style.display='none';
+ rDraw();
+}
+function rDraw(){
+ const box=$('#rPeople');box.innerHTML='';
+ rOrder.map(n=>({n,e:rEmo[n]})).sort((a,b)=>a.n.localeCompare(b.n)).forEach(p=>{const used=rPicked.includes(p.n);
+  const b=document.createElement('button');b.className='person'+(used?' used':'');b.innerHTML=`<div class="e">${p.e}</div><b class="k">${p.n}</b>`;
+  b.onclick=()=>{if(used||rDone)return;rPicked.push(p.n);rDraw();if(rPicked.length===rOrder.length)rCheck()};box.appendChild(b)});
+ const lad=$('#rLadder');lad.innerHTML='';const n=rOrder.length;
+ rPicked.forEach((nm,i)=>lad.insertAdjacentHTML('beforeend',`<div class="rung" style="height:${120-i*(80/(n-1||1))}px">${i+1}. ${nm}</div>`));
+ if(!rPicked.length)lad.innerHTML='<span class="muted">여기에 순서대로 쌓여요 →</span>';
+}
+function rCheck(){
+ if(rPicked.join()===rOrder.join()){rDone=true;addLens(2);$('#rFb').textContent='단서를 모두 연결했어요! 🔗';$('#rFb').className='feedback center ok';
+  say(rClues);const mid=rOrder[1];
+  $('#rPersp').style.display='block';
+  $('#rPQ').textContent=`👀 관점 질문: ${mid}는 ${ADJ[rA.adj].k.replace(/·.*$/,'')} 사람일까요?`;
+  const box=$('#rPOpts');box.innerHTML='';let lock=false;
+  shuffle([{t:`누구와 비교하느냐에 따라 달라요! (${rOrder[0]}보다는 덜, ${rOrder[2]}보다는 더)`,ok:true},{t:`네, ${mid}는 언제나 가장 ${ADJ[rA.adj].k.replace(/·.*$/,'')} 사람이에요.`,ok:false},{t:`아니요, ${mid}는 언제나 가장 덜 ${ADJ[rA.adj].k.replace(/·.*$/,'')} 사람이에요.`,ok:false}]).forEach(o=>{
+   const b=document.createElement('button');b.className='tile';b.textContent=o.t;
+   b.onclick=()=>{if(lock)return;if(o.ok){lock=true;b.classList.add('right');addLens(2);$('#rFb').textContent='관점이 넓어졌어요! 비교는 관계 속에서 정해져요 🔭';
+     rRound++;$('#rNext').style.display='inline-block';$('#rNext').textContent=rRound>=R_TOTAL?'말하기 미션으로 ▶':'다음 ▶';if(rRound>=R_TOTAL)$('#rProg').style.width='100%'}
+    else{b.classList.add('wrong');$('#rFb').textContent='다른 사람과 비교하면 어떻게 될까요?';$('#rFb').className='feedback center no'}};box.appendChild(b)});
+ }else{$('#rFb').textContent='단서 문장을 하나씩 다시 연결해 볼까요? “A is taller than B” → A가 B보다 앞!';$('#rFb').className='feedback center no';
+  setTimeout(()=>{rPicked=[];rDraw()},1600)}
+}
+$('#rReset').onclick=()=>{if(rDone)return;rPicked=[];rDraw()};
+$('#rRead').onclick=()=>say(rClues);
+$('#rNext').onclick=()=>{if(rRound>=R_TOTAL){rRound=0;go('v1')}rNew()};
+
+/* ===== V1: 말하기 ===== */
+let role='compare',sP=null,sTrue=true,sStmt='',sDone=false;
+document.querySelectorAll('#roles .role').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#roles .role').forEach(x=>x.classList.remove('on'));b.classList.add('on');role=b.dataset.role;sNew()});
+function sNew(){
+ sP=makePair();sDone=false;sTrue=Math.random()<.5;
+ sStmt=sTrue?sentOf(sP,sP.win,sP.lose):sentOf(sP,sP.lose,sP.win);
+ $('#sPair').innerHTML=pairHTML(sP);$('#sFb').textContent='';
+ $('#sHeard').innerHTML='<span class="muted">마이크를 누르고 영어로 말해 보세요.</span>';
+ if(role==='compare'){
+  $('#sMission').textContent=`친구가 "${qOf(sP)}"라고 물어요. 그림을 보고 비교해 말해 보세요!`;
+  $('#sHint').textContent=`힌트: ... is ${ADJ[sP.adj].c} than ...`+(sP.lowerWins?' (⏱️ 기록이 짧을수록 빨라요)':'');say([qOf(sP)]);
+ }else{
+  $('#sMission').textContent=`친구: "${sStmt}" 그림과 맞나요? 의견을 말해 보세요!`;
+  $('#sHint').textContent="힌트: That's right. / That's not right."+(sP.lowerWins?' (⏱️ 기록이 짧을수록 빨라요)':'');say([qOf(sP),sStmt]);
+ }
+}
+function sTargetOk(text){
+ const t=' '+text.toLowerCase().replace(/[^a-z' ]/g,' ').replace(/\s+/g,' ')+' ';
+ if(role==='judge'){const neg=/not right|isn't right|isnt right|that's wrong|not correct|\bno\b/.test(t);const pos=/right|correct|yes/.test(t);
+  return sTrue?(pos&&!neg):neg;}
+ const c=ADJ[sP.adj].c,iC=t.indexOf(c),iThan=t.indexOf(' than ');
+ if(iC<0||iThan<0)return false;
+ const iW=t.indexOf(sP.win.key),iL=t.lastIndexOf(sP.lose.key);
+ return iW>=0&&iL>iThan&&iW<iThan;
+}
+function sModel(){return role==='compare'?[sentOf(sP,sP.win,sP.lose)]:[sTrue?"That's right.":"That's not right.",...(sTrue?[]:[sentOf(sP,sP.win,sP.lose)])]}
+function sSuccess(viaPeer){
+ if(sDone)return;sDone=true;addLens();const pre=viaPeer?'친구가 확인했어요! ':'';
+ if(role==='compare'){$('#sFb').textContent=pre+"정확하게 비교했어요! That's right! 👍";say(["That's right."])}
+ else $('#sFb').textContent=pre+(sTrue?'맞는 말에 동의했어요! 👍':'틀린 비교를 바르게 짚었어요! 👎 → '+sentOf(sP,sP.win,sP.lose));
+ $('#sFb').className='feedback ok';
+}
+$('#sModel').onclick=()=>say(sModel());
+$('#sPeer').onclick=()=>sSuccess(true);
+$('#sNext').onclick=sNew;
+
+/* --- 음성 인식 엔진 --- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const UA=navigator.userAgent;
+const BROWSER=/Whale/i.test(UA)?'웨일':/SamsungBrowser/i.test(UA)?'삼성 인터넷':/KAKAOTALK|NAVER\(|Instagram|FBAN|FBAV|Line\//i.test(UA)?'앱 내부 브라우저':/Edg\//.test(UA)?'엣지':/(iPhone|iPad)/.test(UA)||(/Macintosh/.test(UA)&&'ontouchend' in document)?'iOS 사파리':/Chrome\//.test(UA)?'크롬':/Safari\//.test(UA)?'사파리':'기타';
+const ERR_MSG={
+ 'not-allowed':'🔒 마이크 권한이 막혀 있어요. 주소창 왼쪽 자물쇠(또는 ⓘ) → 마이크 ‘허용’ → 새로고침 해 주세요.',
+ 'service-not-allowed':'🚫 이 브라우저에서는 음성 인식 서비스를 쓸 수 없어요. 크롬에서 열어 주세요.',
+ 'no-speech':'🤫 소리가 들리지 않았어요. 마이크에 가까이 대고 또박또박 말해 보세요.',
+ 'audio-capture':'🎙️ 마이크를 찾을 수 없어요. 마이크 연결이나 다른 프로그램을 확인해 주세요.',
+ 'network':'🌐 음성 인식 서버에 연결하지 못했어요. 인터넷(학교 방화벽) 상태를 확인해 주세요.',
+ 'language-not-supported':'🌏 영어 음성 인식을 지원하지 않는 환경이에요. 크롬을 사용해 주세요.'
+};
+let rec=null,recOn=false,recTimer=null,lastHeard=[],gotFinal=false,recMode='game';
+function micUI(on){recOn=on;$('#micBtn').classList.toggle('rec',on)}
+function judge(alts){
+ if(recMode==='test'){$('#dTest').textContent=alts[0]?'✅ 인식 성공: "'+alts[0]+'"':'다시 시도해 주세요.';return}
+ if(alts.some(sTargetOk))sSuccess(false);
+ else{$('#sFb').textContent=role==='judge'?'그림을 다시 보고 의견을 말해 볼까요? 🔍':'거의 다 왔어요! 큰 쪽을 먼저, than 뒤에 작은 쪽을 말해요 🔊';$('#sFb').className='feedback no'}
+}
+function startRec(mode){
+ if(!SR){$('#micWarn').style.display='block';$('#diag').style.display='block';runDiag();return}
+ if(recOn){try{rec.stop()}catch(e){}return}
+ recMode=mode||'game';try{speechSynthesis.cancel()}catch(e){}
+ rec=new SR();rec.lang='en-US';rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=5;
+ lastHeard=[];gotFinal=false;const out=()=>recMode==='test'?$('#dTest'):$('#sHeard');
+ rec.onstart=()=>{micUI(true);out().innerHTML='<span class="muted">듣고 있어요… 🎧 지금 말해 보세요!</span>'};
+ rec.onresult=e=>{const alts=[];let final=false;
+  for(let r=e.resultIndex;r<e.results.length;r++){const res=e.results[r];for(let j=0;j<res.length;j++)alts.push(res[j].transcript);if(res.isFinal)final=true}
+  if(alts.length){lastHeard=alts;out().textContent='🗣️ '+alts[0]}
+  if(final){gotFinal=true;judge(alts)}};
+ rec.onerror=e=>{micUI(false);clearTimeout(recTimer);if(e.error==='aborted')return;
+  out().textContent=ERR_MSG[e.error]||('⚠️ 음성 인식 오류('+e.error+'). 새로고침 후 다시 시도해 주세요.');
+  if(e.error!=='no-speech'){$('#diag').style.display='block';runDiag()}};
+ rec.onend=()=>{micUI(false);clearTimeout(recTimer);if(!gotFinal&&lastHeard.length)judge(lastHeard)};
+ try{rec.start();recTimer=setTimeout(()=>{try{rec.stop()}catch(e){}},9000)}
+ catch(err){micUI(false);out().textContent='⚠️ 마이크를 시작하지 못했어요. 잠시 후 다시 눌러 주세요.'}
+}
+$('#micBtn').onclick=()=>startRec('game');
+if(!SR)$('#micWarn').style.display='block';
+async function runDiag(){
+ const L=[];const ok=(t,g)=>L.push(`<li class="${g?'ok':''}">${t}</li>`);
+ const sec=location.protocol==='https:'||location.hostname==='localhost';
+ ok('보안 연결(https): '+(sec?'정상':'⚠️ https 주소로 열어 주세요'),sec);
+ const goodB=BROWSER==='크롬'||BROWSER==='엣지';
+ ok('브라우저: '+BROWSER+(goodB?' (권장)':BROWSER==='iOS 사파리'?' — 설정 › Siri 및 받아쓰기 켜기가 필요해요':' — ⚠️ 크롬으로 열어 주세요'),goodB);
+ ok('음성 인식 기능: '+(SR?'지원':'⚠️ 지원하지 않음'),!!SR);
+ ok('독립 창에서 열림: '+(window.self===window.top?'정상':'⚠️ 다른 페이지 안에 들어가 있어요. 새 탭으로 열어 주세요'),window.self===window.top);
+ let perm='확인 불가';
+ try{if(navigator.permissions){const p=await navigator.permissions.query({name:'microphone'});perm=p.state}}catch(e){}
+ ok('마이크 권한: '+({granted:'허용됨',denied:'⚠️ 차단됨 → 자물쇠 아이콘에서 허용',prompt:'아직 묻지 않음 (아래 버튼으로 허용)'}[perm]||perm),perm==='granted');
+ $('#dList').innerHTML=L.join('');
+}
+$('#diagBtn').onclick=()=>{const d=$('#diag');d.style.display=d.style.display==='block'?'none':'block';if(d.style.display==='block')runDiag()};
+$('#dPerm').onclick=async()=>{
+ try{const s=await navigator.mediaDevices.getUserMedia({audio:true});s.getTracks().forEach(t=>t.stop());$('#dTest').textContent='✅ 마이크 허용 완료! 이제 테스트해 보세요.'}
+ catch(e){$('#dTest').textContent=e.name==='NotFoundError'?'🎙️ 마이크 장치를 찾을 수 없어요.':'🔒 마이크가 차단되었어요. 주소창 자물쇠에서 허용해 주세요.'}
+ runDiag();
+};
+$('#dTry').onclick=()=>startRec('test');
+
+/* ===== V2: 쓰기 ===== */
+document.querySelectorAll('#levels .lv').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#levels .lv').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ ['1','2','3'].forEach(n=>$('#lv'+n).style.display=n===b.dataset.lv?'block':'none')});
+// 1단계
+let l1Items=[],l1i=0;
+function l1Build(){l1Items=Array.from({length:6},()=>makePair());l1i=0;l1Render()}
+function l1Render(){
+ const p=l1Items[l1i];$('#l1Count').textContent=`(${l1i+1}/${l1Items.length})`;$('#l1Pair').innerHTML=pairHTML(p);
+ $('#l1Fb').textContent='';$('#l1Next').style.display='none';
+ $('#l1Sent').innerHTML=`<span class="bubble a" style="font-size:1rem">${qOf(p)}</span><br>${cap(p.win.ph)} is <span class="blank" id="l1B">&nbsp;</span> than ${p.lose.ph}.`;
+ const box=$('#l1Opts');box.innerHTML='';let done=false;
+ shuffle([ADJ[p.adj].c,...wrongForms(p.adj)]).forEach(o=>{const b=document.createElement('button');b.className='tile';b.textContent=o;
+  b.onclick=()=>{if(done)return;if(o===ADJ[p.adj].c){done=true;b.classList.add('right');$('#l1B').textContent=o;addLens();say([sentOf(p,p.win,p.lose)]);
+    $('#l1Fb').textContent='정답! 형태와 than이 두 대상을 연결해요 🔗';$('#l1Fb').className='feedback center ok';$('#l1Next').style.display='inline-block';
+    if(l1i===l1Items.length-1)$('#l1Next').textContent='2단계 도전 ▶'}
+   else{b.classList.add('wrong');$('#l1Fb').textContent='-er 규칙을 떠올려 봐요. (y→i, 끝 글자 하나 더!)';$('#l1Fb').className='feedback center no'}};box.appendChild(b)});
+}
+$('#l1Next').onclick=()=>{if(l1i===l1Items.length-1){$('#l1Next').textContent='다음 ▶';document.querySelector('[data-lv="2"]').click();l2Build();return}l1i++;l1Render()};
+// 2단계
+let l2Items=[],l2i=0,l2Ans=[];
+function l2Build(){l2Items=Array.from({length:6},()=>makePair());l2i=0;l2Render()}
+function l2Render(){
+ const p=l2Items[l2i];l2Ans=[];$('#l2Count').textContent=`(${l2i+1}/${l2Items.length})`;$('#l2Pair').innerHTML=pairHTML(p);
+ $('#l2Fb').textContent='';$('#l2Next').style.display='none';$('#l2Check').style.display='inline-block';
+ const s=sentOf(p,p.win,p.lose);p.s=s;p.words=s.replace(/\.$/,'').split(' ').concat(['.']);
+ let m=shuffle(p.words),g=0;while(m.join(' ')===p.words.join(' ')&&g++<10)m=shuffle(p.words);
+ p.bank=m.map((w,i)=>({w,i,used:false}));l2Draw();
+}
+function l2Draw(){
+ const p=l2Items[l2i];$('#l2Ans').innerHTML='';$('#l2Bank').innerHTML='';
+ l2Ans.forEach((t,pos)=>{const b=document.createElement('button');b.className='tile';b.textContent=t.w;b.onclick=()=>{t.used=false;l2Ans.splice(pos,1);l2Draw()};$('#l2Ans').appendChild(b)});
+ p.bank.forEach(t=>{if(t.used)return;const b=document.createElement('button');b.className='tile';b.textContent=t.w;b.onclick=()=>{t.used=true;l2Ans.push(t);l2Draw()};$('#l2Bank').appendChild(b)});
+}
+$('#l2Reset').onclick=()=>{l2Items[l2i].bank.forEach(t=>t.used=false);l2Ans=[];l2Draw()};
+$('#l2Check').onclick=()=>{
+ const p=l2Items[l2i];const got=l2Ans.map(t=>t.w).join(' ');
+ if(got===p.words.join(' ')){$('#l2Fb').textContent='완벽해요! '+p.s+' 👍';$('#l2Fb').className='feedback center ok';addLens(2);say([p.s]);
+  $('#l2Check').style.display='none';$('#l2Next').style.display='inline-block';if(l2i===l2Items.length-1)$('#l2Next').textContent='3단계 도전 ▶'}
+ else if(l2Ans.length<p.words.length){$('#l2Fb').textContent='아직 남은 카드가 있어요.';$('#l2Fb').className='feedback center no'}
+ else{$('#l2Fb').textContent='그림을 다시 보고 더 큰 쪽을 먼저 써 봐요. 문장은 대문자로 시작!';$('#l2Fb').className='feedback center no'}
+};
+$('#l2Next').onclick=()=>{if(l2i===l2Items.length-1){$('#l2Next').textContent='다음 ▶';document.querySelector('[data-lv="3"]').click();return}l2i++;l2Render()};
+// 3단계: 비교 탐구 카드
+const C_ADJ=['long','heavy','big','tall','fast','strong','old'];
+const C_UNIT={long:'cm',heavy:'g',big:'cm',tall:'cm',fast:'초(짧을수록 빠름)',strong:'kg',old:'살'};
+const C_EX=[{a:'my pencil',b:"Junho's pencil",adj:'long',va:16,vb:12},{a:'my pencil case',b:"Junho's pencil case",adj:'heavy',va:300,vb:200},{a:'Jisu',b:'Minh',adj:'tall',va:150,vb:146}];
+function cRowHTML(i,ex){
+ return `<div class="crow" data-i="${i}"><b class="k">비교 ${i+1}</b>
+ <div class="grid" style="margin-top:6px">
+  <input type="text" class="ca" placeholder="${ex.a}" value="">
+  <input type="number" class="cva" placeholder="${ex.va}">
+  <select class="cadj">${C_ADJ.map(a=>`<option value="${a}"${a===ex.adj?' selected':''}>${a} → ${ADJ[a].c}</option>`).join('')}</select>
+  <input type="text" class="cb" placeholder="${ex.b}" value="">
+  <input type="number" class="cvb" placeholder="${ex.vb}">
+ </div>
+ <div class="muted cunit"></div>
+ <div class="win"></div>
+ <input type="text" class="cs" style="margin-top:6px" placeholder="문장 쓰기 예) My pencil is longer than Junho's pencil.">
+ <ul class="checks"></ul></div>`;
+}
+$('#cRows').innerHTML=C_EX.slice(0,2).map((e,i)=>cRowHTML(i,e)).join('');
+function rowCheck(row){
+ const g=s=>row.querySelector(s);const A=g('.ca').value.trim(),B=g('.cb').value.trim(),adj=g('.cadj').value;
+ const va=parseFloat(g('.cva').value),vb=parseFloat(g('.cvb').value),s=g('.cs').value.trim();
+ g('.cunit').textContent='단위: '+C_UNIT[adj];
+ const lower=adj==='fast';const ready=A&&B&&!isNaN(va)&&!isNaN(vb)&&va!==vb;
+ let W='',L='';if(ready){const aw=lower?va<vb:va>vb;W=aw?A:B;L=aw?B:A;g('.win').textContent=`🏆 숫자로 보면: ${W} → 더 ${ADJ[adj].k}`}else g('.win').textContent='';
+ const low=' '+s.toLowerCase()+' ';const c=ADJ[adj].c;
+ const iW=W?low.indexOf(W.toLowerCase()):-1,iT=low.indexOf(' than '),iL=L?low.lastIndexOf(L.toLowerCase()):-1;
+ const anyWrong=wrongForms(adj).concat(['more '+adj]).some(w=>low.includes(' '+w+' '));
+ const checks=[
+  ['두 대상의 이름과 숫자를 모두 적었나요?',!!ready],
+  [`비교 형태를 바르게 썼나요? (${c})`,low.includes(' '+c+' ')&&!anyWrong],
+  ['두 대상을 than으로 연결했나요?',iT>=0],
+  ['숫자 결과와 문장이 맞나요? (더 큰 쪽이 than 앞에)',ready&&iW>=0&&iT>iW&&iL>iT],
+  ['대문자로 시작하고 마침표로 끝냈나요?',/^[A-Z]/.test(s)&&/[.!]$/.test(s)]
+ ];
+ g('.checks').innerHTML=checks.map(([t,ok])=>`<li class="${ok?'ok':''}">${t}</li>`).join('');
+ return {n:checks.filter(x=>x[1]).length,tot:checks.length,s};
+}
+function pCheck(){const s=$('#cPersp').value.trim();const ok1=/\bthan\b/i.test(s),ok2=/^(but|however|and)\b/i.test(s)||/\bbut\b/i.test(s);
+ $('#cPChecks').innerHTML=`<li class="${ok1?'ok':''}">다른 대상과 than으로 비교했나요?</li><li class="${ok2?'ok':''}">But으로 다른 관점을 이어 썼나요?</li>`;return (ok1?1:0)+(ok2?1:0)}
+document.querySelectorAll('.crow').forEach(r=>r.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',()=>rowCheck(r))));
+document.querySelectorAll('.crow').forEach(r=>r.querySelector('select').addEventListener('change',()=>rowCheck(r)));
+document.querySelectorAll('.crow').forEach(rowCheck);
+$('#cPersp').addEventListener('input',pCheck);pCheck();
+let cMade=false;
+$('#cMake').onclick=()=>{
+ const rs=[...document.querySelectorAll('.crow')].map(rowCheck);const pn=pCheck();
+ const lines=rs.map(r=>r.s).filter(Boolean);if($('#cPersp').value.trim())lines.push('👀 '+$('#cPersp').value.trim());
+ if(!lines.length){$('#cFb').textContent='비교 문장을 먼저 써 주세요.';$('#cFb').className='feedback center no';return}
+ $('#champBody').textContent=lines.join('\n');$('#champ').style.display='block';$('#cBtns').style.display='flex';
+ const n=rs.reduce((a,r)=>a+r.n,0)+pn,tot=rs.reduce((a,r)=>a+r.tot,0)+2;
+ $('#cFb').textContent=n>=tot-1?'챔피언 카드 완성! 친구와 바꿔 읽고 That\'s right / That\'s not right로 확인해 봐요 🏆':`점검 ${n}/${tot} 완료! 숫자와 문장이 맞는지 다시 확인해요.`;
+ $('#cFb').className='feedback center '+(n>=tot-1?'ok':'');if(!cMade){addLens(3);cMade=true}
+};
+$('#cRead').onclick=()=>say($('#champBody').textContent.replace(/👀 /g,'').split('\n'));
+$('#cCopy').onclick=()=>{const t='🏆 Today, I\'m the Champion!\n'+$('#champBody').textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{$('#cFb').textContent='복사했어요! 게시판에 공유해요.';$('#cFb').className='feedback center ok'}).catch(()=>{$('#cFb').textContent='복사가 안 되면 글을 길게 눌러 복사해 주세요.'})};
+
+/* ===== I: 성찰 ===== */
+const ICANS=['비교하는 질문을 하고 답할 수 있어요. (Which is faster? – A is faster than B.)','비교 형태(-er, 끝 글자 하나 더, y→ier)를 바르게 쓸 수 있어요.',"That's right. / That's not right.로 동의하거나 부인할 수 있어요.",'여러 비교를 연결하고, 비교하는 대상에 따라 결과가 달라짐을 설명할 수 있어요.'];
+const STRATS=['🔊 예시 다시 듣기','🔢 그림의 숫자 비교하기','📋 표에서 규칙 찾기','🔗 단서를 하나씩 연결하기','🙋 친구에게 묻기','🔎 점검 카드로 고치기'];
+const ACTS=['내 물건을 친구 물건과 재 보고 영어로 비교하기','친구와 비교할 때 놀리지 않고 존중하기','어제의 나와 오늘의 나를 비교해 성장 찾기','친구 의견에 That\'s right / That\'s not right로 정중하게 답하기'];
+let refl=store.get('refl',{stars:[0,0,0,0],strats:[],acts:[]});
+function chipToggle(boxId,list,key){
+ const box=$(boxId);box.innerHTML='';
+ list.forEach(t=>{const b=document.createElement('button');b.className='btn ghost';b.style.fontSize='.95rem';b.textContent=t;
+  const on=()=>refl[key].includes(t);const paint=()=>{b.style.background=on()?'var(--main-l)':'#fff';b.style.borderColor=on()?'var(--main)':'var(--line)'};
+  b.onclick=()=>{if(on())refl[key]=refl[key].filter(x=>x!==t);else refl[key].push(t);paint()};paint();box.appendChild(b)});
+}
+function iRender(){
+ $('#icans').innerHTML='';
+ ICANS.forEach((t,i)=>{const d=document.createElement('div');d.className='row';d.style.justifyContent='space-between';d.style.padding='6px 0';d.style.borderBottom='1px dashed var(--line)';
+  d.innerHTML=`<span>${t}</span><span class="stars"></span>`;const st=d.querySelector('.stars');
+  for(let k=1;k<=3;k++){const b=document.createElement('button');b.textContent='⭐';if(refl.stars[i]>=k)b.classList.add('on');b.onclick=()=>{refl.stars[i]=k;iRender()};st.appendChild(b)}
+  $('#icans').appendChild(d)});
+ chipToggle('#strats',STRATS,'strats');chipToggle('#acts',ACTS,'acts');
+ ['r1','r2','r3','r4','r5'].forEach(k=>{if(refl[k]!==undefined)$('#'+k).value=refl[k]});
+ if(refl.own)$('#actOwn').value=refl.own;
+}
+$('#saveRefl').onclick=()=>{['r1','r2','r3','r4','r5'].forEach(k=>refl[k]=$('#'+k).value);refl.own=$('#actOwn').value;store.set('refl',refl);addLens(2);
+ $('#rfFb').textContent='저장했어요! 이 기기에서 다시 열면 이어서 볼 수 있어요 🌱';$('#rfFb').className='feedback center ok'};
+
+/* ===== 시작 ===== */
+fStart();aNew();rNew();sNew();l1Build();l2Build();iRender();
+try{speechSynthesis.cancel()}catch(e){}
+</script>
+</body>
+</html>
