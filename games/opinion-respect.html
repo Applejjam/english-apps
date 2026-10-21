@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>관점을 존중하는 우리 | NAVI PLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Nunito:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F3FF; --card:#FFFFFF; --ink:#2A2D3E; --soft:#6E6A78;
+  --main:#7356E8; --main-l:#ECE6FF; --teal:#178A8A; --teal-l:#DDF3F1;
+  --pink:#E2567A; --pink-l:#FDE4EB; --yel:#F2B33D; --yel-l:#FFF2D6;
+  --line:#E6DEF7; --ok:#2E9E5B; --bad:#D64545;
+  --r:20px; --shadow:0 6px 18px rgba(50,30,110,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito','Jua',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.5}
+.k{font-family:'Jua',sans-serif;font-weight:400}
+button{font-family:inherit;cursor:pointer;border:none}
+header{position:relative;background:linear-gradient(135deg,#178A8A,#7356E8 55%,#E2567A);color:#fff;padding:18px 16px 14px;text-align:center}
+header .brand{font-size:.8rem;letter-spacing:.15em;opacity:.85;font-weight:800}
+header h1{font-family:'Jua';font-size:clamp(1.4rem,4vw,2.1rem);font-weight:400;margin:2px 0}
+header .concepts{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.chip{background:rgba(255,255,255,.22);padding:3px 12px;border-radius:99px;font-size:.85rem;font-family:'Jua'}
+.home-link{position:absolute;left:12px;top:12px;background:rgba(255,255,255,.22);color:#fff;text-decoration:none;font-family:'Jua';font-size:.95rem;padding:6px 12px;border-radius:99px}
+.home-link:hover{background:rgba(255,255,255,.35)}
+@media (max-width:560px){.home-link{position:static;display:inline-block;margin-bottom:6px}}
+nav{display:flex;gap:6px;overflow-x:auto;padding:10px 12px;background:#fff;border-bottom:2px solid var(--line);position:sticky;top:0;z-index:10}
+nav button{flex:1 0 auto;background:var(--bg);color:var(--ink);padding:9px 14px;border-radius:14px;font-family:'Jua';font-size:1rem;white-space:nowrap;border:2px solid transparent}
+nav button .tag{display:inline-block;width:24px;height:24px;line-height:24px;border-radius:50%;background:var(--main);color:#fff;font-size:.85rem;margin-right:5px;text-align:center}
+nav button.on{border-color:var(--main);background:var(--main-l)}
+main{max-width:980px;margin:0 auto;padding:18px 16px 70px}
+section{display:none;animation:fade .3s}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1}}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:20px;margin-bottom:16px}
+.stage{font-family:'Jua';color:var(--main);font-size:.95rem}
+h2{font-family:'Jua';font-weight:400;font-size:1.55rem;margin:2px 0 6px}
+h3{font-family:'Jua';font-weight:400;font-size:1.2rem;margin-bottom:8px}
+.q{background:var(--teal-l);border-left:5px solid var(--teal);padding:10px 14px;border-radius:12px;margin:10px 0;font-family:'Jua';font-size:1.05rem}
+.muted{color:var(--soft);font-size:.92rem}
+.btn{background:var(--main);color:#fff;padding:11px 20px;border-radius:14px;font-family:'Jua';font-size:1.05rem;box-shadow:0 3px 0 #4F37B5;text-decoration:none;display:inline-block}
+.btn:active{transform:translateY(2px);box-shadow:none}
+.btn.teal{background:var(--teal);box-shadow:0 3px 0 #0E5D5D}
+.btn.yel{background:var(--yel);box-shadow:0 3px 0 #C28A20;color:#3A2A00}
+.btn.pink{background:var(--pink);box-shadow:0 3px 0 #A63656}
+.btn.ghost{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:none}
+.btn.big{font-size:1.3rem;padding:14px 28px}
+.btn.right{background:var(--ok);box-shadow:0 3px 0 #1E7040}.btn.wrong{background:var(--bad);box-shadow:0 3px 0 #9C2E2E}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.center{text-align:center}
+.bubble{display:inline-block;background:#fff;border:2px solid var(--line);border-radius:18px;padding:10px 16px;margin:4px;font-size:1.05rem;font-weight:800}
+.bubble.a{border-color:var(--teal)}.bubble.b{border-color:var(--main)}.bubble.c{border-color:var(--pink)}
+.badge{position:fixed;right:14px;bottom:14px;background:#fff;border-radius:99px;padding:8px 16px;box-shadow:var(--shadow);font-family:'Jua';font-size:1.1rem;z-index:20}
+.feedback{min-height:32px;font-family:'Jua';font-size:1.12rem;margin-top:10px}
+.feedback.ok{color:var(--ok)}.feedback.no{color:var(--bad)}
+.navi-map{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.navi-map .step{background:var(--bg);border-radius:16px;padding:14px}
+.navi-map .L{font-family:'Jua';font-size:2rem;color:var(--main);line-height:1}
+.toggle{display:inline-flex;align-items:center;gap:6px;font-family:'Jua';background:var(--bg);padding:6px 12px;border-radius:99px}
+.progress{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0}
+.progress i{display:block;height:100%;background:var(--yel);width:0;transition:.4s}
+/* memory */
+.mem{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:520px;margin:12px auto}
+.mcard{aspect-ratio:1/1;border-radius:18px;background:linear-gradient(135deg,var(--main),var(--teal));color:#fff;font-family:'Jua';font-size:2rem;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:var(--shadow);transition:transform .2s}
+.mcard.open{background:#fff;color:var(--ink);border:3px solid var(--main)}
+.mcard.done{background:var(--teal-l);color:var(--teal);border:3px solid var(--teal);transform:scale(.95)}
+.mcard small{font-family:'Nunito';font-weight:800;font-size:1.05rem}
+/* lens */
+.scene{background:var(--yel-l);border-radius:18px;padding:14px;text-align:center;margin:10px 0}
+.scene .em{font-size:3.2rem}
+.persons{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.persons{grid-template-columns:1fr}}
+.pcard{background:var(--bg);border-radius:18px;padding:14px;text-align:center}
+.pcard .face{font-size:2.4rem}
+.pcard .why{font-family:'Jua';margin:4px 0 8px}
+.pcard .said{min-height:40px;font-weight:800;color:var(--main);font-size:1.1rem;margin-top:6px}
+.opt{background:#fff;border:2px solid var(--main);color:var(--ink);padding:7px 12px;border-radius:12px;font-weight:800;font-size:1rem;margin:3px}
+.opt.right{border-color:var(--ok);background:#E5F6EC}.opt.wrong{border-color:var(--bad);background:#FBE6E6}
+/* function sort */
+.utter{font-size:1.6rem;font-weight:800;color:var(--teal);min-height:54px;margin:10px 0}
+.baskets{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.baskets{grid-template-columns:1fr 1fr}}
+.basket{background:#fff;border:3px solid var(--line);border-radius:18px;padding:12px 8px;text-align:center;font-family:'Jua'}
+.basket .e{font-size:1.8rem}
+.basket b{display:block;font-weight:400;font-size:1.05rem}
+.basket span{font-family:'Nunito';font-size:.8rem;color:var(--soft);font-weight:700}
+.basket.right{border-color:var(--ok);background:#E5F6EC}.basket.wrong{border-color:var(--bad);background:#FBE6E6}
+/* board */
+.post{background:#fff;border:2px solid var(--line);border-radius:18px;padding:16px;margin:10px 0}
+.post .who{font-family:'Jua';color:var(--main)}
+.sent{display:inline;padding:2px 4px;border-radius:6px;cursor:pointer;font-size:1.08rem;font-weight:700;line-height:2}
+.sent:hover{background:var(--yel-l)}
+.sent.hl{background:#FFE58A}
+.sent.miss{background:#FBE6E6}
+.comment{margin:6px 0 0 18px;padding:6px 10px;border-left:3px solid var(--line);font-weight:700}
+.comment .n{font-family:'Jua';color:var(--teal);margin-right:6px}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tabs button{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:6px 12px;font-family:'Jua';font-size:.98rem}
+.tabs button.on{border-color:var(--main);background:var(--main-l)}
+/* speak */
+.topics{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.topic{background:#fff;border:3px solid var(--line);border-radius:16px;padding:8px 12px;font-family:'Jua';font-size:1rem}
+.topic .e{font-size:1.8rem;display:block}
+.topic.on{border-color:var(--main);background:var(--main-l)}
+.stepbox{background:var(--bg);border-radius:16px;padding:14px;margin:10px 0}
+.stepbox .no{display:inline-block;background:var(--main);color:#fff;border-radius:99px;padding:1px 10px;font-family:'Jua';margin-right:6px}
+.stepbox.lock{opacity:.4;pointer-events:none}
+.mic{width:86px;height:86px;border-radius:50%;background:var(--main);color:#fff;font-size:2.2rem;box-shadow:0 5px 0 #4F37B5}
+.mic.rec{animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(115,86,232,.25),0 5px 0 #4F37B5}}
+.heard{background:#fff;border-radius:12px;padding:10px;margin-top:10px;min-height:44px;font-size:1.05rem}
+.bot{display:flex;gap:10px;align-items:center;background:#fff;border-radius:16px;padding:10px 14px;margin-top:8px}
+.bot .face{font-size:2.4rem}
+.score{font-family:'Jua';font-size:1.1rem;color:var(--teal)}
+/* writing */
+.frames{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.frame{background:var(--bg);border-radius:16px;padding:12px 14px}
+.frame .fn{font-family:'Jua';color:var(--main)}
+.frame .fx{font-weight:800;font-size:1.02rem;margin-top:4px}
+.frame .fx u{text-decoration:none;border-bottom:2px dashed var(--main);color:var(--main);padding:0 6px}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.lv{border:3px solid var(--line);border-radius:18px;padding:14px;background:#fff;text-align:left}
+.lv.on{border-color:var(--main);background:var(--main-l)}
+.lv b{font-family:'Jua';font-weight:400;font-size:1.2rem}
+.dlg{max-width:620px;margin:10px auto}
+.dline{display:flex;gap:10px;align-items:center;margin:8px 0}
+.dline .who{font-size:2rem}
+.dline .txt{background:var(--bg);border-radius:14px;padding:10px 14px;font-weight:800;font-size:1.12rem;flex:1}
+.blank{display:inline-block;min-width:90px;border-bottom:3px dashed var(--main);text-align:center;color:var(--main)}
+.tile{background:#fff;border:2px solid var(--teal);color:var(--ink);padding:8px 14px;border-radius:12px;font-weight:800;font-size:1.08rem}
+.tiles{display:flex;flex-wrap:wrap;gap:8px;min-height:58px;padding:10px;border-radius:14px;background:var(--bg);margin:8px 0}
+.answer{border:2px dashed var(--teal);background:#fff}
+input[type=text],textarea,select{width:100%;border:2px solid var(--line);border-radius:12px;padding:9px 11px;font-family:'Nunito';font-size:1.05rem;font-weight:600;color:var(--ink);background:#fff}
+textarea{min-height:64px;resize:vertical}
+.wf{background:var(--bg);border-radius:16px;padding:14px;margin:10px 0}
+.wf .line{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:8px 0;font-weight:800;font-size:1.08rem}
+.wf .line select,.wf .line input{width:auto;min-width:130px;flex:0 1 auto}
+.wf .line input.wide{min-width:200px;flex:1 1 200px}
+.wf .num{display:inline-block;width:24px;height:24px;line-height:24px;border-radius:50%;background:var(--teal);color:#fff;text-align:center;font-family:'Jua';font-size:.85rem}
+.wf .hint{font-size:.85rem;color:var(--soft);font-family:'Jua';width:100%;padding-left:30px}
+.checks{list-style:none;margin-top:6px}
+.checks li{padding:3px 0;font-size:.95rem}
+.checks li::before{content:'⬜ '}
+.checks li.ok::before{content:'✅ '}
+.ftable{width:100%;border-collapse:collapse;margin-top:6px}
+.ftable td,.ftable th{padding:6px;border-bottom:1px solid var(--line);text-align:left;font-size:.98rem}
+.ftable th{font-family:'Jua';font-weight:400;color:var(--soft)}
+.ftable select,.ftable input{padding:6px 8px;font-size:.98rem}
+.rcard{width:min(540px,100%);margin:16px auto 0;border:4px solid var(--main);border-radius:24px;overflow:hidden;background:#fff;box-shadow:var(--shadow)}
+.rcard .top{background:linear-gradient(135deg,#7356E8,#E2567A);color:#fff;text-align:center;padding:12px;font-family:'Jua';font-size:1.4rem}
+.rcard .body{padding:16px 20px;font-weight:700;font-size:1.08rem;white-space:pre-wrap}
+.stars button{background:none;font-size:1.8rem;filter:grayscale(1);opacity:.4}
+.stars button.on{filter:none;opacity:1}
+.refl{border-left:5px solid var(--main);padding-left:12px;margin:14px 0}
+.dim{font-size:.8rem;background:var(--main-l);color:var(--main);padding:2px 8px;border-radius:99px;font-family:'Jua'}
+.pill{background:var(--bg);border:2px solid var(--line);border-radius:99px;padding:6px 12px;font-family:'Jua';font-size:.95rem}
+.pill.on{border-color:var(--teal);background:var(--teal-l)}
+footer{text-align:center;color:var(--soft);font-size:.85rem;padding:20px}
+@media print{
+  nav,.badge,.home-link,footer{display:none}
+  body.pc *{visibility:hidden}
+  body.pc .printArea,body.pc .printArea *{visibility:visible}
+  body.pc .printArea{position:absolute;left:0;top:0;width:100%}
+}
+</style>
+</head>
+<body>
+<header>
+  <a class="home-link" href="../index.html">🎈 NAVI PLAY 홈</a>
+  <div class="brand">NAVI PLAY · LESSON 7</div>
+  <h1>다양한 관점으로 표현하고 존중하는 우리</h1>
+  <div class="concepts"><span class="chip">👀 관점 Perspective</span><span class="chip">⚙️ 기능 Function</span><span class="chip">🤝 책임 Responsibility</span></div>
+</header>
+
+<nav id="nav">
+  <button data-go="home" class="on">🏠 시작</button>
+  <button data-go="n"><span class="tag">N</span>관점 렌즈</button>
+  <button data-go="a1"><span class="tag">A</span>기능 탐정</button>
+  <button data-go="a2"><span class="tag">A</span>댓글 게시판</button>
+  <button data-go="v1"><span class="tag">V</span>생각 맞히기</button>
+  <button data-go="v2"><span class="tag">V</span>문장 쓰기</button>
+  <button data-go="i"><span class="tag">I</span>성찰과 실천</button>
+</nav>
+
+<main>
+<!-- HOME -->
+<section id="home" class="on">
+  <div class="card center">
+    <div style="font-size:3.2rem">🎢😆😨🤝</div>
+    <h2>What do you think?</h2>
+    <p class="muted">같은 놀이기구도 누군가에게는 <b>fun</b>, 누군가에게는 <b>dangerous</b>예요. 생각이 다른 이유를 <b>관점</b>으로 살펴보고, 의견을 말하고·묻고·동의하고·부인하는 말의 <b>기능</b>을 탐구하며, 다른 의견을 존중하며 표현하는 <b>책임</b>을 실천해요.</p>
+    <div class="q">🧭 중심 아이디어: 사람마다 관점이 다르기에 같은 대상에도 다양한 의견이 생기며, 우리는 의견을 나누는 말을 통해 생각을 표현하고 서로의 관점을 존중할 책임이 있다.</div>
+    <button class="btn big" data-go="n">탐구 시작하기 ▶</button>
+  </div>
+  <div class="card">
+    <h3>🔍 탐구 질문</h3>
+    <div class="frames">
+      <div class="frame"><div class="fn">👀 관점 · 사실적</div><div class="fx k">같은 대상을 두고 왜 사람마다 의견이 다를까?</div></div>
+      <div class="frame"><div class="fn">⚙️ 기능 · 개념적</div><div class="fx k">의견을 묻고, 동의하고, 부인하는 말은 대화에서 어떤 역할을 할까?</div></div>
+      <div class="frame"><div class="fn">🤝 책임 · 논쟁적</div><div class="fx k">나와 생각이 다른 친구에게 어떻게 말하는 것이 책임 있는 말일까?</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>NAVI 탐구 지도</h3>
+    <div class="navi-map">
+      <div class="step"><div class="L">N</div><b class="k">Notice & Navigate</b><p class="muted">반대말 카드 짝을 찾고, 같은 대상을 다르게 보는 두 친구의 관점을 발견해요.</p></div>
+      <div class="step"><div class="L">A</div><b class="k">Ask & Find</b><p class="muted">들은 말의 기능을 분류하고, 작품 리뷰 게시판에서 의견 문장과 책임 있는 댓글을 찾아요.</p></div>
+      <div class="step"><div class="L">V</div><b class="k">Voice & Choice</b><p class="muted">NAVI 친구의 생각을 맞히며 말하고, 문장 쓰기 프레임으로 리뷰와 제안을 써요.</p></div>
+      <div class="step"><div class="L">I</div><b class="k">Interact & Reflect</b><p class="muted">관점·기능·책임으로 배움을 돌아보고, 생활 속 실천 약속을 세워요.</p></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>오늘의 말 🔑</h3>
+    <div class="center">
+      <span class="bubble a">I think it's fun. What do you think?</span><br>
+      <span class="bubble b">I think so, too. 👍</span>
+      <span class="bubble c">I don't think so. I think it's boring. 🙌</span>
+    </div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="btn ghost" onclick="say(['I think it\'s fun. What do you think?','I think so, too.','I don\'t think so. I think it\'s boring.'])">🔊 들어 보기</button>
+      <span class="toggle">🐢 말 빠르기 <select id="rate" style="width:auto;font-family:Jua;border:none;background:none;font-size:1rem;padding:0"><option value="0.7">천천히</option><option value="0.9" selected>보통</option><option value="1.05">빠르게</option></select></span>
+    </div>
+  </div>
+</section>
+
+<!-- N -->
+<section id="n">
+  <div class="card">
+    <div class="stage">N · Notice & Navigate ① 워밍업</div>
+    <h2>🃏 반대말 카드 짝 찾기</h2>
+    <div class="q">의견을 나타내는 말은 서로 반대되는 짝이 있어요. 카드를 뒤집어 반대말 짝을 찾아보세요!</div>
+    <div class="mem" id="mem"></div>
+    <div class="feedback center" id="memFb"></div>
+    <div class="center"><button class="btn ghost" id="memReset">↺ 다시 섞기</button></div>
+  </div>
+  <div class="card">
+    <div class="stage">N · Notice & Navigate ② 👀 관점 렌즈</div>
+    <h2>같은 것, 다른 생각</h2>
+    <div class="q">👀 관점: 두 친구는 같은 것을 보고 있어요. 각 친구의 이유를 읽고, 그 친구가 할 말을 골라 보세요.</div>
+    <div class="progress"><i id="lensProg"></i></div>
+    <div class="scene"><div class="em" id="lensEm"></div><div class="k" style="font-size:1.25rem" id="lensTopic"></div></div>
+    <div class="persons" id="lensPersons"></div>
+    <div class="feedback center" id="lensFb"></div>
+    <div class="center"><button class="btn yel" id="lensNext" style="display:none">다음 장면 ▶</button></div>
+  </div>
+</section>
+
+<!-- A1 -->
+<section id="a1">
+  <div class="card">
+    <div class="stage">A · Ask & Find ① ⚙️ 기능 탐정</div>
+    <h2>이 말은 어떤 일을 할까?</h2>
+    <div class="q">⚙️ 기능: 말을 잘 듣고, 이 말이 대화에서 하는 일(기능)의 바구니에 넣어 보세요.</div>
+    <div class="row" style="justify-content:center">
+      <span class="toggle"><input type="checkbox" id="showText" style="width:auto"> 글자 보기</span>
+      <span class="score" id="fnScore"></span>
+    </div>
+    <div class="progress"><i id="fnProg"></i></div>
+    <div class="center">
+      <button class="btn teal big" id="fnPlay">🔊 듣기</button>
+      <div class="utter" id="fnUtter"></div>
+    </div>
+    <div class="baskets" id="baskets">
+      <button class="basket" data-f="express"><div class="e">💬</div><b>의견 말하기</b><span>I think it's ~.</span></button>
+      <button class="basket" data-f="ask"><div class="e">❓</div><b>의견 묻기</b><span>What do you think?</span></button>
+      <button class="basket" data-f="agree"><div class="e">👍</div><b>동의하기</b><span>I think so, too.</span></button>
+      <button class="basket" data-f="disagree"><div class="e">🙌</div><b>부인하기</b><span>I don't think so.</span></button>
+    </div>
+    <div class="feedback center" id="fnFb"></div>
+    <div class="center"><button class="btn yel" id="fnNext" style="display:none">다음 ▶</button></div>
+  </div>
+  <div class="card">
+    <h3>🧩 대화 순서 맞추기</h3>
+    <p class="muted">말의 기능을 생각하며 대화가 자연스럽게 이어지도록 순서대로 눌러요.</p>
+    <div class="tiles answer" id="ordAns"></div>
+    <div class="tiles" id="ordBank"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="ordReset">↺ 다시</button>
+      <button class="btn" id="ordCheck">확인하기</button>
+      <button class="btn yel" id="ordNext" style="display:none">다른 대화 ▶</button>
+    </div>
+    <div class="feedback center" id="ordFb"></div>
+  </div>
+</section>
+
+<!-- A2 -->
+<section id="a2">
+  <div class="card">
+    <div class="stage">A · Ask & Find ② 읽기</div>
+    <h2>📌 우리 반 작품 리뷰 게시판</h2>
+    <div class="q">미션 1 🖍️ 의견을 나타내는 문장을 모두 눌러 표시해요. → 미션 2 🔎 댓글을 읽고 질문에 답해요. → 미션 3 🤝 책임 있는 댓글을 골라요.</div>
+    <div class="tabs" id="postTabs"></div>
+    <div class="post" id="post"></div>
+    <div class="row" style="justify-content:center"><button class="btn" id="hlCheck">🖍️ 표시 확인</button><button class="btn ghost" id="postRead">🔊 글 들어 보기</button></div>
+    <div class="feedback center" id="hlFb"></div>
+    <div id="m2" style="display:none">
+      <h3 style="margin-top:10px">🔎 미션 2</h3>
+      <p class="k" id="m2Q"></p>
+      <div class="row" id="m2Opts"></div>
+      <div class="feedback" id="m2Fb"></div>
+    </div>
+    <div id="m3" style="display:none">
+      <h3 style="margin-top:10px">🤝 미션 3 · 생각이 다를 때, 책임 있는 댓글은?</h3>
+      <p class="muted" id="m3Q"></p>
+      <div id="m3Opts"></div>
+      <div class="feedback" id="m3Fb"></div>
+    </div>
+  </div>
+</section>
+
+<!-- V1 -->
+<section id="v1">
+  <div class="card">
+    <div class="stage">V · Voice & Choice ① 말하기</div>
+    <h2>🤖 NAVI 친구 생각 맞히기</h2>
+    <div class="q">내 의견을 말하고 친구의 의견을 물어요. NAVI 친구도 나와 같은 생각일까요? 생각이 달라도 존중해요!</div>
+    <div class="score center" id="gScore"></div>
+    <div class="stepbox" id="st1"><span class="no">1</span><b class="k">이야기할 대상을 골라요</b>
+      <div class="topics" id="topics" style="margin-top:8px"></div></div>
+    <div class="stepbox lock" id="st2"><span class="no">2</span><b class="k">나의 의견을 골라요</b>
+      <div class="row" id="myOps" style="margin-top:8px;justify-content:center"></div></div>
+    <div class="stepbox lock" id="st3"><span class="no">3</span><b class="k">예측해요: NAVI 친구도 나와 같은 생각일까?</b>
+      <div class="row" style="margin-top:8px;justify-content:center"><button class="btn teal" data-pred="same">👍 같을 거야</button><button class="btn pink" data-pred="diff">🙌 다를 거야</button></div></div>
+    <div class="stepbox lock" id="st4"><span class="no">4</span><b class="k">마이크를 누르고 말해요</b>
+      <div class="center" style="margin-top:6px"><div class="bubble a" id="targetLine"></div></div>
+      <div class="row" style="justify-content:center;margin-top:8px">
+        <button class="mic" id="micBtn">🎤</button>
+        <div><button class="btn ghost" id="modelBtn">🔊 먼저 들어 보기</button><br><button class="btn ghost" id="peerBtn" style="margin-top:6px">👂 친구가 듣고 확인했어요</button></div>
+      </div>
+      <div class="heard" id="heard"><span class="muted">🎤 버튼을 누르고 또박또박 말해 보세요.</span></div>
+      <p class="muted" id="micWarn" style="display:none">⚠️ 이 브라우저는 음성 인식을 지원하지 않아요. 크롬에서 열거나, 짝에게 말하고 ‘친구가 듣고 확인했어요’를 눌러요.</p></div>
+    <div class="stepbox lock" id="st5"><span class="no">5</span><b class="k">NAVI 친구의 대답 · 어떻게 반응할까요?</b>
+      <div class="bot"><div class="face">🤖</div><div><b id="botSay" style="font-size:1.1rem"></b><div class="muted" id="botWhy"></div></div></div>
+      <div class="feedback" id="predFb"></div>
+      <div class="row" id="reacts" style="margin-top:6px"></div>
+      <div class="feedback" id="reactFb"></div>
+      <div class="center"><button class="btn yel" id="gNext" style="display:none">다음 판 ▶</button></div></div>
+  </div>
+</section>
+
+<!-- V2 -->
+<section id="v2">
+  <div class="card">
+    <div class="stage">V · Voice & Choice ② 쓰기</div>
+    <h2>✏️ 문장 쓰기 프레임</h2>
+    <p class="muted">말의 기능에 따라 문장 틀을 골라 써요. 밑줄 부분을 나의 생각으로 바꾸면 돼요.</p>
+    <div class="frames">
+      <div class="frame"><div class="fn">💬 의견 말하기</div><div class="fx">I think it's <u>fun</u>.<br>I think <u>dodgeball</u> is <u>fun</u>.</div></div>
+      <div class="frame"><div class="fn">❓ 의견 묻기</div><div class="fx">What do you think?</div></div>
+      <div class="frame"><div class="fn">👍 동의하기</div><div class="fx">I think so, too.</div></div>
+      <div class="frame"><div class="fn">🙌 부인하고 내 의견 말하기</div><div class="fx">I don't think so. I think it's <u>boring</u>.</div></div>
+      <div class="frame"><div class="fn">🎬 작품 소개하기</div><div class="fx">Yesterday, I <u>watched the movie</u> <u>Toy Story</u>.<br>It's about <u>toys</u>.<br>Did you <u>watch</u> it?</div></div>
+      <div class="frame"><div class="fn">🏫 제안하기 (Take Action)</div><div class="fx">I think <u>a movie day</u> is <u>fun</u> for our class.<br>What do you think?</div></div>
+    </div>
+    <div class="levels" id="levels" style="margin-top:14px">
+      <button class="lv on" data-lv="1"><b>🌱 1단계</b><br><span class="muted">그림 보고 대화 빈칸 채우기</span></button>
+      <button class="lv" data-lv="2"><b>🌿 2단계</b><br><span class="muted">낱말 카드로 문장 만들기</span></button>
+      <button class="lv" data-lv="3"><b>🌳 3단계</b><br><span class="muted">나의 작품 리뷰 쓰기</span></button>
+      <button class="lv" data-lv="4"><b>🌏 4단계</b><br><span class="muted">우리 반에 의견 제안하기</span></button>
+    </div>
+  </div>
+
+  <div class="card" id="lv1">
+    <h3>🌱 1단계 · 대화 빈칸 채우기 <span class="muted" id="l1Count"></span></h3>
+    <div class="scene"><div class="em" id="l1Em"></div><div class="k" id="l1Topic"></div></div>
+    <div class="dlg" id="l1Dlg"></div>
+    <div class="row" style="justify-content:center" id="l1Opts"></div>
+    <div class="feedback center" id="l1Fb"></div>
+    <div class="center"><button class="btn yel" id="l1Next" style="display:none">다음 ▶</button></div>
+  </div>
+
+  <div class="card" id="lv2" style="display:none">
+    <h3>🌿 2단계 · 문장 만들기 <span class="muted" id="l2Count"></span></h3>
+    <p class="k" id="l2Ko"></p>
+    <div class="tiles answer" id="l2Ans"></div>
+    <div class="tiles" id="l2Bank"></div>
+    <div class="row" style="justify-content:center">
+      <button class="btn ghost" id="l2Reset">↺ 다시</button>
+      <button class="btn" id="l2Check">확인하기</button>
+      <button class="btn yel" id="l2Next" style="display:none">다음 ▶</button>
+    </div>
+    <div class="feedback center" id="l2Fb"></div>
+  </div>
+
+  <div class="card" id="lv3" style="display:none">
+    <h3>🌳 3단계 · 나의 작품 리뷰 쓰기</h3>
+    <p class="muted">내가 보거나 읽은 작품을 골라 프레임에 맞춰 써요. 모르는 표현은 온라인 사전으로 찾아봐요.</p>
+    <div class="wf">
+      <div class="line"><span class="num">1</span>Yesterday, I
+        <select id="wVerb"><option value="watched the movie">watched the movie</option><option value="saw the musical">saw the musical</option><option value="read the book">read the book</option><option value="watched the show">watched the show</option></select>
+        <input type="text" id="wTitle" class="wide" placeholder="작품 이름 (예: Toy Story)">.</div>
+      <div class="hint">🎬 감상한 작품</div>
+      <div class="line"><span class="num">2</span>It's about <input type="text" id="wAbout" class="wide" placeholder="소재 (예: toys, a lion, a brave girl)">.</div>
+      <div class="hint">📌 소재</div>
+      <div class="line"><span class="num">3</span>Did you <b id="wDid">watch</b> it?</div>
+      <div class="hint">❓ 친구에게 묻기 (자동으로 바뀌어요)</div>
+      <div class="line"><span class="num">4</span>I think it's
+        <select id="wOp"><option value="">고르기</option><option>fun</option><option>great</option><option>good</option><option>exciting</option><option>sad</option><option>boring</option><option>easy</option><option>difficult</option></select>.</div>
+      <div class="hint">💬 나의 의견</div>
+      <div class="line"><span class="num">5</span><input type="text" id="wWhy" class="wide" placeholder="(선택) 더 쓰기: I liked the songs. / I saw it twice."></div>
+      <div class="hint">✨ 덧붙이기 (선택)</div>
+      <div class="line"><span class="num">6</span>What do you think?</div>
+      <div class="line">내 별점 <span class="stars" id="wStars"></span></div>
+    </div>
+    <ul class="checks" id="wChecks"></ul>
+    <div class="row" style="justify-content:center;margin-top:12px"><button class="btn" id="wMake">🎬 리뷰 카드 만들기</button></div>
+    <div class="printArea" id="wPrint"><div class="rcard" id="wCard" style="display:none"><div class="top">🎬 My Review · What do you think?</div><div class="body" id="wBody"></div></div></div>
+    <div id="wAfter" style="display:none">
+      <div class="wf">
+        <b class="k">💬 친구 리뷰에 댓글 달기 (짝의 리뷰를 읽고 써요)</b>
+        <div class="line">⤷ <select id="cType" style="min-width:200px"><option value="agree">I think so, too.</option><option value="dis">I don't think so. I think it's …</option></select>
+        <select id="cWord" style="display:none"><option>fun</option><option>great</option><option>boring</option><option>sad</option><option>easy</option><option>difficult</option></select></div>
+        <div class="line"><input type="text" id="cMore" class="wide" placeholder="(선택) 존중하는 한마디: Good review! / I want to see it."></div>
+        <div class="row"><button class="btn teal" id="cAdd">댓글 붙이기</button></div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:12px">
+        <button class="btn ghost" id="wRead">🔊 읽어 보기</button>
+        <button class="btn ghost" id="wCopy">📋 글 복사</button>
+        <button class="btn ghost" onclick="printCard('wPrint')">🖨️ 인쇄</button>
+      </div>
+    </div>
+    <div class="feedback center" id="wFb"></div>
+  </div>
+
+  <div class="card" id="lv4" style="display:none">
+    <h3>🌏 4단계 · 우리 반에 의견 제안하기 (Take Action)</h3>
+    <p class="muted">우리 반 특별 행사나 학교생활에서 하고 싶은 일을 제안하고, 모둠 친구들의 의견을 모아요.</p>
+    <div class="wf">
+      <div class="line"><span class="num">1</span>I think
+        <select id="pAct"><option value="">활동 고르기</option><option>a movie day</option><option>dodgeball</option><option>a cooking class</option><option>a dance show</option><option>a school market day</option><option>a reading party</option><option value="__own">직접 쓰기 ✏️</option></select>
+        <input type="text" id="pOwn" placeholder="직접 쓰기" style="display:none">
+        is <select id="pOp"><option value="">고르기</option><option>fun</option><option>great</option><option>good</option><option>safe</option><option>easy</option></select> for our class.</div>
+      <div class="line"><span class="num">2</span>What do you think?</div>
+    </div>
+    <h3>👥 모둠 친구들의 의견</h3>
+    <table class="ftable">
+      <thead><tr><th>이름</th><th>동의 여부</th><th>친구의 의견 (부인할 때)</th></tr></thead>
+      <tbody id="fRows"></tbody>
+    </table>
+    <ul class="checks" id="pChecks"></ul>
+    <div class="row" style="justify-content:center;margin-top:12px"><button class="btn" id="pMake">🏫 제안 카드 만들기</button></div>
+    <div class="printArea" id="pPrint"><div class="rcard" id="pCard" style="display:none"><div class="top">🏫 Our Class Idea</div><div class="body" id="pBody"></div></div></div>
+    <div class="row" style="justify-content:center;margin-top:12px;display:none" id="pBtns">
+      <button class="btn ghost" id="pRead">🔊 읽어 보기</button>
+      <button class="btn ghost" id="pCopy">📋 글 복사</button>
+      <button class="btn ghost" onclick="printCard('pPrint')">🖨️ 인쇄</button>
+    </div>
+    <div class="feedback center" id="pFb"></div>
+  </div>
+</section>
+
+<!-- I -->
+<section id="i">
+  <div class="card">
+    <div class="stage">I · Interact & Reflect</div>
+    <h2>🪞 나의 배움 돌아보기</h2>
+    <h3>I Can ⭐ 스스로 점검</h3>
+    <div id="icans"></div>
+  </div>
+  <div class="card">
+    <h3>💭 개념으로 생각하기</h3>
+    <div class="refl"><span class="dim">👀 관점</span><p class="k" style="margin-top:4px">오늘 나와 생각이 달랐던 친구(또는 NAVI)는 왜 그렇게 생각했을까요?</p><textarea id="r1"></textarea></div>
+    <div class="refl"><span class="dim">⚙️ 기능</span><p class="k" style="margin-top:4px">“What do you think?”라는 말이 없으면 대화가 어떻게 될까요?</p><textarea id="r2"></textarea></div>
+    <div class="refl"><span class="dim">🤝 책임</span><p class="k" style="margin-top:4px">친구와 생각이 다를 때, 나는 어떻게 말할 책임이 있나요?</p><textarea id="r3"></textarea></div>
+  </div>
+  <div class="card">
+    <h3>🧭 나의 학습 돌아보기</h3>
+    <div class="refl"><span class="dim">동기·책임</span><p class="k" style="margin-top:4px">오늘 가장 열심히 도전한 활동은? 왜 그 활동을 골랐나요?</p><textarea id="r4"></textarea></div>
+    <div class="refl"><span class="dim">전략·통제</span><p class="k" style="margin-top:4px">어려울 때 내가 쓴 방법을 골라 보세요.</p><div class="row" id="strats"></div></div>
+    <div class="refl"><span class="dim">메타·성찰</span><p class="k" style="margin-top:4px">다음 시간에 더 잘하고 싶은 점은?</p><textarea id="r5"></textarea></div>
+  </div>
+  <div class="card">
+    <h3>🌱 Take Action: 나의 실천 약속</h3>
+    <div class="row" id="acts"></div>
+    <input type="text" id="actOwn" placeholder="나만의 실천 약속을 써 보세요." style="margin-top:10px">
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn" id="saveRefl">💾 저장하기</button>
+      <button class="btn ghost" onclick="window.print()">🖨️ 인쇄</button>
+    </div>
+    <div class="feedback center" id="rfFb"></div>
+    <div class="center" style="margin-top:14px"><a class="btn yel big" href="../index.html">🎈 NAVI PLAY 첫 화면으로 돌아가기</a></div>
+  </div>
+</section>
+</main>
+
+<div class="badge" title="존중 하트">💗 <span id="heart">0</span></div>
+<footer><a href="../index.html" style="color:inherit">NAVI PLAY</a> · 다양한 관점으로 표현하고 존중하는 우리 · Made by Boeun.S</footer>
+
+<script>
+/* ===== 도구 ===== */
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={get(k,d){try{const v=localStorage.getItem('navi_l7_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('navi_l7_'+k,JSON.stringify(v))}catch(e){}}};
+const compact=t=>t.toLowerCase().replace(/[^a-z]/g,'');
+let heart=store.get('heart',0);$('#heart').textContent=heart;
+function addHeart(n=1){heart+=n;$('#heart').textContent=heart;store.set('heart',heart)}
+function printCard(id){['wPrint','pPrint'].forEach(x=>document.getElementById(x).classList.toggle('printArea',x===id));document.body.classList.add('pc');window.print();document.body.classList.remove('pc')}
+
+/* ===== 화면 이동 ===== */
+function go(id){$$('section').forEach(s=>s.classList.toggle('on',s.id===id));
+ $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));window.scrollTo({top:0,behavior:'smooth'});
+ try{speechSynthesis.cancel()}catch(e){}}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b)go(b.dataset.go)});
+
+/* ===== 음성 합성 ===== */
+let voices=[];
+function loadVoices(){try{voices=speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang))}catch(e){}}
+if('speechSynthesis' in window){loadVoices();speechSynthesis.onvoiceschanged=loadVoices}
+function say(lines,done){
+ if(!('speechSynthesis' in window)){done&&done();return}
+ if(typeof lines==='string')lines=[lines];
+ speechSynthesis.cancel();const rate=parseFloat($('#rate').value);
+ lines.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.lang='en-US';u.rate=rate;
+  if(voices.length)u.voice=voices[i%2===0?0:Math.min(1,voices.length-1)];u.pitch=i%2===0?1.0:1.25;
+  if(i===lines.length-1&&done)u.onend=done;speechSynthesis.speak(u)});
+}
+
+/* ===== 데이터 ===== */
+const OPP={fun:'boring',boring:'fun',easy:'difficult',difficult:'easy',safe:'dangerous',dangerous:'safe'};
+const EMO={fun:'😆',boring:'🥱',easy:'😌',difficult:'🤯',safe:'🛡️',dangerous:'⚠️',great:'🤩'};
+const KO={fun:'재미있는',boring:'지루한',easy:'쉬운',difficult:'어려운',safe:'안전한',dangerous:'위험한'};
+
+/* ===== N ① 반대말 짝 찾기 ===== */
+let memOpen=[],memDone=0,memLock=false;
+function memInit(){
+ const words=['fun','boring','easy','difficult','safe','dangerous'];
+ $('#mem').innerHTML=shuffle(words).map(w=>`<button class="mcard" data-w="${w}">?</button>`).join('');
+ memOpen=[];memDone=0;$('#memFb').textContent='';
+ $$('#mem .mcard').forEach(c=>c.onclick=()=>memFlip(c));
+}
+function memFlip(c){
+ if(memLock||c.classList.contains('open')||c.classList.contains('done'))return;
+ const w=c.dataset.w;c.classList.add('open');c.innerHTML=`${EMO[w]}<small>${w}</small>`;say(w);
+ memOpen.push(c);
+ if(memOpen.length===2){const[a,b]=memOpen;memLock=true;
+  if(OPP[a.dataset.w]===b.dataset.w){setTimeout(()=>{a.classList.add('done');b.classList.add('done');memOpen=[];memLock=false;memDone++;
+    $('#memFb').textContent=`✨ ${a.dataset.w} ↔ ${b.dataset.w} (${KO[a.dataset.w]} ↔ ${KO[b.dataset.w]})`;$('#memFb').className='feedback center ok';
+    if(memDone===3){$('#memFb').textContent='🎉 세 쌍을 모두 찾았어요! 의견을 부인할 때는 반대말을 써서 내 생각을 말할 수 있어요.';addHeart(1)}},500)}
+  else setTimeout(()=>{[a,b].forEach(x=>{x.classList.remove('open');x.textContent='?'});memOpen=[];memLock=false;
+    $('#memFb').textContent='반대말이 아니에요. 다시 찾아볼까요? 🔍';$('#memFb').className='feedback center no'},900)}
+}
+$('#memReset').onclick=memInit;memInit();
+
+/* ===== N ② 관점 렌즈 ===== */
+const LENS=[
+ {em:'🎢',t:'the roller coaster 롤러코스터',p:[{f:'😆',n:'Minho',why:'“나는 빠른 게 너무 신나!”',a:'fun'},{f:'😨',n:'Jia',why:'“높은 곳은 무서워. 떨어질 것 같아.”',a:'dangerous'}]},
+ {em:'🧩',t:'the cube puzzle 큐브',p:[{f:'😎',n:'Yeji',why:'“매일 연습해서 30초면 맞춰!”',a:'easy'},{f:'🤔',n:'Diego',why:'“처음 해 봐서 하나도 못 맞추겠어.”',a:'difficult'}]},
+ {em:'📚',t:'the history book 역사책',p:[{f:'🤓',n:'Seojun',why:'“옛날이야기가 정말 재미있어!”',a:'fun'},{f:'😪',n:'Harin',why:'“글자가 너무 많고 그림이 없어.”',a:'boring'}]},
+ {em:'🛹',t:'skateboarding 스케이트보드',p:[{f:'🧢',n:'Hajun',why:'“헬멧과 보호대를 했어!”',a:'safe'},{f:'😟',n:'Jenny',why:'“사람이 많은 곳에서 타면 부딪힐 것 같아.”',a:'dangerous'}]},
+ {em:'🧮',t:'the math quiz 수학 퀴즈',p:[{f:'😄',n:'Sua',why:'“나는 구구단 박사야!”',a:'easy'},{f:'😵',n:'Junwoo',why:'“분수 문제는 아직 헷갈려.”',a:'difficult'}]},
+ {em:'👻',t:'the haunted house 유령의 집',p:[{f:'🤩',n:'Lena',why:'“깜짝 놀라는 게 재미있어!”',a:'fun'},{f:'😑',n:'Minh',why:'“가짜인 걸 다 알아서 시시해.”',a:'boring'}]}
+];
+let lensOrder=shuffle(LENS.map((_,i)=>i)),lensI=0,lensGot=0;
+function lensShow(){
+ const s=LENS[lensOrder[lensI]];lensGot=0;
+ $('#lensProg').style.width=(lensI/LENS.length*100)+'%';
+ $('#lensEm').textContent=s.em;$('#lensTopic').textContent=s.t;$('#lensFb').textContent='';$('#lensNext').style.display='none';
+ $('#lensPersons').innerHTML=s.p.map((p,k)=>{
+  const opts=shuffle([p.a,OPP[p.a],rand(Object.keys(OPP).filter(w=>w!==p.a&&w!==OPP[p.a]))]);
+  return `<div class="pcard"><div class="face">${p.f}</div><b class="k">${p.n}</b><div class="why">${p.why}</div>
+  <div>${opts.map(o=>`<button class="opt" data-k="${k}" data-o="${o}">I think it's ${o}.</button>`).join('')}</div><div class="said" id="said${k}"></div></div>`}).join('');
+ $$('#lensPersons .opt').forEach(b=>b.onclick=()=>{
+  const p=s.p[+b.dataset.k];if(b.parentNode.dataset.done)return;
+  if(b.dataset.o===p.a){b.classList.add('right');b.parentNode.dataset.done=1;$('#said'+b.dataset.k).textContent=`💬 I think it's ${p.a}.`;say(`I think it's ${p.a}.`);lensGot++;
+   if(lensGot===2){$('#lensFb').innerHTML=`👀 같은 <b>${s.t.split(' ').pop()}</b>을(를) 보고도 두 친구의 생각이 달라요. 경험과 마음이 다르면 <b>관점</b>도 달라요. 둘 다 이유가 있는 의견이에요!`;$('#lensFb').className='feedback center ok';addHeart(1);
+    $('#lensNext').style.display='inline-block';$('#lensNext').textContent=lensI===LENS.length-1?'처음부터 다시 ↺':'다음 장면 ▶'}}
+  else{b.classList.add('wrong');$('#lensFb').textContent='이유를 다시 읽어 봐요. 그 친구의 마음은 어떨까요? 💭';$('#lensFb').className='feedback center no'}
+ });
+}
+$('#lensNext').onclick=()=>{lensI++;if(lensI>=LENS.length){lensI=0;lensOrder=shuffle(lensOrder)}lensShow()};
+lensShow();
+
+/* ===== A1 기능 탐정 ===== */
+const FN=[
+ ["I think it's fun.",'express'],["I think it's dangerous.",'express'],["I think it's easy.",'express'],["I think dodgeball is fun.",'express'],["I think it's great.",'express'],
+ ["What do you think?",'ask'],["Look at this game. What do you think?",'ask'],["I think it's boring. What do you think?",'ask'],
+ ["I think so, too.",'agree'],["Yes. I think so, too.",'agree'],
+ ["I don't think so.",'disagree'],["I don't think so. I think it's safe.",'disagree'],["I don't think so. I think it's difficult.",'disagree']
+];
+const FNK={express:'💬 의견 말하기',ask:'❓ 의견 묻기',agree:'👍 동의하기',disagree:'🙌 부인하기'};
+let fnQ=shuffle(FN).slice(0,10),fnI=0,fnOk=0,fnDone=false;
+function fnShow(){
+ const[t]=fnQ[fnI];fnDone=false;
+ $('#fnProg').style.width=(fnI/fnQ.length*100)+'%';$('#fnScore').textContent=`🎯 ${fnOk} / ${fnQ.length}`;
+ $('#fnUtter').textContent=$('#showText').checked?t:'🎧 ? ? ?';$('#fnFb').textContent='';$('#fnNext').style.display='none';
+ $$('.basket').forEach(b=>b.classList.remove('right','wrong'));
+ setTimeout(()=>say(t),250);
+}
+$('#fnPlay').onclick=()=>say(fnQ[fnI][0]);
+$('#showText').onchange=()=>{if(!fnDone)$('#fnUtter').textContent=$('#showText').checked?fnQ[fnI][0]:'🎧 ? ? ?'};
+$$('.basket').forEach(b=>b.onclick=()=>{
+ if(fnDone)return;const[t,f]=fnQ[fnI];
+ if(b.dataset.f===f){fnDone=true;b.classList.add('right');fnOk++;$('#fnUtter').textContent=t;
+  let tip='';if(t.includes('What do you think')&&t.includes('I think it'))tip=' 의견을 먼저 말하고, 이어서 상대의 의견을 물었어요!';
+  if(f==='disagree'&&t.includes('I think it'))tip=' 부인한 뒤 내 의견까지 말해서 더 친절해요!';
+  $('#fnFb').textContent='정답! '+FNK[f]+tip;$('#fnFb').className='feedback center ok';$('#fnScore').textContent=`🎯 ${fnOk} / ${fnQ.length}`;
+  $('#fnNext').style.display='inline-block';$('#fnNext').textContent=fnI===fnQ.length-1?'결과 보기 🏁':'다음 ▶'}
+ else{b.classList.add('wrong');$('#fnFb').textContent='다시 들어 볼까요? 🔊 이 말을 들은 친구는 무엇을 하게 될까요?';$('#fnFb').className='feedback center no'}
+});
+$('#fnNext').onclick=()=>{
+ if(fnI<fnQ.length-1){fnI++;fnShow();return}
+ $('#fnProg').style.width='100%';$('#fnUtter').textContent=`🏁 ${fnOk} / ${fnQ.length}`;
+ $('#fnFb').textContent=fnOk>=8?'⚙️ 기능 탐정 인증! 말이 하는 일을 정확히 구별했어요.':'잘했어요! 한 번 더 도전하면 더 잘 구별할 수 있어요.';$('#fnFb').className='feedback center ok';
+ if(fnOk>=8)addHeart(2);$('#fnNext').style.display='inline-block';$('#fnNext').textContent='다시 도전 ↺';
+ $('#fnNext').onclick=()=>{fnQ=shuffle(FN).slice(0,10);fnI=0;fnOk=0;$('#fnNext').onclick=fnNextDefault;fnShow()};
+};
+const fnNextDefault=$('#fnNext').onclick;
+fnShow();
+
+/* 대화 순서 */
+const ORD=[
+ ["Look at this game.","I think it's easy. What do you think?","I don't think so. I think it's difficult."],
+ ["I think it's fun. What do you think?","I think so, too.","Okay. Let's play this game."],
+ ["Look! It's a new movie.","I think it's boring. What do you think?","I don't think so. I think it's fun."],
+ ["Look at that!","I think it's dangerous. What do you think?","I don't think so. I think it's safe."]
+];
+let ordI=0,ordPick=[];
+function ordShow(){
+ const d=ORD[ordI];ordPick=[];$('#ordFb').textContent='';$('#ordNext').style.display='none';
+ const bank=shuffle(d.map((t,i)=>({t,i})));
+ $('#ordBank').innerHTML=bank.map(o=>`<button class="tile" data-i="${o.i}">${esc(o.t)}</button>`).join('');
+ $('#ordAns').innerHTML='';
+ $$('#ordBank .tile').forEach(b=>b.onclick=()=>{ordPick.push(+b.dataset.i);$('#ordAns').appendChild(b);b.onclick=null;
+  const n=$('#ordAns').children.length;b.textContent=(n%2?'🧒 ':'👧 ')+d[+b.dataset.i]});
+}
+$('#ordReset').onclick=ordShow;
+$('#ordCheck').onclick=()=>{
+ const d=ORD[ordI];if(ordPick.length<d.length){$('#ordFb').textContent='카드를 모두 옮겨 주세요.';$('#ordFb').className='feedback center no';return}
+ if(ordPick.every((v,i)=>v===i)){$('#ordFb').textContent='👏 자연스러운 대화예요! 의견 말하기 → 묻기 → 동의/부인하기 순서로 이어져요.';$('#ordFb').className='feedback center ok';say(d);addHeart(1);$('#ordNext').style.display='inline-block'}
+ else{$('#ordFb').textContent='묻기 전에 대답할 수 있을까요? 말의 기능을 생각해 다시 놓아 봐요. 🔄';$('#ordFb').className='feedback center no'}
+};
+$('#ordNext').onclick=()=>{ordI=(ordI+1)%ORD.length;ordShow()};
+ordShow();
+
+/* ===== A2 댓글 게시판 ===== */
+const POSTS=[
+ {tab:'🎭 The Lion King',who:'Lucia ⭐⭐⭐⭐⭐',s:[["Yesterday, I saw the musical The Lion King.",0],["It's about a lion's life.",0],["The actors wore colorful clothes and danced.",0],["I think it's great.",1],["What do you think?",0]],
+  c:[["Minji","I think so, too."],["Tom","I think it's fun. I saw it twice."]],
+  q:'Lucia의 의견에 동의한 친구는 누구인가요?',qo:['Minji','Tom'],qa:'Minji',
+  m3:'Jiho는 이 뮤지컬이 지루하다고 생각해요. 어떤 댓글이 책임 있는 댓글일까요?',
+  r:[["I don't think so. I think it's boring.",1,'생각이 다르다는 것을 정중하게 알리고, 내 의견까지 분명히 말했어요.'],["It's boring! You're wrong.",0,'"You\'re wrong."은 친구의 생각을 무시하는 말이에요.'],["The Lion King? That's for babies.",0,'작품과 친구의 취향을 깎아내리는 말이에요.']]},
+ {tab:'📖 Harry Potter',who:'John ⭐⭐⭐⭐',s:[["Last week, I read the book Harry Potter.",0],["It's about Harry's magic school life.",0],["Ron and Hermione are his friends.",0],["I think it's fun.",1],["What do you think?",0]],
+  c:[["Sora","I read this book, too. I think it's great."],["Ben","I don't think so. I think it's difficult."]],
+  q:'John과 생각이 다른 친구는 누구인가요?',qo:['Sora','Ben'],qa:'Ben',
+  m3:'Ben의 댓글을 본 John이 답글을 써요. 어떤 답글이 책임 있는 답글일까요?',
+  r:[["Okay. Thanks for your opinion!",1,'생각이 달라도 의견을 말해 준 친구에게 고마움을 표현했어요.'],["No! It's not difficult!",0,'친구의 느낌을 부정하는 말이에요. 어렵다고 느낄 수 있어요.'],["You can't read well.",0,'친구를 놀리는 말은 상처를 줘요.']]},
+ {tab:'🎬 Toy Story',who:'Yuna ⭐⭐⭐',s:[["Yesterday, I watched the movie Toy Story.",0],["It's about toys.",0],["Did you watch the movie?",0],["I think it's fun.",1],["I don't think it's sad.",1],["What do you think?",0]],
+  c:[["Leo","I don't think so. I think it's sad."],["Ari","I think so, too. I like Woody."]],
+  q:'Yuna와 같은 생각을 가진 친구는 누구인가요?',qo:['Leo','Ari'],qa:'Ari',
+  m3:'나는 이 영화가 지루했어요. 어떤 댓글을 달면 좋을까요?',
+  r:[["I don't think so. I think it's boring. But it was a good review!",1,'내 의견을 솔직하게 말하면서 친구의 글도 존중했어요.'],["Boring movie. Boring review.",0,'친구가 정성껏 쓴 글까지 깎아내리는 말이에요.'],["(아무 말 없이 ‘싫어요’만 누르기)",0,'이유 없이 싫어요만 누르면 친구는 내 생각을 알 수 없어요.']]}
+];
+let postI=0;
+function postShow(){
+ const p=POSTS[postI];
+ $('#postTabs').innerHTML=POSTS.map((x,i)=>`<button class="${i===postI?'on':''}" data-p="${i}">${x.tab}</button>`).join('');
+ $$('#postTabs button').forEach(b=>b.onclick=()=>{postI=+b.dataset.p;postShow()});
+ $('#post').innerHTML=`<div class="who">✍️ ${p.who}</div><div>${p.s.map((x,i)=>`<span class="sent" data-i="${i}">${esc(x[0])}</span> `).join('')}</div>
+  ${p.c.map(c=>`<div class="comment"><span class="n">⤷ ${c[0]}</span>${esc(c[1])}</div>`).join('')}`;
+ $$('#post .sent').forEach(s=>s.onclick=()=>s.classList.toggle('hl'));
+ $('#hlFb').textContent='';$('#m2').style.display='none';$('#m3').style.display='none';
+}
+$('#postRead').onclick=()=>{const p=POSTS[postI];say(p.s.map(x=>x[0]).concat(p.c.map(c=>c[1])))};
+$('#hlCheck').onclick=()=>{
+ const p=POSTS[postI];let ok=true;
+ $$('#post .sent').forEach(s=>{const need=p.s[+s.dataset.i][1]===1,has=s.classList.contains('hl');s.classList.remove('miss');if(need!==has){ok=false;if(!need&&has)s.classList.add('miss')}});
+ if(ok){$('#hlFb').textContent='🖍️ 정확해요! 의견 문장에는 “I think …”가 들어 있어요.';$('#hlFb').className='feedback center ok';addHeart(1);m2Show()}
+ else{$('#hlFb').textContent='다시 살펴봐요. 사실(무엇을 했는지)과 의견(어떻게 생각하는지)을 구별해 봐요. 🔍';$('#hlFb').className='feedback center no'}
+};
+function m2Show(){const p=POSTS[postI];$('#m2').style.display='block';$('#m2Q').textContent=p.q;$('#m2Fb').textContent='';
+ $('#m2Opts').innerHTML=p.qo.map(o=>`<button class="btn ghost" data-o="${o}">${o}</button>`).join('');
+ $$('#m2Opts button').forEach(b=>b.onclick=()=>{if(b.dataset.o===p.qa){b.className='btn right';$('#m2Fb').textContent='정답! 댓글의 “I think so, too.”와 “I don\'t think so.”를 잘 읽었어요.';$('#m2Fb').className='feedback ok';m3Show()}
+  else{b.className='btn wrong';$('#m2Fb').textContent='댓글을 다시 읽어 봐요. 동의하는 말은 무엇이었나요?';$('#m2Fb').className='feedback no'}})}
+function m3Show(){const p=POSTS[postI];$('#m3').style.display='block';$('#m3Q').textContent=p.m3;$('#m3Fb').textContent='';
+ $('#m3Opts').innerHTML=shuffle(p.r).map(r=>`<button class="opt" style="display:block;width:100%;text-align:left;margin:6px 0" data-g="${r[1]}" data-w="${esc(r[2])}">💬 ${esc(r[0])}</button>`).join('');
+ $$('#m3Opts .opt').forEach(b=>b.onclick=()=>{const good=b.dataset.g==='1';b.classList.add(good?'right':'wrong');
+  $('#m3Fb').innerHTML=(good?'🤝 책임 있는 댓글이에요! ':'🙅 ')+b.dataset.w+(good&&postI<POSTS.length-1?' <br>위의 다음 게시물 탭도 읽어 보세요.':'');$('#m3Fb').className='feedback '+(good?'ok':'no');if(good)addHeart(2)})}
+postShow();
+
+/* ===== V1 생각 맞히기 ===== */
+const TOPICS=[
+ {e:'🎮',n:'this game',w:['fun','boring','easy','difficult']},
+ {e:'📚',n:'this book',w:['fun','boring','easy','difficult']},
+ {e:'🎬',n:'this movie',w:['fun','boring']},
+ {e:'🧮',n:'this math quiz',w:['easy','difficult','fun','boring']},
+ {e:'🚲',n:'this bike ride',w:['safe','dangerous','fun','boring']},
+ {e:'👻',n:'this haunted house',w:['fun','boring','safe','dangerous']},
+ {e:'🏐',n:'dodgeball',w:['fun','boring','safe','dangerous']},
+ {e:'🧗',n:'rock climbing',w:['safe','dangerous','easy','difficult']}
+];
+const BOTWHY={fun:'(NAVI는 이런 걸 정말 좋아해요!)',boring:'(NAVI는 이런 건 별로 흥미가 없대요.)',easy:'(NAVI는 이미 많이 해 봤대요.)',difficult:'(NAVI는 처음 해 봐서 어렵대요.)',safe:'(NAVI는 안전 수칙을 잘 지키면 괜찮다고 생각해요.)',dangerous:'(NAVI는 다칠까 봐 걱정이 된대요.)'};
+let g={t:null,my:null,pred:null,bot:null},gPlay=store.get('gPlay',0),gHit=store.get('gHit',0);
+function gScore(){$('#gScore').textContent=`🎯 예측 성공 ${gHit} / ${gPlay}판`}
+function lock(id,on){$(id).classList.toggle('lock',on)}
+function gReset(){g={t:null,my:null,pred:null,bot:null};['#st2','#st3','#st4','#st5'].forEach(x=>lock(x,true));
+ $('#topics').innerHTML=TOPICS.map((t,i)=>`<button class="topic" data-t="${i}"><span class="e">${t.e}</span>${t.n}</button>`).join('');
+ $$('#topics .topic').forEach(b=>b.onclick=()=>{$$('#topics .topic').forEach(x=>x.classList.remove('on'));b.classList.add('on');g.t=TOPICS[+b.dataset.t];
+  $('#myOps').innerHTML=g.t.w.map(w=>`<button class="opt" data-w="${w}">${EMO[w]} ${w}</button>`).join('');lock('#st2',false);
+  ['#st3','#st4','#st5'].forEach(x=>lock(x,true));
+  $$('#myOps .opt').forEach(o=>o.onclick=()=>{$$('#myOps .opt').forEach(x=>x.classList.remove('right'));o.classList.add('right');g.my=o.dataset.w;lock('#st3',false);lock('#st4',true);lock('#st5',true)})});
+ $('#heard').innerHTML='<span class="muted">🎤 버튼을 누르고 또박또박 말해 보세요.</span>';$('#gNext').style.display='none';gScore();
+}
+$$('[data-pred]').forEach(b=>b.onclick=()=>{if(!g.my)return;g.pred=b.dataset.pred;
+ $$('[data-pred]').forEach(x=>x.style.outline='');b.style.outline='4px solid var(--yel)';
+ const pair=g.t.w.filter(w=>w===g.my||w===OPP[g.my]);g.bot=rand(pair.length===2?pair:[g.my,OPP[g.my]]);
+ $('#targetLine').textContent=`I think ${g.t.n==='dodgeball'||g.t.n==='rock climbing'?g.t.n+' is':'it\'s'} ${g.my}. What do you think?`;
+ lock('#st4',false);$('#heard').innerHTML='<span class="muted">🎤 버튼을 누르고 또박또박 말해 보세요.</span>'});
+$('#modelBtn').onclick=()=>say($('#targetLine').textContent);
+$('#peerBtn').onclick=()=>{if(g.pred)botAnswer()};
+function speakOk(t){const c=compact(t);return c.includes('think')&&c.includes(g.my)}
+function botAnswer(){
+ lock('#st5',false);gPlay++;const same=g.bot===g.my;
+ const line=same?'I think so, too.':`I don't think so. I think it's ${g.bot}.`;
+ $('#botSay').textContent='🤖 '+line;$('#botWhy').textContent=BOTWHY[g.bot];say(line);
+ const hit=(g.pred==='same')===same;if(hit)gHit++;store.set('gPlay',gPlay);store.set('gHit',gHit);gScore();
+ $('#predFb').textContent=hit?'🎯 예측 성공! NAVI의 생각을 잘 짐작했어요.':'😮 예측과 달랐어요. 친구의 생각은 직접 물어봐야 알 수 있어요!';$('#predFb').className='feedback '+(hit?'ok':'no');
+ const R=same?[["Great! Let's try it together.",1],["Good. We think the same!",1],["Hmm, you copied me.",0]]
+  :[["Okay. Thanks for your opinion.",1],["That's okay. We can think differently.",1],["No! You're wrong.",0]];
+ $('#reacts').innerHTML=shuffle(R).map(r=>`<button class="opt" data-g="${r[1]}">${esc(r[0])}</button>`).join('');$('#reactFb').textContent='';
+ $$('#reacts .opt').forEach(b=>b.onclick=()=>{const good=b.dataset.g==='1';b.classList.add(good?'right':'wrong');
+  if(good){say(b.textContent);addHeart(same?1:2);$('#reactFb').textContent=same?'😊 같은 생각을 즐겁게 나눴어요!':'🤝 생각이 달라도 존중하는 책임 있는 반응이에요! 💗 +2';$('#reactFb').className='feedback ok';$('#gNext').style.display='inline-block'}
+  else{$('#reactFb').textContent='이 말을 들은 NAVI의 마음은 어떨까요? 다른 반응을 골라 봐요.';$('#reactFb').className='feedback no'}});
+ $('#st5').scrollIntoView({behavior:'smooth',block:'center'});
+}
+$('#gNext').onclick=()=>{gReset();$('#st1').scrollIntoView({behavior:'smooth'})};
+gReset();
+
+/* --- 음성 인식 --- */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const ERR_MSG={'not-allowed':'🔒 마이크 권한이 막혀 있어요. 주소창 왼쪽 자물쇠 → 마이크 ‘허용’ → 새로고침 해 주세요.','service-not-allowed':'🚫 이 브라우저에서는 음성 인식을 쓸 수 없어요. 크롬에서 열어 주세요.','no-speech':'🤫 소리가 들리지 않았어요. 마이크에 가까이 대고 또박또박 말해 보세요.','audio-capture':'🎙️ 마이크를 찾을 수 없어요.','network':'🌐 음성 인식 서버에 연결하지 못했어요. 인터넷 상태를 확인해 주세요.'};
+let rec=null,recOn=false,recTimer=null,lastHeard=[],gotFinal=false;
+function micUI(on){recOn=on;$('#micBtn').classList.toggle('rec',on)}
+function judge(alts){
+ if(!g.pred)return;
+ if(alts.some(speakOk)){$('#heard').innerHTML='✅ 잘 들렸어요: “'+esc(alts[0])+'”';botAnswer()}
+ else $('#heard').innerHTML='🗣️ “'+esc(alts[0]||'')+'” · 거의 다 왔어요! <b>I think it\'s '+g.my+'.</b>를 또박또박 말해 봐요 🔊';
+}
+function startRec(){
+ if(!SR){$('#micWarn').style.display='block';return}
+ if(!g.pred)return;if(recOn){try{rec.stop()}catch(e){}return}
+ try{speechSynthesis.cancel()}catch(e){}
+ rec=new SR();rec.lang='en-US';rec.interimResults=true;rec.continuous=false;rec.maxAlternatives=5;lastHeard=[];gotFinal=false;
+ rec.onstart=()=>{micUI(true);$('#heard').innerHTML='<span class="muted">듣고 있어요… 🎧 지금 말해 보세요!</span>'};
+ rec.onresult=e=>{const alts=[];let final=false;
+  for(let r=e.resultIndex;r<e.results.length;r++){const res=e.results[r];for(let j=0;j<res.length;j++)alts.push(res[j].transcript);if(res.isFinal)final=true}
+  if(alts.length){lastHeard=alts;$('#heard').textContent='🗣️ '+alts[0]}
+  if(final){gotFinal=true;judge(alts)}};
+ rec.onerror=e=>{micUI(false);clearTimeout(recTimer);if(e.error==='aborted')return;$('#heard').textContent=ERR_MSG[e.error]||('⚠️ 음성 인식 오류('+e.error+'). 새로고침 후 다시 시도해 주세요.')};
+ rec.onend=()=>{micUI(false);clearTimeout(recTimer);if(!gotFinal&&lastHeard.length)judge(lastHeard)};
+ try{rec.start();recTimer=setTimeout(()=>{try{rec.stop()}catch(e){}},9000)}catch(err){micUI(false);$('#heard').textContent='⚠️ 마이크를 시작하지 못했어요. 잠시 후 다시 눌러 주세요.'}
+}
+$('#micBtn').onclick=startRec;
+if(!SR)$('#micWarn').style.display='block';
+
+/* ===== V2 쓰기 ===== */
+$$('#levels .lv').forEach(b=>b.onclick=()=>{
+ $$('#levels .lv').forEach(x=>x.classList.remove('on'));b.classList.add('on');
+ ['1','2','3','4'].forEach(n=>$('#lv'+n).style.display=n===b.dataset.lv?'block':'none')});
+
+/* 1단계 */
+const L1=[
+ {e:'🎮',t:'Look at this game.',a:'easy',agree:true},
+ {e:'📕',t:'Look at this book.',a:'boring',agree:false,b:'fun'},
+ {e:'🏠',t:'Look at this house.',a:'safe',agree:true},
+ {e:'🧪',t:'Look at this bottle.',a:'dangerous',agree:true},
+ {e:'🧮',t:'Look at this math quiz.',a:'difficult',agree:false,b:'easy'},
+ {e:'🎬',t:'Look at this movie.',a:'fun',agree:false,b:'boring'},
+ {e:'🎡',t:'Look at that ride.',a:'dangerous',agree:false,b:'safe'}
+];
+let l1Q=shuffle(L1),l1I=0,l1Step=0;
+function l1Show(){
+ const q=l1Q[l1I];l1Step=0;$('#l1Count').textContent=`(${l1I+1}/${l1Q.length})`;
+ $('#l1Em').textContent=q.e+' '+EMO[q.a];$('#l1Topic').textContent=q.t+' · 그림 속 친구의 표정을 보고 의견을 골라요.';
+ $('#l1Fb').textContent='';$('#l1Next').style.display='none';l1Render();l1Opts();
+}
+function l1Render(f1,f2){const q=l1Q[l1I];
+ $('#l1Dlg').innerHTML=`<div class="dline"><div class="who">🧒</div><div class="txt">I think it's <span class="blank">${f1||'?'}</span>. What do you think?</div></div>
+ <div class="dline"><div class="who">👧</div><div class="txt">${q.agree?'👍 (동의해요) ':'🙌 (생각이 달라요 → '+EMO[q.b]+') '}<span class="blank" style="min-width:160px">${f2||'?'}</span></div></div>`}
+function l1Opts(){const q=l1Q[l1I];let opts,ans;
+ if(l1Step===0){ans=q.a;opts=shuffle([q.a,OPP[q.a],rand(Object.keys(OPP).filter(w=>w!==q.a&&w!==OPP[q.a]))])}
+ else{ans=q.agree?'I think so, too.':`I don't think so. I think it's ${q.b}.`;
+  opts=shuffle(q.agree?['I think so, too.',"I don't think so.","What do you think?"]:[`I don't think so. I think it's ${q.b}.`,'I think so, too.',`I don't think so. I think it's ${q.a}.`])}
+ $('#l1Opts').innerHTML=opts.map(o=>`<button class="opt">${esc(o)}</button>`).join('');
+ $$('#l1Opts .opt').forEach(b=>b.onclick=()=>{
+  if(b.textContent===ans){b.classList.add('right');
+   if(l1Step===0){l1Step=1;l1Render(q.a);$('#l1Fb').textContent='좋아요! 이제 친구의 대답을 골라요.';$('#l1Fb').className='feedback center ok';setTimeout(l1Opts,400)}
+   else{l1Render(q.a,ans);say([`I think it's ${q.a}. What do you think?`,ans]);$('#l1Fb').textContent='🎉 대화 완성! 소리 내어 따라 읽어 봐요.';$('#l1Fb').className='feedback center ok';addHeart(1);
+    $('#l1Next').style.display='inline-block';$('#l1Next').textContent=l1I===l1Q.length-1?'처음부터 ↺':'다음 ▶'}}
+  else{b.classList.add('wrong');$('#l1Fb').textContent=l1Step===0?'표정 그림을 다시 봐요. 🔍':'친구는 동의하나요, 생각이 다른가요? 생각이 다르면 내 의견도 말해요.';$('#l1Fb').className='feedback center no'}})}
+$('#l1Next').onclick=()=>{l1I++;if(l1I>=l1Q.length){l1I=0;l1Q=shuffle(L1)}l1Show()};
+l1Show();
+
+/* 2단계 */
+const L2=[
+ ['I think it\'s fun.','나는 그것이 재미있다고 생각해.'],['What do you think?','너는 어떻게 생각해?'],['I think so, too.','나도 그렇게 생각해.'],
+ ['I don\'t think so.','나는 그렇게 생각하지 않아.'],['I think it\'s dangerous.','나는 그것이 위험하다고 생각해.'],['I think dodgeball is fun.','나는 피구가 재미있다고 생각해.'],
+ ['I don\'t think so. I think it\'s safe.','나는 그렇게 생각하지 않아. 나는 그것이 안전하다고 생각해.'],['It\'s about toys.','그것은 장난감에 관한 것이야.'],['Yesterday, I read the book.','어제 나는 그 책을 읽었어.']
+];
+let l2Q=shuffle(L2),l2I=0,l2Pick=[];
+function l2Show(){const[s,ko]=l2Q[l2I];l2Pick=[];$('#l2Count').textContent=`(${l2I+1}/${l2Q.length})`;$('#l2Ko').textContent='🇰🇷 '+ko;
+ $('#l2Fb').textContent='';$('#l2Next').style.display='none';$('#l2Ans').innerHTML='';
+ const words=s.split(' ');$('#l2Bank').innerHTML=shuffle(words.map((w,i)=>({w,i}))).map(o=>`<button class="tile" data-w="${esc(o.w)}">${esc(o.w)}</button>`).join('');
+ $$('#l2Bank .tile').forEach(b=>b.onclick=()=>{const into=b.parentNode.id==='l2Bank';(into?$('#l2Ans'):$('#l2Bank')).appendChild(b)});
+}
+$('#l2Reset').onclick=l2Show;
+$('#l2Check').onclick=()=>{const[s]=l2Q[l2I];const made=$$('#l2Ans .tile').map(b=>b.dataset.w).join(' ');
+ if(made===s){$('#l2Fb').textContent='👏 정확해요! 대문자로 시작하고 마침표(.)나 물음표(?)로 끝났어요.';$('#l2Fb').className='feedback center ok';say(s);addHeart(1);$('#l2Next').style.display='inline-block'}
+ else{$('#l2Fb').textContent='다시 배열해 봐요. 대문자로 시작하는 카드가 맨 앞이에요. ✍️';$('#l2Fb').className='feedback center no'}};
+$('#l2Next').onclick=()=>{l2I++;if(l2I>=l2Q.length){l2I=0;l2Q=shuffle(L2)}l2Show()};
+l2Show();
+
+/* 3단계 리뷰 */
+let wStar=0,wComments=[];
+$('#wStars').innerHTML=[1,2,3,4,5].map(n=>`<button data-s="${n}">⭐</button>`).join('');
+$$('#wStars button').forEach(b=>b.onclick=()=>{wStar=+b.dataset.s;$$('#wStars button').forEach(x=>x.classList.toggle('on',+x.dataset.s<=wStar))});
+const DID={'watched the movie':'watch','saw the musical':'see','read the book':'read','watched the show':'watch'};
+function wText(){
+ const v=$('#wVerb').value,t=$('#wTitle').value.trim(),ab=$('#wAbout').value.trim().replace(/\.$/,''),op=$('#wOp').value,why=$('#wWhy').value.trim();
+ const L=[`Yesterday, I ${v} ${t}.`,`It's about ${ab}.`,`Did you ${DID[v]} it?`,`I think it's ${op}.`];
+ if(why)L.push(/[.!?]$/.test(why)?why:why+'.');L.push('What do you think?');return L;
+}
+function wCheck(){
+ $('#wDid').textContent=DID[$('#wVerb').value];
+ const t=$('#wTitle').value.trim(),ab=$('#wAbout').value.trim(),op=$('#wOp').value,why=$('#wWhy').value.trim();
+ const C=[[!!t,'🎬 작품 이름을 썼어요'],[t&&/^[A-Z0-9]/.test(t),'🔠 작품 이름의 첫 글자를 대문자로 썼어요'],[!!ab,'📌 무엇에 관한 작품인지 썼어요'],[!!op,'💬 “I think it\'s …”로 나의 의견을 썼어요'],[!why||/^[A-Z]/.test(why),'✨ 덧붙인 문장도 대문자로 시작해요'],[wStar>0,'⭐ 별점을 골랐어요']];
+ $('#wChecks').innerHTML=C.map(c=>`<li class="${c[0]?'ok':''}">${c[1]}</li>`).join('');return C.slice(0,4).every(c=>c[0]);
+}
+['#wVerb','#wTitle','#wAbout','#wOp','#wWhy'].forEach(s=>$(s).addEventListener('input',wCheck));$$('#wStars button').forEach(b=>b.addEventListener('click',wCheck));wCheck();
+function wRender(){$('#wBody').textContent=(wStar?'⭐'.repeat(wStar)+'\n':'')+wText().join('\n')+(wComments.length?'\n\n'+wComments.map(c=>'⤷ '+c).join('\n'):'')}
+$('#wMake').onclick=()=>{if(!wCheck()){$('#wFb').textContent='체크리스트의 빈 칸을 먼저 채워 주세요. ✍️';$('#wFb').className='feedback center no';return}
+ wRender();$('#wCard').style.display='block';$('#wAfter').style.display='block';$('#wFb').textContent='🎉 나의 리뷰 카드 완성! 짝과 바꿔 읽고 댓글을 달아 봐요.';$('#wFb').className='feedback center ok';addHeart(2);
+ store.set('review',{t:wText(),s:wStar})};
+$('#cType').onchange=()=>$('#cWord').style.display=$('#cType').value==='dis'?'inline-block':'none';
+$('#cAdd').onclick=()=>{let c=$('#cType').value==='agree'?'I think so, too.':`I don't think so. I think it's ${$('#cWord').value}.`;
+ const m=$('#cMore').value.trim();if(m)c+=' '+(/[.!?]$/.test(m)?m:m+'.');wComments.push(c);$('#cMore').value='';wRender();addHeart(1);
+ $('#wFb').textContent='💬 댓글을 붙였어요. 생각이 달라도 내 의견과 함께 정중하게!';$('#wFb').className='feedback center ok'};
+$('#wRead').onclick=()=>say(wText().concat(wComments));
+$('#wCopy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('#wBody').textContent).then(()=>{$('#wFb').textContent='📋 복사했어요! 온라인 게시판에 붙여 넣어 공유해요.';$('#wFb').className='feedback center ok'})};
+
+/* 4단계 제안 */
+$('#fRows').innerHTML=[1,2,3].map(n=>`<tr><td><input type="text" id="fn${n}" placeholder="친구 ${n}"></td>
+ <td><select id="fa${n}"><option value="">-</option><option value="o">⭕ I think so, too.</option><option value="x">❌ I don't think so.</option></select></td>
+ <td><select id="fw${n}" style="display:none"><option value="">I think it's …</option><option>boring</option><option>difficult</option><option>dangerous</option><option>not fun</option></select></td></tr>`).join('');
+[1,2,3].forEach(n=>$('#fa'+n).onchange=()=>{$('#fw'+n).style.display=$('#fa'+n).value==='x'?'inline-block':'none';pCheck()});
+$('#pAct').onchange=()=>{$('#pOwn').style.display=$('#pAct').value==='__own'?'inline-block':'none';pCheck()};
+function pAct(){return $('#pAct').value==='__own'?$('#pOwn').value.trim():$('#pAct').value}
+function pCheck(){const a=pAct(),o=$('#pOp').value,fr=[1,2,3].filter(n=>$('#fa'+n).value);
+ const disOk=[1,2,3].every(n=>$('#fa'+n).value!=='x'||$('#fw'+n).value);
+ const C=[[!!a,'🏫 제안할 활동을 정했어요'],[!!o,'💬 “I think … is …”로 의견을 썼어요'],[fr.length>=2,'👥 친구 2명 이상의 의견을 모았어요'],[disOk,'🙌 생각이 다른 친구는 그 친구의 의견까지 적었어요']];
+ $('#pChecks').innerHTML=C.map(c=>`<li class="${c[0]?'ok':''}">${c[1]}</li>`).join('');return C.every(c=>c[0])}
+['#pOwn','#pOp'].forEach(s=>$(s).addEventListener('input',pCheck));[1,2,3].forEach(n=>{$('#fw'+n).onchange=pCheck;$('#fn'+n).oninput=pCheck});pCheck();
+function pLines(){const L=[`I think ${pAct()} is ${$('#pOp').value} for our class.`,'What do you think?'];
+ [1,2,3].forEach(n=>{const a=$('#fa'+n).value;if(!a)return;const nm=$('#fn'+n).value.trim()||'Friend '+n;
+  L.push(`⤷ ${nm}: `+(a==='o'?'I think so, too.':`I don't think so. I think it's ${$('#fw'+n).value}.`))});return L}
+$('#pMake').onclick=()=>{if(!pCheck()){$('#pFb').textContent='체크리스트를 모두 채워 주세요. ✍️';$('#pFb').className='feedback center no';return}
+ const yes=[1,2,3].filter(n=>$('#fa'+n).value==='o').length,all=[1,2,3].filter(n=>$('#fa'+n).value).length;
+ $('#pBody').textContent=pLines().join('\n')+`\n\n👍 찬성 ${yes+1}명 / 전체 ${all+1}명 (나 포함)`+(yes+1>all-yes?'\n➡️ Let\'s suggest it to our class!':'\n➡️ Let\'s think about another idea together.');
+ $('#pCard').style.display='block';$('#pBtns').style.display='flex';$('#pFb').textContent='🌏 우리 반 제안 카드 완성! 학급 회의나 게시판에서 나눠 봐요. 모두의 의견을 존중하며 결정해요.';$('#pFb').className='feedback center ok';addHeart(2)};
+$('#pRead').onclick=()=>say(pLines().map(l=>l.replace(/^⤷ [^:]+: /,'')));
+$('#pCopy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('#pBody').textContent).then(()=>{$('#pFb').textContent='📋 복사했어요!';$('#pFb').className='feedback center ok'})};
+
+/* ===== I 성찰 ===== */
+const ICAN=['의견을 묻고 답할 수 있어요. (I think it\'s fun. What do you think?)','동의 여부를 표현할 수 있어요. (I think so, too. / I don\'t think so.)','작품에 관한 의견을 나타내는 글을 읽고 쓸 수 있어요.','생각이 다른 친구의 의견을 존중하며 말할 수 있어요.'];
+const saved=store.get('refl',{});
+$('#icans').innerHTML=ICAN.map((t,i)=>`<div class="row" style="justify-content:space-between;margin:6px 0"><span>${esc(t)}</span><span class="stars" data-i="${i}">${[1,2,3].map(n=>`<button data-s="${n}">⭐</button>`).join('')}</span></div>`).join('');
+const icanVal=saved.ican||[0,0,0,0];
+function icanPaint(){$$('#icans .stars').forEach(s=>{const i=+s.dataset.i;s.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.s<=icanVal[i]))})}
+$$('#icans .stars button').forEach(b=>b.onclick=()=>{icanVal[+b.parentNode.dataset.i]=+b.dataset.s;icanPaint()});icanPaint();
+const STR=['🔊 다시 듣기','👀 표정·그림 단서 보기','📝 문장 프레임 보기','🙋 친구에게 묻기','🔎 온라인 사전 찾기','🔁 여러 번 따라 말하기'];
+const ACT=['영화나 책을 본 뒤 가족에게 “What do you think?” 묻기','생각이 다른 친구에게 “I don\'t think so. I think …”로 정중하게 말하기','학급 회의에서 내 의견 제안하기','온라인 댓글을 쓸 때 상대를 존중하는 말 쓰기'];
+const selS=new Set(saved.s||[]),selA=new Set(saved.a||[]);
+function pills(id,arr,set){$(id).innerHTML=arr.map((t,i)=>`<button class="pill ${set.has(i)?'on':''}" data-i="${i}">${esc(t)}</button>`).join('');
+ $$(id+' .pill').forEach(b=>b.onclick=()=>{const i=+b.dataset.i;set.has(i)?set.delete(i):set.add(i);b.classList.toggle('on')})}
+pills('#strats',STR,selS);pills('#acts',ACT,selA);
+['r1','r2','r3','r4','r5','actOwn'].forEach(k=>{if(saved[k])document.getElementById(k).value=saved[k]});
+$('#saveRefl').onclick=()=>{const o={ican:icanVal,s:[...selS],a:[...selA]};['r1','r2','r3','r4','r5','actOwn'].forEach(k=>o[k]=document.getElementById(k).value);
+ store.set('refl',o);$('#rfFb').textContent='💾 저장했어요! 이 기기에서 다시 열면 그대로 남아 있어요. 💗 '+heart+'개의 존중 하트를 모았어요.';$('#rfFb').className='feedback center ok'};
+</script>
+</body>
+</html>
