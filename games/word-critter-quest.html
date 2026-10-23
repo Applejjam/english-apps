@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Word Critter Quest | NAVI PLAY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+/* Layout: one phone-width handheld "screen" — map, encounter box (wild critter top-right, partner bottom-left), question panel below */
+:root{
+  --bg:#E3F3E6; --ink:#1F2A44; --panel:#FFFFFF; --muted:#5D6B82;
+  --coral:#FF6B4A; --sun:#FFC93C; --good:#2E9E5B; --bad:#E0464E;
+  --woods:#7CC36E; --bay:#5BB8E8; --peak:#A99BE8;
+  --display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --body:"Atkinson Hyperlegible",Verdana,system-ui,sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+.wrap{max-width:480px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.1;text-wrap:balance}
+h1{font-size:2.3rem;font-weight:800}
+h2{font-size:1.6rem;font-weight:800}
+button{font:inherit;color:inherit;cursor:pointer;border:none;background:none}
+button:focus-visible{outline:3px solid var(--coral);outline-offset:3px}
+.btn{font-family:var(--display);font-weight:800;font-size:1.2rem;background:var(--coral);color:#fff;
+  padding:12px 20px;border-radius:14px;border:3px solid var(--ink);box-shadow:0 4px 0 var(--ink);transition:transform .08s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.btn.alt{background:var(--panel);color:var(--ink)}
+.btn.sun{background:var(--sun);color:var(--ink)}
+.panel{background:var(--panel);border:3px solid var(--ink);border-radius:18px;padding:16px}
+.topbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{font-family:var(--display);font-weight:600;font-size:.95rem;background:var(--panel);border:2px solid var(--ink);border-radius:999px;padding:2px 12px}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+
+/* start */
+.hero{text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.hero .row{display:flex;justify-content:center;gap:4px}
+.hero .row svg{width:90px;height:90px}
+.starters{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.starter{background:var(--panel);border:3px solid var(--ink);border-radius:16px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.starter svg{width:100%;max-width:100px;height:auto}
+.starter b{font-family:var(--display);font-size:1.15rem}
+.starter span{font-size:.8rem;color:var(--muted);text-align:center}
+.starter[aria-pressed="true"]{background:#FFF4D1;box-shadow:0 0 0 4px var(--sun)}
+.note{font-size:.85rem;color:var(--muted);background:#F4FAF5;border:2px dashed #B9D8BF;border-radius:12px;padding:10px 12px}
+
+/* map */
+.partner-card{display:flex;gap:12px;align-items:center}
+.partner-card svg{width:84px;height:84px;flex:none}
+.xpbar{height:12px;background:#E6E9F0;border:2px solid var(--ink);border-radius:99px;overflow:hidden}
+.xpbar i{display:block;height:100%;background:var(--sun);transition:width .4s}
+.areas{display:flex;flex-direction:column;gap:12px}
+.area{border:3px solid var(--ink);border-radius:18px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 0 var(--ink)}
+.area:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.area.woods{background:linear-gradient(#D7F0CF,#A9DB9C)}
+.area.bay{background:linear-gradient(#D6EEFB,#9DD3F2)}
+.area.peak{background:linear-gradient(#ECE7FB,#C8BEF1)}
+.area .head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.area .mons{display:flex;gap:6px}
+.area .mons svg{width:56px;height:56px}
+.badge{font-family:var(--display);font-size:.85rem;background:var(--sun);border:2px solid var(--ink);border-radius:99px;padding:0 10px}
+
+/* encounter */
+.field{position:relative;height:260px;border:3px solid var(--ink);border-radius:18px;overflow:hidden}
+.field.woods{background:linear-gradient(#CDEBFF 0 55%,#8ECF7E 55%)}
+.field.bay{background:linear-gradient(#CDEBFF 0 50%,#F6DE9E 50% 62%,#6EC1EA 62%)}
+.field.peak{background:linear-gradient(#E4E0FA 0 55%,#F1F3FA 55%)}
+.spot{position:absolute;width:150px}
+.spot svg{width:100%;height:auto;display:block}
+.spot.wild{right:8px;top:10px}
+.spot.mine{left:6px;bottom:0}
+.pad{position:absolute;border-radius:50%;background:rgba(31,42,68,.13)}
+.hud{position:absolute;background:var(--panel);border:2px solid var(--ink);border-radius:12px;padding:4px 10px;font-family:var(--display);font-weight:800;font-size:1rem}
+.hud.wild{left:10px;top:12px}
+.hud.mine{right:10px;bottom:14px}
+.hearts{display:flex;gap:3px;margin-top:2px}
+.hearts svg{width:20px;height:20px}
+.say{font-family:var(--display);font-size:1.25rem;font-weight:800}
+.passage{background:#F5F8FF;border-left:5px solid var(--bay);border-radius:8px;padding:10px 12px;font-size:1.1rem}
+.prompt{font-weight:700;font-size:1.15rem}
+.qhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.speak{flex:none;width:46px;height:46px;border-radius:50%;background:var(--sun);border:3px solid var(--ink);display:grid;place-items:center}
+.speak svg{width:22px;height:22px}
+.choices{display:flex;flex-direction:column;gap:10px}
+.choice{text-align:left;font-size:1.1rem;background:var(--panel);border:3px solid var(--ink);border-radius:14px;padding:10px 14px;display:flex;gap:10px;align-items:center}
+.choice .key{font-family:var(--display);font-weight:800;width:30px;height:30px;flex:none;border-radius:50%;background:#EEF1F7;display:grid;place-items:center}
+.choice.right{background:#DDF5E5;border-color:var(--good)}
+.choice.wrong{background:#FDE3E4;border-color:var(--bad)}
+.choice:disabled{cursor:default}
+.feedback{border-radius:14px;padding:12px 14px;font-size:1.05rem;display:flex;flex-direction:column;gap:10px}
+.feedback.good{background:#DDF5E5}
+.feedback.bad{background:#FFF1D6}
+.qpanel{display:flex;flex-direction:column;gap:12px}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{flex:1}
+
+/* animations */
+@keyframes hit{0%,100%{transform:translateX(0)}20%{transform:translateX(-10px)}40%{transform:translateX(10px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+@keyframes dash{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,-30px) scale(1.05)}}
+@keyframes dodge{0%,100%{transform:translateX(0)}50%{transform:translateX(30px)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes shrink{to{transform:scale(.1) translateY(200px);opacity:0}}
+@keyframes wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-14deg)}75%{transform:rotate(14deg)}}
+@keyframes pop{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+.bob{animation:bob 2.2s ease-in-out infinite}
+.hit{animation:hit .5s}
+.dash{animation:dash .45s}
+.dodge{animation:dodge .45s}
+.shrink{animation:shrink .6s forwards}
+.wobble{animation:wobble .55s 3}
+.pop{animation:pop .35s both}
+.jar{position:absolute;right:58px;top:110px;width:60px}
+@media (prefers-reduced-motion:reduce){.bob,.hit,.dash,.dodge,.wobble,.pop{animation:none}.shrink{animation-duration:.01s}}
+
+/* book */
+.book{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.entry{background:var(--panel);border:3px solid var(--ink);border-radius:14px;padding:6px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.entry svg{width:100%;max-width:96px;height:auto}
+.entry b{font-family:var(--display);font-size:1rem}
+.entry span{font-size:.75rem;color:var(--muted)}
+
+/* overlay */
+.overlay{position:fixed;inset:0;background:rgba(31,42,68,.55);display:grid;place-items:center;padding:20px;z-index:20}
+.overlay .panel{max-width:400px;width:100%;text-align:center;display:flex;flex-direction:column;gap:12px;align-items:center}
+.overlay svg.big{width:180px;height:180px}
+.navihome{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;font-family:var(--display);font-weight:800;font-size:1rem;color:var(--ink);text-decoration:none;background:var(--panel);border:2px solid var(--ink);border-radius:999px;padding:4px 14px;box-shadow:0 3px 0 var(--ink)}
+.navihome:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+footer.navi{text-align:center;color:var(--muted);font-size:.85rem;margin-top:8px}
+footer.navi a{color:inherit}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<a class="navihome" href="../index.html">🎈 NAVI PLAY 홈</a>
+
+<!-- START -->
+<section id="s-start" class="hero">
+  <div class="row" id="heroMons"></div>
+  <h1>Word Critter Quest</h1>
+  <p>Walk in the tall grass. Meet wild critters. Answer English questions to catch them all!</p>
+  <div class="panel" style="width:100%;display:flex;flex-direction:column;gap:12px">
+    <h2>Pick your partner</h2>
+    <div class="starters" id="starters"></div>
+    <button class="btn" id="startBtn" disabled>Let's go!</button>
+  </div>
+  <p class="note"><b>부모님 안내</b> · AR 2.5~3.5 수준의 짧은 읽기·어휘·문법 문제가 나와요. 🔊 버튼을 누르면 영어로 읽어줘요. 문제 3개를 맞히면 몬스터를 잡고, 정답이 쌓이면 파트너가 진화해요. 진행 상황은 이 기기에 저장됩니다.</p>
+</section>
+
+<!-- MAP -->
+<section id="s-map" hidden>
+  <div class="wrap">
+    <div class="topbar">
+      <h2>Where to?</h2>
+      <button class="chip" id="bookBtn">Critter Book <span id="bookCount"></span></button>
+    </div>
+    <div class="panel partner-card" id="partnerCard"></div>
+    <div class="areas" id="areas"></div>
+    <button class="btn alt small" id="resetBtn" style="font-size:.95rem">Start over</button>
+    <div id="resetConfirm" class="panel" hidden>
+      <p style="margin:0 0 10px">Start a new game? Your critters will be gone.</p>
+      <div class="actions"><button class="btn" id="resetYes">Yes, start over</button><button class="btn alt" id="resetNo">Keep playing</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ENCOUNTER -->
+<section id="s-enc" hidden>
+  <div class="wrap">
+    <div class="topbar">
+      <span class="chip" id="encArea"></span>
+      <button class="chip" id="runBtn">Run away</button>
+    </div>
+    <div class="field" id="field">
+      <div class="pad" style="right:20px;top:120px;width:126px;height:26px"></div>
+      <div class="spot wild" id="wildSpot"></div>
+      <div class="spot mine" id="mineSpot"></div>
+      <div class="hud wild" id="wildHud"></div>
+      <div class="hud mine" id="mineHud"></div>
+    </div>
+    <div class="panel qpanel" id="qpanel"></div>
+  </div>
+</section>
+
+<!-- BOOK -->
+<section id="s-book" hidden>
+  <div class="wrap">
+    <div class="topbar">
+      <h2>Critter Book</h2>
+      <button class="chip" id="bookBack">Back to map</button>
+    </div>
+    <p class="muted small" id="bookNote" style="margin:0"></p>
+    <div class="book" id="book"></div>
+  </div>
+</section>
+
+<footer class="navi"><a href="../index.html">NAVI PLAY</a> · Word Critter Quest · Made by Boeun.S</footer>
+</div>
+<div id="overlay" hidden></div>
+
+<script>
+/* ---------- critter art (original designs) ---------- */
+const INK="#1F2A44";
+function critterSVG(c,{evo=false,sil=false}={}){
+  const col=sil?"#3A4560":(evo&&c.evoColor?c.evoColor:c.color);
+  const bel=sil?"#3A4560":c.belly;
+  const dims={blob:[36,32,72],tall:[30,38,70],wide:[42,27,80]}[c.shape];
+  let [rx,ry,cy]=dims; const cx=60;
+  if(evo){rx+=4;ry+=4;}
+  const t=cy-ry, st=`stroke="${INK}" stroke-width="2.5"`;
+  let back="",front="",face="";
+  const has=a=>c.parts.includes(a);
+  if(has("wings")) back+=`<ellipse cx="${cx-rx}" cy="${cy-12}" rx="16" ry="25" transform="rotate(-30 ${cx-rx} ${cy-12})" fill="${sil?col:'#EEE2FF'}" ${st}/><ellipse cx="${cx+rx}" cy="${cy-12}" rx="16" ry="25" transform="rotate(30 ${cx+rx} ${cy-12})" fill="${sil?col:'#EEE2FF'}" ${st}/>`;
+  if(has("fins")) back+=`<path d="M${cx-rx+4} ${cy} L${cx-rx-16} ${cy-14} L${cx-rx-10} ${cy+12} Z" fill="${col}" ${st}/><path d="M${cx+rx-4} ${cy} L${cx+rx+16} ${cy-14} L${cx+rx+10} ${cy+12} Z" fill="${col}" ${st}/><path d="M${cx-8} ${t+4} L${cx} ${t-16} L${cx+10} ${t+4} Z" fill="${col}" ${st}/>`;
+  if(has("shell")) back+=`<circle cx="${cx+20}" cy="${cy-10}" r="28" fill="${sil?col:'#F4B66A'}" ${st}/><path d="M${cx+20} ${cy-10} m-4 0 a4 4 0 1 1 8 0 a9 9 0 1 1 -18 0 a15 15 0 1 1 30 0" fill="none" ${st}/>`;
+  if(has("cloud")) back+=[[-30,-18,14],[0,-34,18],[30,-18,14],[-38,6,12],[38,6,12]].map(([dx,dy,r])=>`<circle cx="${cx+dx}" cy="${cy+dy}" r="${r}" fill="${sil?col:'#FFFFFF'}" ${st}/>`).join("");
+  if(has("ears")) back+=`<ellipse cx="${cx-17}" cy="${t+2}" rx="8" ry="18" transform="rotate(-18 ${cx-17} ${t+2})" fill="${col}" ${st}/><ellipse cx="${cx+17}" cy="${t+2}" rx="8" ry="18" transform="rotate(18 ${cx+17} ${t+2})" fill="${col}" ${st}/>`;
+  if(has("horns")) back+=`<path d="M${cx-18} ${t+8} L${cx-24} ${t-12} L${cx-6} ${t+4} Z" fill="${sil?col:'#FFF6D8'}" ${st}/><path d="M${cx+18} ${t+8} L${cx+24} ${t-12} L${cx+6} ${t+4} Z" fill="${sil?col:'#FFF6D8'}" ${st}/>`;
+  if(has("antenna")) back+=`<path d="M${cx-8} ${t+4} Q${cx-14} ${t-8} ${cx-20} ${t-14}" fill="none" ${st}/><path d="M${cx+8} ${t+4} Q${cx+14} ${t-8} ${cx+20} ${t-14}" fill="none" ${st}/><circle cx="${cx-20}" cy="${t-15}" r="5" fill="${sil?col:'#FFD34D'}" ${st}/><circle cx="${cx+20}" cy="${t-15}" r="5" fill="${sil?col:'#FFD34D'}" ${st}/>`;
+  if(has("leaf")) back+=`<path d="M${cx} ${t+2} Q${cx-2} ${t-8} ${cx+2} ${t-14}" fill="none" ${st}/><ellipse cx="${cx+12}" cy="${t-16}" rx="${evo?15:11}" ry="${evo?7:5}" transform="rotate(-25 ${cx+12} ${t-16})" fill="${sil?col:'#59B94A'}" ${st}/>${evo?`<ellipse cx="${cx-10}" cy="${t-12}" rx="11" ry="5" transform="rotate(25 ${cx-10} ${t-12})" fill="${sil?col:'#7FD36C'}" ${st}/>`:""}`;
+  const body=`<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="${col}" ${st}/>`;
+  if(!sil) front+=`<ellipse cx="${cx}" cy="${cy+ry*.38}" rx="${rx*.58}" ry="${ry*.48}" fill="${bel}"/>`;
+  if(has("spots")&&!sil) front+=[[-20,-14,6],[16,-18,5],[24,2,4],[-26,6,4]].map(([dx,dy,r])=>`<circle cx="${cx+dx}" cy="${cy+dy}" r="${r}" fill="#FFF3EC"/>`).join("");
+  if(has("cap")) front+=`<path d="M${cx-rx*.85} ${t+16} Q${cx} ${t-12} ${cx+rx*.85} ${t+16} Z" fill="${sil?col:'#8B5A2B'}" ${st}/><rect x="${cx-3}" y="${t-6}" width="6" height="9" rx="2" fill="${sil?col:'#6B4220'}" ${st}/>`;
+  if(has("bubbles")&&!sil) front+=[[-46,-20,6],[44,-28,8],[48,10,5]].map(([dx,dy,r])=>`<circle cx="${cx+dx}" cy="${cy+dy}" r="${r}" fill="#E8F7FF" stroke="${INK}" stroke-width="1.8"/>`).join("");
+  if(!sil){
+    const ey=cy-6;
+    face=`<circle cx="${cx-12}" cy="${ey}" r="5.5" fill="${INK}"/><circle cx="${cx+12}" cy="${ey}" r="5.5" fill="${INK}"/>
+    <circle cx="${cx-10.5}" cy="${ey-2}" r="2" fill="#fff"/><circle cx="${cx+13.5}" cy="${ey-2}" r="2" fill="#fff"/>
+    <ellipse cx="${cx-22}" cy="${cy+4}" rx="5" ry="3" fill="#FF8FA3" opacity=".7"/><ellipse cx="${cx+22}" cy="${cy+4}" rx="5" ry="3" fill="#FF8FA3" opacity=".7"/>
+    <path d="M${cx-5} ${cy+4} Q${cx} ${cy+10} ${cx+5} ${cy+4}" fill="none" stroke="${INK}" stroke-width="2.2" stroke-linecap="round"/>`;
+  }
+  let crown="";
+  if(evo&&!sil) crown=`<path d="M${cx-14} ${t+2} L${cx-14} ${t-14} L${cx-6} ${t-6} L${cx} ${t-18} L${cx+6} ${t-6} L${cx+14} ${t-14} L${cx+14} ${t+2} Z" fill="#FFC93C" ${st}/>`+
+    [[18,30],[100,26],[104,92]].map(([x,y])=>`<path d="M${x} ${y-7} L${x+2} ${y-2} L${x+7} ${y} L${x+2} ${y+2} L${x} ${y+7} L${x-2} ${y+2} L${x-7} ${y} L${x-2} ${y-2} Z" fill="#FFC93C"/>`).join("");
+  return `<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${sil?'Unknown critter':(evo?c.evoName:c.name)}"><ellipse cx="60" cy="112" rx="34" ry="5" fill="${INK}" opacity=".12"/>${back}${body}${front}${face}${crown}</svg>`;
+}
+const heartSVG=f=>`<svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1 8.2 3.4 4.5 7 4.5c2 0 3.5 1.1 5 3 1.5-1.9 3-3 5-3 3.6 0 6 3.7 4.5 7.3C19.5 16.4 12 21 12 21z" fill="${f?'#FF6B4A':'#E6E9F0'}" stroke="${INK}" stroke-width="2"/></svg>`;
+const jarSVG=`<svg viewBox="0 0 60 70"><rect x="14" y="4" width="32" height="10" rx="3" fill="#FF6B4A" stroke="${INK}" stroke-width="2.5"/><path d="M10 16 h40 v40 a10 10 0 0 1 -10 10 h-20 a10 10 0 0 1 -10 -10 z" fill="#DDF3FF" stroke="${INK}" stroke-width="2.5"/><path d="M18 26 v24" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg>`;
+const speakerSVG=`<svg viewBox="0 0 24 24" fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h4l5-4v14l-5-4H4z" fill="${INK}"/><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/></svg>`;
+
+/* ---------- data ---------- */
+const STARTERS={
+  sprig:{id:"sprig",name:"Sprig",evoName:"Sprigwood",color:"#9EDB7A",evoColor:"#6FC25A",belly:"#E9F8D9",shape:"blob",parts:["leaf","ears"],about:"A leafy buddy"},
+  puddle:{id:"puddle",name:"Puddle",evoName:"Puddlemoon",color:"#7CC7F2",evoColor:"#4FA8E6",belly:"#E1F4FF",shape:"tall",parts:["fins"],about:"A splashy buddy"},
+  glow:{id:"glow",name:"Glow",evoName:"Glowbright",color:"#FFD966",evoColor:"#FFC233",belly:"#FFF6D6",shape:"wide",parts:["antenna"],about:"A shiny buddy"}
+};
+const AREAS=[
+ {id:"woods",name:"Whisper Woods",critters:[
+   {id:"acornip",name:"Acornip",color:"#D9A066",belly:"#F6E2C8",shape:"blob",parts:["cap"],fact:"It hides in a hat made of acorn."},
+   {id:"mothlet",name:"Mothlet",color:"#B79BE6",belly:"#EFE7FF",shape:"tall",parts:["wings","antenna"],fact:"It flies at night, like an owl."},
+   {id:"mushbun",name:"Mushbun",color:"#F07C6E",belly:"#FFE4DE",shape:"blob",parts:["ears","spots"],fact:"It naps under big mushrooms."}]},
+ {id:"bay",name:"Bubble Bay",critters:[
+   {id:"shellby",name:"Shellby",color:"#FFB98A",belly:"#FFEBDC",shape:"wide",parts:["shell"],fact:"It carries its home on its back."},
+   {id:"finnow",name:"Finnow",color:"#5CCFC1",belly:"#DDF8F3",shape:"tall",parts:["fins"],fact:"It swims as fast as a boat."},
+   {id:"bubblop",name:"Bubblop",color:"#F7A6CF",belly:"#FFE7F3",shape:"blob",parts:["bubbles"],fact:"It blows bubbles when it is happy."}]},
+ {id:"peak",name:"Pebble Peak",critters:[
+   {id:"rockmole",name:"Rockmole",color:"#A4A9B8",belly:"#E4E6EC",shape:"wide",parts:["ears","spots"],fact:"It digs tunnels under the rocks."},
+   {id:"frostle",name:"Frostle",color:"#A8E0F5",belly:"#F0FAFF",shape:"tall",parts:["horns"],fact:"Its breath makes tiny snowflakes."},
+   {id:"cloudlet",name:"Cloudlet",color:"#DCE3F5",belly:"#FFFFFF",shape:"blob",parts:["cloud"],fact:"It floats on the mountain wind."}]}
+];
+const ALL=AREAS.flatMap(a=>a.critters.map(c=>({...c,area:a.id})));
+
+// [passage, question, correct, wrong1, wrong2, explanation]
+const Q={
+woods:[
+ ["Ben has a red kite. He takes it to the park. The wind is strong, so the kite flies high.","Why does the kite fly high?","The wind is strong.","Ben is tall.","The kite is red.","The story says \"The wind is strong, SO the kite flies high.\""],
+ ["Owls are awake at night. They sleep during the day. Owls are nocturnal.","What does \"nocturnal\" mean?","awake at night","very small","good at swimming","Owls are awake at night, so nocturnal means awake at night."],
+ ["","A squirrel ___ nuts for the winter.","hides","sleeps","sings","Squirrels hide nuts so they have food in winter."],
+ ["","What is the opposite of \"quiet\"?","loud","soft","slow","Quiet and loud are opposites."],
+ ["Mia found a tiny bird on the ground. It could not fly yet. She called her mom to help.","How did Mia feel about the bird?","She wanted to help it.","She was angry at it.","She wanted to play a game.","Mia called her mom to help, so she cared about the bird."],
+ ["","Yesterday, we ___ a deer in the forest.","saw","see","seeing","\"Yesterday\" means the past, so we use \"saw\"."],
+ ["The bear was enormous. It was bigger than a car!","What does \"enormous\" mean?","very big","very old","very fast","It was bigger than a car, so enormous means very big."],
+ ["First, you plant a seed. Next, it gets water and sun. Then, a little sprout grows.","What happens after the seed gets water and sun?","A sprout grows.","You plant the seed.","It starts to snow.","The word \"Then\" tells us a sprout grows next."],
+ ["","Which sentence is correct?","The fox runs fast.","The fox run fast.","The fox running fast.","One fox → runs. \"The fox runs fast.\""],
+ ["","Which word means the same as \"glad\"?","happy","sad","tired","Glad and happy mean the same thing."]
+],
+bay:[
+ ["Sam built a sand castle near the water. A big wave came. Then the castle was gone!","What happened to the castle?","The wave washed it away.","Sam took it home.","It got bigger.","A big wave came, and then the castle was gone."],
+ ["The water is shallow here. You can stand up, and the water only comes to your knees.","What does \"shallow\" mean?","not deep","very cold","very dirty","The water only comes to your knees, so it is not deep."],
+ ["","Fish use their fins to ___.","swim","read","fly","Fins help fish move in the water."],
+ ["","What is the opposite of \"wet\"?","dry","cold","soft","Wet and dry are opposites."],
+ ["Lily put on her sun hat and sunscreen. She took a bucket, a shovel, and a towel.","Where is Lily going?","to the beach","to bed","to the library","A sun hat, a bucket, and a shovel are for the beach."],
+ ["","There are many ___ on the beach.","shells","shell","shelling","\"Many\" means more than one, so we say \"shells\"."],
+ ["The crab does not walk forward. It walks sideways, from left to right.","What does \"sideways\" mean?","to the side","up high","very slowly","From left to right is to the side."],
+ ["An octopus has eight arms. It can change color to hide from danger.","Why does an octopus change color?","to hide","to sing","to sleep","It changes color to hide from danger."],
+ ["","Which sentence is correct?","She has two buckets.","She have two buckets.","She having two buckets.","With \"she\" we use \"has\"."],
+ ["","Which word means the same as \"huge\"?","giant","tiny","quick","Huge and giant both mean very big."]
+],
+peak:[
+ ["It snowed all night. In the morning, Jack and his sister made a snowman. They gave it a carrot nose.","When did they make the snowman?","in the morning","at night","after dinner","The story says \"In the morning, Jack and his sister made a snowman.\""],
+ ["The path to the top was steep. It went up and up, so they walked very slowly.","What does \"steep\" mean?","going up a lot","flat and easy","wet and muddy","The path went up and up, so steep means it goes up a lot."],
+ ["","Put on your coat. It is ___ outside.","cold","hot","sleepy","We wear a coat when it is cold."],
+ ["","What is the opposite of \"top\"?","bottom","middle","side","Top and bottom are opposites."],
+ ["Dark clouds filled the sky. Thunder boomed. Dad said, \"Let's go inside!\"","What will happen next?","A storm is coming.","It will be sunny.","They will go swimming.","Dark clouds and thunder mean a storm is coming."],
+ ["","The mountain is ___ than the hill.","taller","tall","tallest","We compare two things with \"-er\" + \"than\": taller than."],
+ ["\"Be careful with that glass!\" said Mom. \"It is fragile. It can break.\"","What does \"fragile\" mean?","breaks easily","very heavy","tastes sweet","Mom says it can break, so fragile means it breaks easily."],
+ ["Goats can live on mountains. They have strong legs and can climb big rocks. They eat grass and plants.","What is this mostly about?","mountain goats","big rocks","green grass","Every sentence tells us about goats."],
+ ["","Which sentence is correct?","We went up the hill.","We goed up the hill.","We going up the hill.","The past of \"go\" is \"went\"."],
+ ["","Which word means the same as \"chilly\"?","cold","angry","noisy","Chilly means a little cold."]
+]};
+
+/* ---------- state ---------- */
+const KEY="wordCritterQuest.v1";
+let S={partner:null,xp:0,caught:[],badges:[]};
+try{const raw=localStorage.getItem(KEY); if(raw) S={...S,...JSON.parse(raw)};}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const P=()=>STARTERS[S.partner];
+const EVO_XP=12;
+const isEvo=()=>S.xp>=EVO_XP;
+const level=()=>1+Math.floor(S.xp/4);
+const pName=()=>isEvo()?P().evoName:P().name;
+const $=id=>document.getElementById(id);
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+
+function show(id){["s-start","s-map","s-enc","s-book"].forEach(s=>$(s).hidden=s!==id);window.scrollTo(0,0);}
+function speak(text){
+  try{ if(!("speechSynthesis" in window)) return;
+    speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text);
+    u.lang="en-US"; u.rate=.85; const v=speechSynthesis.getVoices().find(v=>/en[-_]US/i.test(v.lang)); if(v) u.voice=v;
+    speechSynthesis.speak(u);}catch(e){}
+}
+
+/* ---------- start ---------- */
+$("heroMons").innerHTML=[ALL[1],ALL[3],ALL[8]].map(c=>`<div class="bob">${critterSVG(c)}</div>`).join("");
+let pick=null;
+$("starters").innerHTML=Object.values(STARTERS).map(s=>`<button class="starter" data-id="${s.id}" aria-pressed="false">${critterSVG(s)}<b>${s.name}</b><span>${s.about}</span></button>`).join("");
+$("starters").addEventListener("click",e=>{const b=e.target.closest(".starter"); if(!b) return;
+  pick=b.dataset.id; document.querySelectorAll(".starter").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  $("startBtn").disabled=false; $("startBtn").textContent=`Go with ${STARTERS[pick].name}!`; speak(`I choose ${STARTERS[pick].name}!`);});
+$("startBtn").onclick=()=>{S.partner=pick;save();renderMap();show("s-map");};
+
+/* ---------- map ---------- */
+function renderMap(){
+  const p=P(), lv=level(), toNext=isEvo()?100:Math.min(100,(S.xp/EVO_XP)*100);
+  $("partnerCard").innerHTML=`${critterSVG(p,{evo:isEvo()})}<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+    <h3 style="font-size:1.4rem">${pName()} <span class="chip" style="font-size:.8rem">Lv ${lv}</span></h3>
+    <div class="xpbar"><i style="width:${toNext}%"></i></div>
+    <span class="small muted">${isEvo()?"Fully grown! Keep catching critters.":`${EVO_XP-S.xp} more right answers to grow up!`}</span></div>`;
+  $("areas").innerHTML=AREAS.map(a=>{
+    const n=a.critters.filter(c=>S.caught.includes(c.id)).length;
+    return `<button class="area ${a.id}" data-area="${a.id}">
+      <div class="head"><h3 style="font-size:1.35rem">${a.name}</h3>${S.badges.includes(a.id)?`<span class="badge">Badge!</span>`:`<span class="chip" style="font-size:.85rem">${n}/3</span>`}</div>
+      <div class="mons">${a.critters.map(c=>critterSVG(c,{sil:!S.caught.includes(c.id)})).join("")}</div>
+      <span class="small">Walk in the grass</span></button>`;}).join("");
+  $("bookCount").textContent=`${S.caught.length}/${ALL.length}`;
+}
+$("areas").addEventListener("click",e=>{const b=e.target.closest(".area"); if(b) startEncounter(b.dataset.area);});
+$("bookBtn").onclick=()=>{renderBook();show("s-book");};
+$("bookBack").onclick=()=>{renderMap();show("s-map");};
+$("resetBtn").onclick=()=>{$("resetConfirm").hidden=false;};
+$("resetNo").onclick=()=>{$("resetConfirm").hidden=true;};
+$("resetYes").onclick=()=>{S={partner:null,xp:0,caught:[],badges:[]};save();$("resetConfirm").hidden=true;
+  pick=null;$("startBtn").disabled=true;$("startBtn").textContent="Let's go!";document.querySelectorAll(".starter").forEach(x=>x.setAttribute("aria-pressed","false"));show("s-start");};
+
+/* ---------- encounter ---------- */
+let E=null; const pools={};
+function nextQ(area){ if(!pools[area]||!pools[area].length) pools[area]=shuffle(Q[area]); return pools[area].pop(); }
+function startEncounter(areaId){
+  const area=AREAS.find(a=>a.id===areaId);
+  const fresh=area.critters.filter(c=>!S.caught.includes(c.id));
+  const wild=(fresh.length?fresh:area.critters)[Math.floor(Math.random()*(fresh.length||3))];
+  E={area,wild,hearts:3,again:S.caught.includes(wild.id)};
+  $("field").className="field "+area.id; $("encArea").textContent=area.name;
+  $("wildSpot").innerHTML=`<div class="bob pop">${critterSVG(wild)}</div>`;
+  $("mineSpot").innerHTML=`<div>${critterSVG(P(),{evo:isEvo()})}</div>`;
+  drawHud(); show("s-enc");
+  $("qpanel").innerHTML=`<p class="say" style="margin:0">A wild ${wild.name} jumped out!</p>
+    <p style="margin:0">Answer 3 questions to catch it. Go, ${pName()}!</p>
+    <button class="btn" id="goQ">Start!</button>`;
+  speak(`A wild ${wild.name} jumped out!`);
+  $("goQ").onclick=askQ;
+}
+function drawHud(){
+  $("wildHud").innerHTML=`${E.wild.name}<div class="hearts">${[0,1,2].map(i=>heartSVG(i<E.hearts)).join("")}</div>`;
+  $("mineHud").innerHTML=`${pName()} · Lv ${level()}`;
+}
+function askQ(){
+  const [passage,question,right,w1,w2,why]=nextQ(E.area.id);
+  const opts=shuffle([right,w1,w2]);
+  const readText=(passage?passage+" ":"")+question.replace("___","blank");
+  $("qpanel").innerHTML=`
+    <div class="qhead"><div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+      ${passage?`<div class="passage">${passage}</div>`:""}
+      <div class="prompt">${question}</div></div>
+      <button class="speak" id="spk" aria-label="Read aloud">${speakerSVG}</button></div>
+    <div class="choices">${opts.map((o,i)=>`<button class="choice" data-v="${encodeURIComponent(o)}"><span class="key">${"ABC"[i]}</span>${o}</button>`).join("")}</div>
+    <div id="fb"></div>`;
+  $("spk").onclick=()=>speak(readText);
+  document.querySelectorAll(".choice").forEach(b=>b.onclick=()=>answer(b,right,why));
+}
+function answer(btn,right,why){
+  const chosen=decodeURIComponent(btn.dataset.v), ok=chosen===right;
+  document.querySelectorAll(".choice").forEach(b=>{b.disabled=true; if(decodeURIComponent(b.dataset.v)===right) b.classList.add("right");});
+  if(!ok) btn.classList.add("wrong");
+  const mine=$("mineSpot").firstElementChild, wild=$("wildSpot").firstElementChild;
+  let msg;
+  if(ok){
+    E.hearts--; S.xp++; save();
+    mine.classList.remove("dash"); void mine.offsetWidth; mine.classList.add("dash");
+    setTimeout(()=>{wild.classList.remove("hit"); void wild.offsetWidth; wild.classList.add("hit"); drawHud();},250);
+    const cheers=["Great job!","You got it!","Super!","Awesome!","Wow, smart!"];
+    msg=cheers[Math.floor(Math.random()*cheers.length)];
+    speak(msg);
+  }else{
+    wild.classList.remove("dodge"); void wild.offsetWidth; wild.classList.add("dodge");
+    msg=`${E.wild.name} dodged! The answer is "${right}".`;
+    speak(`Nice try! The answer is ${right}.`);
+  }
+  const done=E.hearts<=0;
+  $("fb").innerHTML=`<div class="feedback ${ok?"good":"bad"}"><b class="say" style="font-size:1.15rem">${msg}</b><span>${why}</span>
+    <button class="btn ${done?"sun":""}" id="nextBtn">${done?"Throw a Catch Jar!":"Next question"}</button></div>`;
+  $("nextBtn").onclick=done?throwJar:askQ;
+  $("nextBtn").scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+function throwJar(){
+  const wild=$("wildSpot").firstElementChild;
+  wild.classList.remove("bob","hit"); wild.classList.add("shrink");
+  const jar=document.createElement("div"); jar.className="jar pop"; jar.innerHTML=jarSVG; $("field").appendChild(jar);
+  $("qpanel").innerHTML=`<p class="say" style="margin:0">Shake... shake... shake...</p>`;
+  setTimeout(()=>jar.classList.add("wobble"),600);
+  setTimeout(()=>{
+    jar.remove();
+    const c=E.wild, first=!S.caught.includes(c.id);
+    if(first) S.caught.push(c.id);
+    const wasEvo=isEvo() && !S.evoSeen;
+    let badgeNew=false;
+    if(!S.badges.includes(E.area.id) && E.area.critters.every(x=>S.caught.includes(x.id))){S.badges.push(E.area.id);badgeNew=true;}
+    save();
+    speak(`Gotcha! You caught ${c.name}!`);
+    overlay(`${critterSVG(c)}`.replace("<svg",'<svg class="big"'),
+      `Gotcha! You caught ${c.name}!`,
+      `${first?"New! ":"You caught it again! "}${c.fact}${badgeNew?`<br><b>You earned the ${E.area.name} Badge!</b>`:""}`,
+      wasEvo?"Wait... something is happening!":"Back to the map",
+      ()=>{ if(wasEvo) evolve(); else {renderMap();show("s-map");} });
+  },2400);
+}
+function evolve(){
+  S.evoSeen=true; save();
+  speak(`${P().name} is growing!`);
+  overlay(critterSVG(P()).replace("<svg",'<svg class="big wobble"'),`${P().name} is growing!`,"All your right answers made your partner strong...","See!",()=>{
+    speak(`${P().name} grew into ${P().evoName}!`);
+    overlay(critterSVG(P(),{evo:true}).replace("<svg",'<svg class="big pop"'),`${P().name} became ${P().evoName}!`,"Your partner is all grown up. Great reading!","Back to the map",()=>{renderMap();show("s-map");});
+  });
+}
+function overlay(art,title,text,btn,fn){
+  const o=$("overlay"); o.className="overlay"; o.hidden=false;
+  o.innerHTML=`<div class="panel pop">${art}<h2>${title}</h2><p style="margin:0">${text}</p><button class="btn" id="ovBtn">${btn}</button></div>`;
+  $("ovBtn").onclick=()=>{o.hidden=true; fn();};
+  $("ovBtn").focus();
+}
+$("runBtn").onclick=()=>{speechSynthesis?.cancel?.(); renderMap(); show("s-map");};
+
+/* ---------- book ---------- */
+function renderBook(){
+  $("bookNote").textContent=`You caught ${S.caught.length} of ${ALL.length} critters. Badges: ${S.badges.length}/3`;
+  $("book").innerHTML=ALL.map((c,i)=>{const got=S.caught.includes(c.id);
+    return `<div class="entry">${critterSVG(c,{sil:!got})}<b>${got?c.name:"???"}</b><span>No. ${String(i+1).padStart(3,"0")}</span></div>`;}).join("");
+}
+
+/* ---------- boot ---------- */
+if(S.partner){renderMap();show("s-map");}else show("s-start");
+</script>
+</body>
+</html>
