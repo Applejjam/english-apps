@@ -8,7 +8,7 @@
     그 브라우저에서는 집계되지 않아요. (다시 열면 해제)
 */
 (function () {
-  var CODE = ''; // ← 여기에 GoatCounter 코드 입력
+  var CODE = 'naviplay'; // ← 여기에 GoatCounter 코드 입력
 
   if (!CODE) return;
   var s = document.createElement('script');
