@@ -820,5 +820,6 @@ pills('#strats',STR,selS);pills('#acts',ACT,selA);
 $('#saveRefl').onclick=()=>{const o={ican:icanVal,s:[...selS],a:[...selA]};['r1','r2','r3','r4','r5','actOwn'].forEach(k=>o[k]=document.getElementById(k).value);
  store.set('refl',o);$('#rfFb').textContent='💾 저장했어요! 이 기기에서 다시 열면 그대로 남아 있어요. ⏳ 타임 코인 '+coin+'개를 모았어요.';$('#rfFb').className='feedback center ok'};
 </script>
+<script src="../stats.js"></script>
 </body>
 </html>
